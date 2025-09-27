@@ -1,9 +1,9 @@
 import {
-  Entity,
   Column,
-  UpdateDateColumn,
   CreateDateColumn,
+  Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('users')
@@ -20,8 +20,11 @@ export class User {
   @Column({ type: 'varchar', length: 255, name: 'phone', nullable: true })
   phone: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'email', nullable: true })
+  @Column({ type: 'varchar', length: 255, name: 'email', nullable: false, unique: true })
   email: string;
+
+  @Column({ type: 'varchar', length: 255, name: 'password', nullable: false })
+  password: string;
 
   @Column({ type: 'date', name: 'dob', nullable: true })
   dob: Date;

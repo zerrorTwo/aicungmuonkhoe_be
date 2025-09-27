@@ -1,5 +1,6 @@
+import { AuthController } from './auth.controller';
 import { UserController } from './user.controller';
 
-const Controllers = [UserController];
+const Controllers = [UserController, AuthController];
 
 export default Controllers;
