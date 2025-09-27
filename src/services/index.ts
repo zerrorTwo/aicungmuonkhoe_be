@@ -1,5 +1,6 @@
+import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 
-const Services = [UserService];
+const Services = [UserService, AuthService];
 
 export default Services;
