@@ -22,17 +22,14 @@ export class HealthDocument {
         nullable: true,
         onDelete: 'CASCADE', // Khi xóa user sẽ xóa luôn health document này
     })
-    @JoinColumn({ name: 'USER_ID_MNMN' })
+    @JoinColumn({ name: 'USER_ID' })
     USER: User;
 
     @Column({ name: 'NAME', type: 'varchar', length: 255, nullable: true })
     NAME: string;
 
-    @Column({ type: 'varchar', length: 255, name: 'FIRST_NAME' })
-    FIRST_NAME: string;
-
-    @Column({ type: 'varchar', length: 255, name: 'LAST_NAME', nullable: true })
-    LAST_NAME: string;
+    @Column({ type: 'varchar', length: 255, name: 'FULL_NAME' })
+    FULL_NAME: string;
 
     @Column({ name: 'DOB', type: 'varchar', length: 255, nullable: true })
     DOB: string;

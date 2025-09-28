@@ -25,17 +25,16 @@ export class AuthService {
 
   constructor(
     private readonly _userRepository: UserRepository,
-    private readonly _healthDocumentRepository: HealthDocumentRepository,
   ) { }
 
   async login(authLogin: AuthLoginDto, res: Response) {
-    const user = await this._userRepository.findByEmail(authLogin.email);
+    const user = await this._userRepository.findByEmail(authLogin.EMAIL);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const isValid = await checkPassword(authLogin.password, user.PASSWORD);
+    const isValid = await checkPassword(authLogin.PASSWORD, user.PASSWORD);
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid password');
@@ -63,17 +62,17 @@ export class AuthService {
     authSignup: AuthSignupDto,
     res: Response,
   ): Promise<{ user: User; access_token: string }> {
-    const user = await this._userRepository.findByEmail(authSignup.email);
+    const user = await this._userRepository.findByEmail(authSignup.EMAIL);
 
     if (user) {
       throw new ConflictException('User already exists');
     }
 
-    const hashedPassword = await HashPassword(authSignup.password);
+    const hashedPassword = await HashPassword(authSignup.PASSWORD);
 
     const newUser: CreateNewUserDto = {
-      email: authSignup.email,
-      password: hashedPassword,
+      EMAIL: authSignup.EMAIL,
+      PASSWORD: hashedPassword,
     };
 
     const createdUser = await this._userRepository.create(newUser);
