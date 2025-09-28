@@ -14,7 +14,7 @@ export class CreateNewUserDto {
   })
   @IsNotEmpty()
   @IsEmail()
-  email: string;
+  EMAIL: string;
 
   @ApiProperty({
     description: 'Password of the user',
@@ -24,17 +24,17 @@ export class CreateNewUserDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
-  password: string;
+  PASSWORD: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  first_name?: string;
+  FIRST_NAME?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @IsOptional()
-  last_name?: string;
+  LAST_NAME?: string;
 }

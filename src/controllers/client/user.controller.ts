@@ -26,7 +26,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Successfully created user' })
   @ApiResponse({
     status: 401,
-    description: 'Employee not found or unauthorized',
+    description: 'User not found or unauthorized',
   })
   async createNew(@Body() createDto: CreateNewUserDto) {
     const result = await this.userService.createEmployee(createDto);
@@ -39,17 +39,17 @@ export class UserController {
   }
 
   @Get('/:id')
-  @ApiOperation({ summary: 'Get employee information by ID' })
+  @ApiOperation({ summary: 'Get user information by ID' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully retrieved employee information',
+    description: 'Successfully retrieved user information',
   })
-  @ApiResponse({ status: 404, description: 'Employee not found' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async getUserById(@Param('id') id: number) {
     const result = await this.userService.findUserByID(id);
 
     if (!result) {
-      throw new HttpException('Employee not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     return Builder<SuccessResponse<User>>()

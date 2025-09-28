@@ -13,7 +13,7 @@ export class AuthLoginDto {
     })
     @IsNotEmpty()
     @IsEmail()
-    email: string;
+    EMAIL: string;
 
     @ApiProperty({
         description: 'Password of the user',
@@ -23,7 +23,7 @@ export class AuthLoginDto {
     @IsNotEmpty()
     @IsString()
     @MinLength(6)
-    password: string;
+    PASSWORD: string;
 
 }
 
@@ -34,7 +34,7 @@ export class AuthSignupDto {
     })
     @IsNotEmpty()
     @IsEmail()
-    email: string;
+    EMAIL: string;
 
     @ApiProperty({
         description: 'Password of the user',
@@ -44,7 +44,7 @@ export class AuthSignupDto {
     @IsNotEmpty()
     @IsString()
     @MinLength(6)
-    password: string;
+    PASSWORD: string;
 
     @ApiProperty({
         description: 'First name of the user',
@@ -52,7 +52,7 @@ export class AuthSignupDto {
     })
     @IsNotEmpty()
     @IsString()
-    first_name: string;
+    FIRST_NAME: string;
 
     @ApiProperty({
         description: 'Last name of the user',
@@ -60,6 +60,6 @@ export class AuthSignupDto {
     })
     @IsNotEmpty()
     @IsString()
-    last_name: string;
+    LAST_NAME: string;
 
 }

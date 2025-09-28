@@ -15,120 +15,120 @@ export class CreateHealthDocumentDto {
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    userId?: number;
+    USER_ID?: number;
 
     @ApiPropertyOptional({ description: 'Tên hiển thị' })
     @IsOptional()
     @IsString()
-    name?: string;
+    NAME?: string;
 
     @ApiPropertyOptional({ description: 'Họ tên đầy đủ' })
     @IsOptional()
     @IsString()
-    fullName?: string;
+    FULL_NAME?: string;
 
     @ApiPropertyOptional({ description: 'Ngày sinh' })
     @IsOptional()
     @IsString()
-    dob?: string;
+    DOB?: string;
 
     @ApiPropertyOptional({ description: 'Số điện thoại' })
     @IsOptional()
     @IsString()
-    phone?: string;
+    PHONE?: string;
 
     @ApiPropertyOptional({ description: 'Đã liên kết tài khoản', default: false })
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => Boolean(value))
-    isLink?: boolean;
+    IS_LINK?: boolean;
 
     @ApiPropertyOptional({ description: 'Đã đồng bộ', default: false })
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => Boolean(value))
-    isSync?: boolean;
+    IS_SYNC?: boolean;
 
     @ApiPropertyOptional({ description: 'Loại hồ sơ' })
     @IsOptional()
     @IsString()
-    type?: string;
+    TYPE?: string;
 
     @ApiPropertyOptional({ description: 'Chiều cao (cm)' })
     @IsOptional()
     @IsString()
-    height?: string;
+    HEIGHT?: string;
 
     @ApiPropertyOptional({ description: 'Cân nặng (kg)' })
     @IsOptional()
     @IsString()
-    weight?: string;
+    WEIGHT?: string;
 
     @ApiPropertyOptional({ description: 'Tình trạng sức khỏe' })
     @IsOptional()
     @IsString()
-    healthStatus?: string;
+    HEALTH_STATUS?: string;
 
     @ApiPropertyOptional({ description: 'Nghề nghiệp' })
     @IsOptional()
     @IsString()
-    job?: string;
+    JOB?: string;
 
     @ApiPropertyOptional({ description: 'Loại hoạt động' })
     @IsOptional()
     @IsString()
-    typeAction?: string;
+    TYPE_ACTION?: string;
 
     @ApiPropertyOptional({ description: 'Ngày làm việc' })
     @IsOptional()
     @IsString()
-    dateWorkday?: string;
+    DATE_WORKDAY?: string;
 
     @ApiPropertyOptional({ description: 'Ngày nghỉ' })
     @IsOptional()
     @IsString()
-    dateOff?: string;
+    DATE_OFF?: string;
 
     @ApiPropertyOptional({ description: 'Là bản thân', default: false })
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => Boolean(value))
-    isMyself?: boolean;
+    IS_MYSELF?: boolean;
 
     @ApiPropertyOptional({ description: 'Đã cập nhật', default: false })
     @IsOptional()
     @IsBoolean()
     @Transform(({ value }) => Boolean(value))
-    isUpdate?: boolean;
+    IS_UPDATE?: boolean;
 
     @ApiPropertyOptional({ description: 'Ảnh đại diện URL' })
     @IsOptional()
     @IsString()
-    avatar?: string;
+    AVATAR?: string;
 
     @ApiPropertyOptional({ description: 'Tần suất tập thể dục' })
     @IsOptional()
     @IsString()
-    exerciseFrequency?: string;
+    EXERCISE_FREQUENCY?: string;
 
     @ApiPropertyOptional({ description: 'Tỉnh/Thành phố' })
     @IsOptional()
     @IsString()
-    province?: string;
+    PROVINCE?: string;
 
     @ApiPropertyOptional({ description: 'ID giới tính' })
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
     @Min(1)
-    genderId?: number;
+    GENDER_ID?: number;
 
     @ApiPropertyOptional({ description: 'ID mức độ tập luyện' })
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
     @Min(1)
-    exerciseIntensityId?: number;
+    EXERCISE_INTENSITY_ID?: number;
 }
 
 export class UpdateHealthDocumentDto extends PartialType(CreateHealthDocumentDto) {
@@ -142,74 +142,74 @@ export class UpdateHealthDocumentDto extends PartialType(CreateHealthDocumentDto
 
 export class HealthDocumentResponseDto {
     @ApiProperty()
-    id: number;
+    ID: number;
 
     @ApiProperty()
-    name?: string;
+    NAME?: string;
 
     @ApiProperty()
-    fullName?: string;
+    FULL_NAME?: string;
 
     @ApiProperty()
-    dob?: string;
+    DOB?: string;
 
     @ApiProperty()
-    phone?: string;
+    PHONE?: string;
 
     @ApiProperty()
-    isLink: boolean;
+    IS_LINK: boolean;
 
     @ApiProperty()
-    isSync: boolean;
+    IS_SYNC: boolean;
 
     @ApiProperty()
-    type?: string;
+    TYPE?: string;
 
     @ApiProperty()
-    height?: string;
+    HEIGHT?: string;
 
     @ApiProperty()
-    weight?: string;
+    WEIGHT?: string;
 
     @ApiProperty()
-    healthStatus?: string;
+    HEALTH_STATUS?: string;
 
     @ApiProperty()
-    job?: string;
+    JOB?: string;
 
     @ApiProperty()
-    typeAction?: string;
+    TYPE_ACTION?: string;
 
     @ApiProperty()
-    dateWorkday?: string;
+    DATE_WORKDAY?: string;
 
     @ApiProperty()
-    dateOff?: string;
+    DATE_OFF?: string;
 
     @ApiProperty()
-    isMyself: boolean;
+    IS_MYSELF: boolean;
 
     @ApiProperty()
-    isUpdate: boolean;
+    IS_UPDATE: boolean;
 
     @ApiProperty()
-    avatar?: string;
+    AVATAR?: string;
 
     @ApiProperty()
-    exerciseFrequency?: string;
+    EXERCISE_FREQUENCY?: string;
 
     @ApiProperty()
-    province?: string;
+    PROVINCE?: string;
 
     @ApiProperty({ type: () => Object, description: 'Thông tin user' })
-    user?: {
+    USER?: {
         user_id: number;
         email: string;
         phone?: string;
     };
 
     @ApiProperty({ type: () => Object, description: 'Thông tin giới tính' })
-    gender?: {
+    GENDER?: {
         id: number;
         name: string;
         cd?: string;
@@ -217,7 +217,7 @@ export class HealthDocumentResponseDto {
     };
 
     @ApiProperty({ type: () => Object, description: 'Thông tin mức độ tập luyện' })
-    exerciseIntensity?: {
+    EXERCISE_INTENSITY?: {
         id: number;
         code: string;
         displayName: string;
@@ -230,7 +230,7 @@ export class GetHealthDocumentByUserDto {
     @IsNumber()
     @Type(() => Number)
     @Min(1)
-    userId: number;
+    USER_ID: number;
 }
 
 export class GetHealthDocumentByIdDto {
@@ -239,5 +239,5 @@ export class GetHealthDocumentByIdDto {
     @IsNumber()
     @Type(() => Number)
     @Min(1)
-    id: number;
+    ID: number;
 }

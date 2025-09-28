@@ -13,20 +13,16 @@ export class HealthDocumentRepository {
     this.repo = repo;
   }
 
-  async create(healthDocument: CreateHealthDocumentDto): Promise<HealthDocument> {
-    // Transform DTO to entity
-    const healthDocumentEntity = plainToInstance(HealthDocument, healthDocument);
-    healthDocumentEntity.IS_MYSELF = true;
-    healthDocumentEntity.IS_DELETED = false;
+  async create(HealthDocument: HealthDocument): Promise<HealthDocument> {
 
     // Save the entity
-    const result = await this.repo.save(healthDocumentEntity);
+    const result = await this.repo.save(HealthDocument);
     return result;
   }
 
-  async update(healthDocument: UpdateHealthDocumentDto): Promise<HealthDocument> {
+  async update(id: number, healthDocument: UpdateHealthDocumentDto): Promise<HealthDocument> {
     // Transform DTO to entity
-    const healthDocumentEntity = plainToInstance(HealthDocument, healthDocument);
+    const healthDocumentEntity = plainToInstance(HealthDocument, { ...healthDocument, id });
     const result = await this.repo.save(healthDocumentEntity);
     return result;
   }
