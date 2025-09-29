@@ -51,4 +51,12 @@ export class HealthDocumentService {
     }
     return healthDocument;
   }
+
+  async findHealthDocumentMySelfByUserID(user_id: number): Promise<HealthDocument> {
+    const healthDocument = await this._healthDocumentRepository.findMySelfByUserId(user_id);
+    if (!healthDocument) {
+      throw new Error(`Health document for user with id ${user_id} not found`);
+    }
+    return healthDocument;
+  }
 }
