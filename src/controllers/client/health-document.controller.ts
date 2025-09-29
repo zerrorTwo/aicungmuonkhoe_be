@@ -81,4 +81,26 @@ export class HealthDocumentController {
       .status(StatusCodes.OK)
       .build();
   }
+
+  @Get('/myself')
+  @ApiOperation({ summary: 'Get health document information for the authenticated user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved health document information',
+  })
+  @ApiResponse({ status: 404, description: 'Health document not found' })
+  async getHealthDocumentMySelf(@Req() req) {
+    const user_id = req.user.user_id;
+    const result = await this.healthDocumentService.findHealthDocumentMySelfByUserID(user_id);
+
+    if (!result) {
+      throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+    }
+
+    return Builder<SuccessResponse<HealthDocument>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
+  }
 }
