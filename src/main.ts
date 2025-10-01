@@ -11,6 +11,7 @@ import initSwagger from './utils/configs/innit-swagger';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './services/logger.service';
+import { getDynamicCorsConfig } from './utils/configs/cors.config';
 
 async function bootstrap() {
   const env = loadEnv();
@@ -28,7 +29,10 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule, appOptions);
-  app.enableCors();
+
+  // Configure CORS using external config
+  app.enableCors(getDynamicCorsConfig());
+
   app.use(compression());
   app.use(cookieParser());
 

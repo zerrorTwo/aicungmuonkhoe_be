@@ -25,16 +25,4 @@ export class CreateNewUserDto {
   @IsString()
   @MinLength(6)
   PASSWORD: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  @IsOptional()
-  FIRST_NAME?: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  @IsOptional()
-  LAST_NAME?: string;
 }
