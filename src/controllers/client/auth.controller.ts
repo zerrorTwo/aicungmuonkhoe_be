@@ -1,7 +1,9 @@
 import {
     Body,
     Controller,
+    Get,
     Post,
+    Req,
     Res,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -52,4 +54,35 @@ export class AuthController {
             .status(StatusCodes.OK)
             .build();
     }
+
+    @Get('/refresh-token')
+    @ApiOperation({ summary: 'Refresh access token' })
+    @ApiResponse({ status: 200, description: 'Successfully refreshed access token' })
+    async refreshToken(@Req() req, @Res({ passthrough: true }) res: Response) {
+        const result = await this.authService.refreshToken(req, res);
+
+        return Builder<SuccessResponse<{ user: User, access_token: string }>>()
+            .data(result)
+            .message(SuccessMessages.ACCESS_TOKEN_SUCCESSFULLY)
+            .status(StatusCodes.OK)
+            .build();
+    }
+
+    @Post('/logout')
+    @ApiOperation({ summary: 'Logout user' })
+    @ApiResponse({ status: 200, description: 'Successfully logged out' })
+    async logout(@Res({ passthrough: true }) res: Response) {
+        // Clear the refresh token cookie
+        res.clearCookie('refresh_token', {
+            httpOnly: true,
+            path: '/',
+        });
+
+        return Builder<SuccessResponse<null>>()
+            .data(null)
+            .message(SuccessMessages.LOGGED)
+            .status(StatusCodes.OK)
+            .build();
+    }
+
 }

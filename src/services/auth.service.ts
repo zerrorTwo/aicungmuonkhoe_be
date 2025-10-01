@@ -18,7 +18,7 @@ import {
   generateRefreshToken,
   HashPassword,
 } from 'src/utils/auth/common';
-
+import Jwt from 'jsonwebtoken';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -53,7 +53,11 @@ export class AuthService {
       httpOnly: true,
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
     });
+
+    this.logger.log(`User logged in: ${user.EMAIL}`);
 
     return { user, access_token };
   }
@@ -94,8 +98,66 @@ export class AuthService {
       httpOnly: true,
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
     });
+
+    this.logger.log(`User signed up: ${createdUser.EMAIL}`);
 
     return { user: createdUser, access_token };
   }
+
+  async refreshToken(req: any, res: Response): Promise<{ user: User; access_token: string }> {
+    const refresh_token = req.cookies.refresh_token;
+    if (!refresh_token) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    let payload: any;
+    try {
+      payload = Jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
+    } catch (error) {
+      // Clear invalid refresh token cookie
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        path: '/',
+      });
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const user = await this._userRepository.findById(payload.user_id);
+    if (!user) {
+      // Clear refresh token cookie if user not found
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        path: '/',
+      });
+      throw new NotFoundException('User not found');
+    }
+
+    // Generate new tokens
+    const access_token = generateAccessToken({
+      user_id: user.USER_ID,
+      email: user.EMAIL,
+    });
+
+    const new_refresh_token = generateRefreshToken({
+      user_id: user.USER_ID,
+      email: user.EMAIL,
+    });
+
+    // Set new refresh token cookie
+    res.cookie('refresh_token', new_refresh_token, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: process.env.NODE_ENV === 'production', // Only use secure in production
+      sameSite: 'lax', // CSRF protection
+    });
+
+    this.logger.log(`Token refreshed for user: ${user.EMAIL}`);
+
+    return { user, access_token };
+  }
+
 }

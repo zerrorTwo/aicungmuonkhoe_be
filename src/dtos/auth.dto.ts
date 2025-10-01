@@ -46,20 +46,4 @@ export class AuthSignupDto {
     @MinLength(6)
     PASSWORD: string;
 
-    @ApiProperty({
-        description: 'First name of the user',
-        example: 'John',
-    })
-    @IsNotEmpty()
-    @IsString()
-    FIRST_NAME: string;
-
-    @ApiProperty({
-        description: 'Last name of the user',
-        example: 'Doe',
-    })
-    @IsNotEmpty()
-    @IsString()
-    LAST_NAME: string;
-
 }
