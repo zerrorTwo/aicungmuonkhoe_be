@@ -67,7 +67,7 @@ export class UpdateUserProfileDto {
   address?: string;
 
   @ApiProperty({
-    description: 'Avatar URL of the user',
+    description: 'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
     example: 'https://cloudinary.com/avatar.jpg',
     required: false,
   })

@@ -71,7 +71,6 @@ export class HealthDocumentController {
       }
       
       const result = await this.healthDocumentService.findHealthDocumentMySelfByUserID(user_id);
-      console.log('Service result:', result);
 
       if (!result) {
         console.log('No health document found for user:', user_id);
