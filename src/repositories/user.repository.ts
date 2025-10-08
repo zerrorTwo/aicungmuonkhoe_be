@@ -33,4 +33,17 @@ export class UserRepository {
     });
     return result;
   }
+
+  async findUserWithHealthDocuments(userId: number): Promise<User | null> {
+    const result = await this.repo.findOne({
+      where: { USER_ID: userId, IS_DELETED: 0 },
+      relations: {
+        HEALTH_DOCUMENTS: {
+          GENDER: true,
+          EXERCISE_INTENSITY: true
+        }
+      }
+    });
+    return result;
+  }
 }

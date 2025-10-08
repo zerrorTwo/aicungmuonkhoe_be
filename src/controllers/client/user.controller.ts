@@ -6,12 +6,15 @@ import {
   HttpStatus,
   Post,
   Param,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
 import { CreateNewUserDto } from 'src/dtos/user.dto';
 import { UserService } from 'src/services/user.service';
+import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
 import { SuccessResponse } from 'src/utils/format';
 import { User } from '../../entities/user.entity';
@@ -57,5 +60,45 @@ export class UserController {
       .message(SuccessMessages.GET_SUCCESSFULLY)
       .status(StatusCodes.OK)
       .build();
+  }
+
+  @Get('/profile/me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get current user profile with health document info' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved user profile',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getCurrentUserProfile(@Req() req) {
+    console.log('=== GET CURRENT USER PROFILE ===');
+    
+    try {
+      const userId = req.user.user_id;
+      console.log('Authenticated user ID:', userId);
+
+      if (!userId) {
+        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
+      }
+
+      const profile = await this.userService.getUserProfile(userId);
+      console.log('Profile result:', profile);
+
+      return Builder<SuccessResponse<any>>()
+        .data(profile)
+        .message(SuccessMessages.GET_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+        
+    } catch (error) {
+      console.error('Get profile error:', error);
+      
+      if (error.message.includes('not found')) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
