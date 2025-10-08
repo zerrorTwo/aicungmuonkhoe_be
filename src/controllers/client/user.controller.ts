@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Put,
   Param,
   UseGuards,
   Req,
@@ -12,7 +13,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
-import { CreateNewUserDto } from 'src/dtos/user.dto';
+import { CreateNewUserDto, UpdateUserProfileDto } from 'src/dtos/user.dto';
 import { UserService } from 'src/services/user.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
@@ -72,18 +73,16 @@ export class UserController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getCurrentUserProfile(@Req() req) {
-    console.log('=== GET CURRENT USER PROFILE ===');
-    
     try {
       const userId = req.user.user_id;
-      console.log('Authenticated user ID:', userId);
+
 
       if (!userId) {
         throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
       }
 
       const profile = await this.userService.getUserProfile(userId);
-      console.log('Profile result:', profile);
+
 
       return Builder<SuccessResponse<any>>()
         .data(profile)
@@ -92,10 +91,52 @@ export class UserController {
         .build();
         
     } catch (error) {
-      console.error('Get profile error:', error);
+     
       
       if (error.message.includes('not found')) {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Put('/profile/me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update current user profile information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated user profile',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid data' })
+  async updateCurrentUserProfile(@Req() req, @Body() updateData: UpdateUserProfileDto) {
+    
+    
+    try {
+      const userId = req.user.user_id;
+
+      if (!userId) {
+        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
+      }
+
+      const updatedProfile = await this.userService.updateUserProfile(userId, updateData);
+
+      return Builder<SuccessResponse<any>>()
+        .data(updatedProfile)
+        .message('Profile updated successfully')
+        .status(StatusCodes.OK)
+        .build();
+        
+    } catch (error) {
+      
+      if (error.message.includes('not found')) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      
+      if (error.message.includes('validation')) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
       
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
