@@ -33,4 +33,31 @@ export class UserRepository {
     });
     return result;
   }
+
+  async findUserWithHealthDocuments(userId: number): Promise<User | null> {
+    const result = await this.repo.findOne({
+      where: { USER_ID: userId, IS_DELETED: 0 },
+      relations: {
+        HEALTH_DOCUMENTS: {
+          GENDER: true,
+          EXERCISE_INTENSITY: true
+        }
+      }
+    });
+    return result;
+  }
+
+  async updateFaceImage(userId: number, faceImageUrl: string): Promise<User> {
+    await this.repo.update(
+      { USER_ID: userId },
+      { FACE_IMAGE: faceImageUrl }
+    );
+    
+    const updatedUser = await this.findById(userId);
+    if (!updatedUser) {
+      throw new Error(`User with id ${userId} not found after update`);
+    }
+    
+    return updatedUser;
+  }
 }

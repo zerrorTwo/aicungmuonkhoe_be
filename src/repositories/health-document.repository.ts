@@ -14,16 +14,27 @@ export class HealthDocumentRepository {
   }
 
   async create(HealthDocument: HealthDocument): Promise<HealthDocument> {
-
-    // Save the entity
     const result = await this.repo.save(HealthDocument);
     return result;
   }
 
-  async update(id: number, healthDocument: UpdateHealthDocumentDto): Promise<HealthDocument> {
-    // Transform DTO to entity
-    const healthDocumentEntity = plainToInstance(HealthDocument, { ...healthDocument, id });
-    const result = await this.repo.save(healthDocumentEntity);
+  async update(id: number, updateData: any): Promise<HealthDocument> {
+    const existingEntity = await this.repo.findOne({
+      where: { ID: id },
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY']
+    });
+
+    if (!existingEntity) {
+      throw new Error(`HealthDocument with id ${id} not found`);
+    }
+
+    const updatedEntity = {
+      ...existingEntity,
+      ...updateData,
+      ID: id,
+    };
+
+    const result = await this.repo.save(updatedEntity);
     return result;
   }
 

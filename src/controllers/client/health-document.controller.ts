@@ -35,13 +35,58 @@ export class HealthDocumentController {
   })
   async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
     const user_id = req.user.user_id;
-    const result = await this.healthDocumentService.createHealthDocument(user_id, createDto);
+    console.log('=== CREATE HEALTH DOCUMENT ===');
+    console.log('user_id:', user_id);
+    console.log('createDto:', createDto);
+    
+    try {
+      const result = await this.healthDocumentService.createHealthDocument(user_id, createDto);
+      console.log('Create result:', result);
+      
+      return Builder<SuccessResponse<HealthDocument>>()
+        .data(result)
+        .message(SuccessMessages.CREATE_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+    } catch (error) {
+      console.error('Create error:', error);
+      throw error;
+    }
+  }
 
-    return Builder<SuccessResponse<HealthDocument>>()
-      .data(result)
-      .message(SuccessMessages.CREATE_SUCCESSFULLY)
-      .status(StatusCodes.OK)
-      .build();
+  // ĐẶT /myself TRƯỚC /:id để tránh conflict
+  @Get('/myself')
+  @ApiOperation({ summary: 'Get health document information for the authenticated user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved health document information',
+  })
+  @ApiResponse({ status: 404, description: 'Health document not found' })
+  async getHealthDocumentMySelf(@Req() req) {
+    try {
+      const user_id = req.user.user_id;
+      
+      if (!user_id) {
+        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
+      }
+      
+      const result = await this.healthDocumentService.findHealthDocumentMySelfByUserID(user_id);
+
+      if (!result) {
+        console.log('No health document found for user:', user_id);
+        throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+      }
+
+      return Builder<SuccessResponse<HealthDocument>>()
+        .data(result)
+        .message(SuccessMessages.GET_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+        
+    } catch (error) {
+      console.error('Get myself error:', error);
+      throw error;
+    }
   }
 
   @Put('/:id')
@@ -69,38 +114,25 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentById(@Param('id') id: number) {
-    const result = await this.healthDocumentService.findHealthDocumentByID(id);
+    console.log('=== GET BY ID ENDPOINT CALLED ===');
+    console.log('id:', id);
+    
+    try {
+      const result = await this.healthDocumentService.findHealthDocumentByID(id);
+      console.log('Get by ID result:', result);
 
-    if (!result) {
-      throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+      if (!result) {
+        throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+      }
+
+      return Builder<SuccessResponse<HealthDocument>>()
+        .data(result)
+        .message(SuccessMessages.GET_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+    } catch (error) {
+      console.error('Get by ID error:', error);
+      throw error;
     }
-
-    return Builder<SuccessResponse<HealthDocument>>()
-      .data(result)
-      .message(SuccessMessages.GET_SUCCESSFULLY)
-      .status(StatusCodes.OK)
-      .build();
-  }
-
-  @Get('/myself')
-  @ApiOperation({ summary: 'Get health document information for the authenticated user' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved health document information',
-  })
-  @ApiResponse({ status: 404, description: 'Health document not found' })
-  async getHealthDocumentMySelf(@Req() req) {
-    const user_id = req.user.user_id;
-    const result = await this.healthDocumentService.findHealthDocumentMySelfByUserID(user_id);
-
-    if (!result) {
-      throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
-    }
-
-    return Builder<SuccessResponse<HealthDocument>>()
-      .data(result)
-      .message(SuccessMessages.GET_SUCCESSFULLY)
-      .status(StatusCodes.OK)
-      .build();
   }
 }
