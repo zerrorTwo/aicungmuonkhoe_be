@@ -100,6 +100,7 @@ export class UpdateSecuritySetting {
     example: 'StrongPassword123!',
     minLength: 6,
   })
+  @IsOptional()
   @IsString()
   @MinLength(6)
   NEW_PASSWORD: string;
@@ -109,6 +110,7 @@ export class UpdateSecuritySetting {
     example: 'StrongPassword123!',
     minLength: 6,
   })
+  @IsOptional()
   @IsString()
   @MinLength(6)
   CURRENT_PASSWORD: string;
@@ -129,4 +131,12 @@ export class UpdateSecuritySetting {
   @IsOptional()
   @IsEmail()
   EMAIL?: string;
+
+  @ApiProperty({
+    description: 'OTP code sent to the new email for verification',
+    example: '123456',
+  })
+  @IsOptional()
+  @IsString()
+  OTP_CODE?: string; 
 }

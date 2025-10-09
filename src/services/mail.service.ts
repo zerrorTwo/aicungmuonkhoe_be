@@ -35,132 +35,121 @@ export class MailService {
   /**
    * Send verification email with OTP
    */
-  async sendVerificationEmail(email: string): Promise<void> {
-    try {   
-          const user = await this.userRepository.findByEmail(email);
-          console.log(user);
-          if (!user) {
-            throw new NotFoundException('User not found');
-          } 
-      
-          // Generate new OTP
-          const otpCode = generateOtpCode();
-          const expiryTime = generateOtpExpiry(5); // 5 minutes
-          
-          // Save OTP to database
-          await this.otpRepository.create({
-            USER_ID_MNMN: user.USER_ID,
-            PHONE_NUMBER: user.PHONE || '', // Store user's current phone for reference
-            OTP_CODE: otpCode,
-            EXPIRES_AT: expiryTime,
-            STATUS: OtpStatus.PENDING,
-            TYPE: OtpType.UPDATE_EMAIL,
-            SENT_COUNT: 1
-          });
-          const mailOptions = {
-            from: this.config.GMAIL_USER,
-            to: email,
-            subject: 'Xác nhận địa chỉ email',
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #2c5aa0;">Xác nhận địa chỉ email</h2>
-                <p>Xin chào,</p>
-                <p>Bạn đã yêu cầu xác nhận địa chỉ email này. Vui lòng sử dụng mã OTP bên dưới:</p>
-                <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
-                  <h1 style="color: #2c5aa0; font-size: 32px; margin: 0; letter-spacing: 5px;">${otpCode}</h1>
-                </div>
-                <p><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong <strong>5 phút</strong>.</p>
-                <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                <p style="color: #6c757d; font-size: 12px;">
-                  Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
-                </p>
-              </div>
-        `
-       };
-      await this.transporter.sendMail(mailOptions);
-    } catch (error) {
-      this.logger.error(`Failed to send verification email to ${email}:`, error);
-      throw new Error('Failed to send verification email');
-    }
+  async sendVerificationEmail(userId: string): Promise<void> {
+    const idNumber = parseInt(userId, 10);
+    const user = await this.userRepository.findById(idNumber);
+    console.log(user);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    } 
+
+    // Generate new OTP
+    const otpCode = generateOtpCode();
+    const expiryTime = generateOtpExpiry(5); // 5 minutes
+    
+    // Save OTP to database
+    await this.otpRepository.create({
+      USER_ID_MNMN: user.USER_ID,
+      PHONE_NUMBER: user.PHONE || '', // Store user's current phone for reference
+      OTP_CODE: otpCode,
+      EXPIRES_AT: expiryTime,
+      STATUS: OtpStatus.PENDING,
+      TYPE: OtpType.UPDATE_EMAIL,
+      SENT_COUNT: 1
+    });
+    const mailOptions = {
+      from: this.config.GMAIL_USER,
+      to: user.EMAIL,
+      subject: 'Xác nhận địa chỉ email',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2c5aa0;">Xác nhận địa chỉ email</h2>
+          <p>Xin chào,</p>
+          <p>Bạn đã yêu cầu xác nhận địa chỉ email này. Vui lòng sử dụng mã OTP bên dưới:</p>
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #2c5aa0; font-size: 32px; margin: 0; letter-spacing: 5px;">${otpCode}</h1>
+          </div>
+          <p><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong <strong>5 phút</strong>.</p>
+          <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+          <p style="color: #6c757d; font-size: 12px;">
+            Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
+          </p>
+        </div>
+  `
+  };
+  await this.transporter.sendMail(mailOptions);
   }
 
   /**
    * Send phone verification SMS (placeholder - would integrate with SMS service)
    */
-  async sendVerificationPhone(phoneNumber: string): Promise<void> {
-    try {
-          const user = await this.userRepository.findByPhone(phoneNumber);
-          if (!user) {
-            throw new NotFoundException('User not found');
-          } 
-      
-          // Generate new OTP
-          const otpCode = generateOtpCode();
-          const expiryTime = generateOtpExpiry(5); // 5 minutes
-      
-          // Save OTP to database
-          await this.otpRepository.create({
-            USER_ID_MNMN: user.USER_ID,
-            PHONE_NUMBER: user.PHONE || '', // Store user's current phone for reference
-            OTP_CODE: otpCode,
-            EXPIRES_AT: expiryTime,
-            STATUS: OtpStatus.PENDING,
-            TYPE: OtpType.UPDATE_PHONE,
-            SENT_COUNT: 1
-          });
+  async sendVerificationPhone(userId: string): Promise<void> {
+    const idNumber = parseInt(userId, 10);
+    const user = await this.userRepository.findById(idNumber);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    } 
 
-          const mailOptions = {
-            from: this.config.GMAIL_USER,
-            to: user.EMAIL || '',
-            subject: 'Xác nhận số điện thoại',
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #2c5aa0;">Xác nhận số điện thoại</h2>
-                <p>Xin chào,</p>
-                <p>Bạn đã yêu cầu xác nhận OTP để thay đổi số điện thoại. Vui lòng sử dụng mã OTP bên dưới:</p>
-                <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
-                  <h1 style="color: #2c5aa0; font-size: 32px; margin: 0; letter-spacing: 5px;">${otpCode}</h1>
-                </div>
-                <p><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong <strong>5 phút</strong>.</p>
-                <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                <p style="color: #6c757d; font-size: 12px;">
-                  Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
-                </p>
-              </div>
-        `
-       };
+    // Generate new OTP
+    const otpCode = generateOtpCode();
+    const expiryTime = generateOtpExpiry(5); // 5 minutes
 
-      await this.transporter.sendMail(mailOptions);
-    } catch (error) {
-      throw new Error('Failed to send verification SMS');
-    }
-  }
+    // Save OTP to database
+    await this.otpRepository.create({
+      USER_ID_MNMN: user.USER_ID,
+      PHONE_NUMBER: user.PHONE || '', // Store user's current phone for reference
+      OTP_CODE: otpCode,
+      EXPIRES_AT: expiryTime,
+      STATUS: OtpStatus.PENDING,
+      TYPE: OtpType.UPDATE_PHONE,
+      SENT_COUNT: 1
+    });
+
+    const mailOptions = {
+      from: this.config.GMAIL_USER,
+      to: user.EMAIL || '',
+      subject: 'Xác nhận số điện thoại',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2c5aa0;">Xác nhận số điện thoại</h2>
+          <p>Xin chào,</p>
+          <p>Bạn đã yêu cầu xác nhận OTP để thay đổi số điện thoại. Vui lòng sử dụng mã OTP bên dưới:</p>
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #2c5aa0; font-size: 32px; margin: 0; letter-spacing: 5px;">${otpCode}</h1>
+          </div>
+          <p><strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong <strong>5 phút</strong>.</p>
+          <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+          <p style="color: #6c757d; font-size: 12px;">
+            Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
+          </p>
+        </div>
+  `
+  };
+
+  await this.transporter.sendMail(mailOptions);
+}
 
    /**
    * Send phone verification SMS (placeholder - would integrate with SMS service)
    */
-  async sendVerification(data: SendVerificationDto): Promise<string> {
-    try {
-      const { phone, email } = data;
-      if (!phone && !email) {
-        throw new Error('Either phone or email must be provided');
-      }
-      if (phone && email) {
-        throw new Error('Please provide either phone or email, not both');
-      }
-
-      if (phone) {
-        await this.sendVerificationPhone(phone);
-      } else if (email) {
-        await this.sendVerificationEmail(email);
-      }
-
-      return 'Send code successfully!!'
-    } catch (error) {
-      throw new Error('Failed to send verification code');
+  async sendVerification(data: SendVerificationDto, userId: string): Promise<string> {
+    const { phone, email } = data;
+    if (!phone && !email) {
+      throw new Error('Either phone or email must be provided');
     }
+    if (phone && email) {
+      throw new Error('Please provide either phone or email, not both');
+    }
+
+    if (phone) {
+      await this.sendVerificationPhone(userId);
+    } else if (email) {
+      await this.sendVerificationEmail(userId);
+    }
+
+    return 'Send code successfully!!'
   }
 
   /**

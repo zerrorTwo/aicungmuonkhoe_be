@@ -80,7 +80,6 @@ export class UserController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getCurrentUserProfile(@Req() req) {
-    try {
       const userId = req.user.user_id;
 
 
@@ -97,15 +96,6 @@ export class UserController {
         .status(StatusCodes.OK)
         .build();
         
-    } catch (error) {
-     
-      
-      if (error.message.includes('not found')) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
-      
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
   }
 
   @Put('/profile/me')
@@ -123,7 +113,6 @@ export class UserController {
     @Req() req, 
     @Body() updateData: UpdateUserProfileDto
   ) {
-    try {
       const userId = req.user.user_id;
 
       if (!userId) {
@@ -138,19 +127,6 @@ export class UserController {
         .message('Profile updated successfully')
         .status(StatusCodes.OK)
         .build();
-        
-    } catch (error) {
-      
-      if (error.message.includes('not found')) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
-      
-      if (error.message.includes('validation')) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      }
-      
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
   }
 
   @Put('/profile/me/avatar')
@@ -168,7 +144,6 @@ export class UserController {
     @Req() req,
     @UploadedFile() avatarFile: Express.Multer.File
   ) {
-    try {
       const userId = req.user.user_id;
 
       if (!userId) {
@@ -187,47 +162,31 @@ export class UserController {
         .message('Avatar updated successfully')
         .status(StatusCodes.OK)
         .build();
-        
-    } catch (error) {
-      console.error('Update avatar error:', error);
-      
-      if (error.message.includes('not found')) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
-      
-      if (error.message.includes('Invalid file') || error.message.includes('File size')) {
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      }
-      
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
   }
+
   @Put('/security/me')
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Update current user security settings (JSON only)' })
   @ApiConsumes('application/json')
   @ApiResponse({ status: 200, description: 'Security settings updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 400, description: 'Bad request - Invalid data' })
-  async securitySetting(@Req() req : any, @Body() data: UpdateSecuritySetting) {
-    try {
-      const userId = req.user.user_id;
-      console.log("userId: ", userId);
-      if (!userId) {
-        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
-      }
-      
-
-      // Delegate to service
-      const updatedSecuritySettings = await this.userService.updateUserSecuritySettings(userId, data);
-
-      return Builder<SuccessResponse<any>>()
-        .data(updatedSecuritySettings)
-        .message('Security settings updated successfully')
-        .status(StatusCodes.OK)
-        .build();
-
-    } catch (error) {
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  @ApiResponse({ status: 401, description: 'Current password is incorrect' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid OTP or validation error' })
+  async securitySetting(@Req() req : any, @Body() data: UpdateSecuritySetting) 
+  {
+    const userId = req.user.user_id;
+    console.log("userId: ", userId);
+    if (!userId) {
+      throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
     }
-  }}
+    
+    // Delegate to service
+    const updatedSecuritySettings = await this.userService.updateUserSecuritySettings(userId, data);
+
+    return Builder<SuccessResponse<any>>()
+      .data(updatedSecuritySettings)
+      .message('Security settings updated successfully')
+      .status(StatusCodes.OK)
+      .build();
+  }
+}

@@ -1,10 +1,11 @@
-import { Body, Controller, Post, HttpException, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatusCodes } from 'http-status-codes';
 import { Builder } from 'builder-pattern';
 import { SendVerificationDto, VerifyEmailDto } from '../../dtos/mail.dto';
 import { SuccessResponse } from 'src/utils/format';
 import { MailService } from 'src/services/mail.service';
+import { AuthGuard } from 'src/utils/auth/auth.guard';
 
 @ApiTags('Mail')
 @Controller('mail')
@@ -12,6 +13,7 @@ export class MailController {
   constructor(private readonly mailService: MailService) {}
 
   @Post('/send-verification')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Send verification code to email or phone' })
   @ApiResponse({
     status: 200,
@@ -19,25 +21,15 @@ export class MailController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async sendVerification(@Body() sendVerificationDto: SendVerificationDto) {
-    try {
-      const responseMessage = await this.mailService.sendVerification(sendVerificationDto)
+  async sendVerification(@Req() req, @Body() sendVerificationDto: SendVerificationDto) { 
+    const userId = req.user.user_id;
+    const responseMessage = await this.mailService.sendVerification(sendVerificationDto, userId);
 
-      return Builder<SuccessResponse>()
-        .data(null)
-        .message(responseMessage)
-        .status(StatusCodes.OK)
-        .build();
-
-    } catch (error) {
-      console.error('Send verification error:', error);
-
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return Builder<SuccessResponse>()
+      .data(null)
+      .message(responseMessage)
+      .status(StatusCodes.OK)
+      .build();
   }
 
   @Post('/verify-email')
@@ -48,23 +40,12 @@ export class MailController {
   })
   @ApiResponse({ status: 400, description: 'Invalid verification code' })
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    try {
-      const result = await this.mailService.verifyEmail(verifyEmailDto.email, verifyEmailDto.code);
+    const result = await this.mailService.verifyEmail(verifyEmailDto.email, verifyEmailDto.code);
 
-      return Builder<SuccessResponse>()
-        .data(result)
-        .message('Email verified successfully')
-        .status(StatusCodes.OK)
-        .build();
-
-    } catch (error) {
-      console.error('Verify email error:', error);
-
-      if (error instanceof HttpException) {
-        throw error;
-      }
-
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return Builder<SuccessResponse>()
+      .data(result)
+      .message('Email verified successfully')
+      .status(StatusCodes.OK)
+      .build();
   }
 }
