@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { HealthDocument } from './health-document.entity';
+import { OtpRecord } from './otp-record.entity';
 
 @Entity('users')
 export class User {
@@ -43,10 +44,17 @@ export class User {
   @UpdateDateColumn({ name: 'UPDATED_AT', nullable: true })
   UPDATED_AT?: Date;
 
-  // Quan hệ 1-nhiều: 1 user có nhiều health documents
-  @OneToMany(() => HealthDocument, (healthDocument: HealthDocument) => healthDocument.USER, {
-    cascade: true, // Khi save/update user sẽ cascade sang healthDocuments
-    onDelete: 'CASCADE' // Khi xóa user sẽ xóa luôn các healthDocuments
+  // 1 user có nhiều health documents
+  @OneToMany(() => HealthDocument, (healthDocument) => healthDocument.USER, {
+    cascade: true,
+    onDelete: 'CASCADE',
   })
   HEALTH_DOCUMENTS: HealthDocument[];
+
+  // 1 user có nhiều OTP records
+  @OneToMany(() => OtpRecord, (otpRecord) => otpRecord.USER_ID_MNMN, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  OTP_RECORDS: OtpRecord[];
 }

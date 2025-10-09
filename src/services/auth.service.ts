@@ -17,6 +17,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
   HashPassword,
+  pickUser,
 } from 'src/utils/auth/common';
 import Jwt from 'jsonwebtoken';
 @Injectable()
@@ -37,7 +38,7 @@ export class AuthService {
     const isValid = await checkPassword(authLogin.PASSWORD, user.PASSWORD);
 
     if (!isValid) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const access_token = generateAccessToken({
@@ -59,7 +60,7 @@ export class AuthService {
 
     this.logger.log(`User logged in: ${user.EMAIL}`);
 
-    return { user, access_token };
+    return { user: pickUser(user), access_token };
   }
 
   async signup(
@@ -76,6 +77,7 @@ export class AuthService {
 
     const newUser: CreateNewUserDto = {
       EMAIL: authSignup.EMAIL,
+      PHONE: authSignup.PHONE,
       PASSWORD: hashedPassword,
     };
 
@@ -104,7 +106,7 @@ export class AuthService {
 
     this.logger.log(`User signed up: ${createdUser.EMAIL}`);
 
-    return { user: createdUser, access_token };
+    return { user: pickUser(createdUser), access_token };
   }
 
   async refreshToken(req: any, res: Response): Promise<{ user: User; access_token: string }> {

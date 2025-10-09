@@ -9,10 +9,11 @@ import { HealthDocument } from '../../entities/health-document.entity';
 import { Gender } from '../../entities/gender.entity';
 import { ExerciseIntensity } from '../../entities/exercise-intensity.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
+import { OtpRecord } from 'src/entities/otp-record.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, HealthDocument, Gender, ExerciseIntensity]),
+    TypeOrmModule.forFeature([User, HealthDocument, Gender, ExerciseIntensity, OtpRecord]),
     ConfigModule,
   ],
   controllers: [...Controllers],

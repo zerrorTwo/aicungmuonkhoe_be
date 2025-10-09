@@ -19,6 +19,14 @@ export class CreateNewUserDto {
   EMAIL: string;
 
   @ApiProperty({
+    description: 'Phone number of the user',
+    example: '0123456789',
+  })
+  @IsNotEmpty()
+  @IsString()
+  PHONE: string;
+
+  @ApiProperty({
     description: 'Password of the user',
     example: 'StrongPassword123!',
     minLength: 6,
@@ -84,4 +92,51 @@ export class UpdateUserProfileDto {
   @IsInt()
   @Min(1)
   genderId?: number;
+}
+
+export class UpdateSecuritySetting {
+   @ApiProperty({
+    description: 'New Password of the user',
+    example: 'StrongPassword123!',
+    minLength: 6,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  NEW_PASSWORD: string;
+
+  @ApiProperty({
+    description: 'Current Password of the user',
+    example: 'StrongPassword123!',
+    minLength: 6,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  CURRENT_PASSWORD: string;
+
+  @ApiProperty({
+  description: 'Phone number of the user',
+  example: '0123456789',
+  required: false,
+  })
+  @IsOptional()
+  @IsString()
+  PHONE?: string;
+
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+  })
+  @IsOptional()
+  @IsEmail()
+  EMAIL?: string;
+
+  @ApiProperty({
+    description: 'OTP code sent to the new email for verification',
+    example: '123456',
+  })
+  @IsOptional()
+  @IsString()
+  OTP_CODE?: string; 
 }

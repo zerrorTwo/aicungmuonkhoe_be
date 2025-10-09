@@ -20,6 +20,11 @@ export class UserRepository {
     return result;
   }
 
+  async update(id: number, data: Partial<User>): Promise<User | null> {
+    await this.repo.update({ USER_ID: id }, data);
+    return this.findById(id);
+  }
+
   async findById(id: number): Promise<User | null> {
     const result = await this.repo.findOne({
       where: { USER_ID: id },
@@ -30,6 +35,13 @@ export class UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const result = await this.repo.findOne({
       where: { EMAIL: email },
+    });
+    return result;
+  }
+
+  async findByPhone(phone: string): Promise<User | null> {
+    const result = await this.repo.findOne({
+      where: { PHONE: phone },
     });
     return result;
   }
