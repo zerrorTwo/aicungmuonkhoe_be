@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
-import { CreateNewUserDto, UpdateUserProfileDto } from 'src/dtos/user.dto';
+import { CreateNewUserDto, UpdateSecuritySetting, UpdateUserProfileDto } from 'src/dtos/user.dto';
 import { UserService } from 'src/services/user.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
@@ -202,4 +202,32 @@ export class UserController {
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-}
+  @Put('/security/me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update current user security settings (JSON only)' })
+  @ApiConsumes('application/json')
+  @ApiResponse({ status: 200, description: 'Security settings updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid data' })
+  async securitySetting(@Req() req : any, @Body() data: UpdateSecuritySetting) {
+    try {
+      const userId = req.user.user_id;
+      console.log("userId: ", userId);
+      if (!userId) {
+        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
+      }
+      
+
+      // Delegate to service
+      const updatedSecuritySettings = await this.userService.updateUserSecuritySettings(userId, data);
+
+      return Builder<SuccessResponse<any>>()
+        .data(updatedSecuritySettings)
+        .message('Security settings updated successfully')
+        .status(StatusCodes.OK)
+        .build();
+
+    } catch (error) {
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }}

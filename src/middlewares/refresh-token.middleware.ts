@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { GoneException, Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import Jwt from 'jsonwebtoken';
 
@@ -8,7 +8,7 @@ export class RefreshTokenMiddleware implements NestMiddleware {
         const refreshToken = req.cookies?.refresh_token;
 
         if (!refreshToken) {
-            throw new UnauthorizedException('No refresh token provided');
+            throw new GoneException('No refresh token provided');
         }
 
         try {
@@ -16,7 +16,7 @@ export class RefreshTokenMiddleware implements NestMiddleware {
             req['refreshTokenPayload'] = payload;
             next();
         } catch (error) {
-            throw new UnauthorizedException('Invalid refresh token');
+            throw new GoneException('Invalid refresh token');
         }
     }
 }

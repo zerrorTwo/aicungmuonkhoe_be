@@ -37,6 +37,14 @@ export class AuthSignupDto {
     EMAIL: string;
 
     @ApiProperty({
+        description: 'Phone number of the user',
+        example: '0123456789',
+    })
+    @IsNotEmpty()
+    @IsString()
+    PHONE: string;
+
+    @ApiProperty({
         description: 'Password of the user',
         example: 'StrongPassword123!',
         minLength: 6,

@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
-import { CreateNewUserDto, UpdateUserProfileDto } from 'src/dtos/user.dto';
+import { CreateNewUserDto, UpdateSecuritySetting, UpdateUserProfileDto } from 'src/dtos/user.dto';
 import { UserRepository } from 'src/repositories/user.repository';
 import { HealthDocumentRepository } from 'src/repositories/health-document.repository';
 import { CloudinaryProvider } from '../providers/cloudinary.provider';
+import { checkPassword, HashPassword, pickUser } from 'src/utils/auth/common';
 
 @Injectable()
 export class UserService {
@@ -297,6 +298,45 @@ export class UserService {
     } catch (error) {
       this.logger.error('Error updating profile:', error);
       throw new Error(`Không thể cập nhật profile: ${error.message}`);
+    }
+  }
+
+  async updateUserSecuritySettings(userId: number, data: UpdateSecuritySetting) {
+    try {
+      const user = await this._userRepository.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      if (user.IS_DELETED) {
+        throw new Error('User account is deleted');
+      }
+
+      let updatedUser : any;
+      // kiểm tra các trường, nếu có trường nào thì cập nhật trường đó
+      if (data.PHONE) {
+        updatedUser = await this._userRepository.update(userId, {
+          ...user,
+          PHONE: data.PHONE,
+          UPDATED_AT: new Date()
+        });
+      } else if (data.NEW_PASSWORD && data.CURRENT_PASSWORD) {
+        const isValid = await checkPassword(data.CURRENT_PASSWORD, user.PASSWORD);
+        console.log("object: ", isValid);
+        if (!isValid) {
+          throw new UnauthorizedException('Current password is incorrect');
+        }
+
+        const hashedPassword = await HashPassword(data.NEW_PASSWORD);
+        
+        updatedUser = await this._userRepository.update(userId, { ...user, PASSWORD: hashedPassword, UPDATED_AT: new Date() });
+      } else {
+        updatedUser = await this._userRepository.update(userId, { ...user, EMAIL: data.EMAIL, UPDATED_AT: new Date() });
+      }
+      console.log("updatedUser: ", updatedUser);
+      return pickUser(updatedUser);
+    } catch (error) {
+      this.logger.error('Error updating user security settings:', error);
+      throw new Error(`Không thể cập nhật cài đặt bảo mật: ${error.message}`);
     }
   }
 }
