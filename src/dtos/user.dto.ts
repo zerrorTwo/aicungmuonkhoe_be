@@ -140,3 +140,41 @@ export class UpdateSecuritySetting {
   @IsString()
   OTP_CODE?: string; 
 }
+
+export class forgotPasswordDto {
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  EMAIL: string;
+
+}
+
+export class resetPasswordDto {
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  EMAIL: string;
+
+  @ApiProperty({
+    description: 'OTP code sent to the email for verification',
+    example: '123456',
+  })
+  @IsNotEmpty()
+  @IsString()
+  OTP_CODE: string;
+
+  @ApiProperty({
+    description: 'New password for the user',
+    example: 'NewStrongPassword123!',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(6)
+  NEW_PASSWORD: string;
+}

@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags, ApiConsumes } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
-import { CreateNewUserDto, UpdateSecuritySetting, UpdateUserProfileDto } from 'src/dtos/user.dto';
+import { CreateNewUserDto, forgotPasswordDto, resetPasswordDto, UpdateSecuritySetting, UpdateUserProfileDto } from 'src/dtos/user.dto';
 import { UserService } from 'src/services/user.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
@@ -186,6 +186,35 @@ export class UserController {
     return Builder<SuccessResponse<any>>()
       .data(updatedSecuritySettings)
       .message('Security settings updated successfully')
+      .status(StatusCodes.OK)
+      .build();
+  }
+
+  @Post('/forgot-password')
+  @ApiOperation({ summary: 'Send forgot password email' })
+  @ApiResponse({ status: 200, description: 'Password reset email sent successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid email' })
+  async forgotPassword(@Body() forgotPasswordDto: forgotPasswordDto) {
+    // Call service to handle forgot password
+    await this.userService.forgotPassword(forgotPasswordDto.EMAIL);
+    return Builder<SuccessResponse<any>>()
+      .message('Password reset email sent successfully')
+      .status(StatusCodes.OK)
+      .build();
+  }
+
+  @Post('/reset-password')
+  @ApiOperation({ summary: 'Reset user password using OTP' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid OTP or validation error' })
+  async resetPassword(@Body() resetPassword: resetPasswordDto) {
+    const { EMAIL, OTP_CODE, NEW_PASSWORD } = resetPassword;
+    // Call service to handle password reset
+    await this.userService.resetPassword(EMAIL, OTP_CODE, NEW_PASSWORD);
+    return Builder<SuccessResponse<any>>()
+      .message('Password reset successfully')
       .status(StatusCodes.OK)
       .build();
   }
