@@ -13,7 +13,7 @@ import loadEnv from './utils/configs/configuration';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [loadEnv]
+      load: [loadEnv],
     }),
     TypeOrmModule.forRoot(dbConfig()),
     AdminModule,

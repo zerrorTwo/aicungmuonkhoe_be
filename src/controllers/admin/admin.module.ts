@@ -1,22 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import Controllers from '.';
-import Services from 'src/services';
-import Repositories from 'src/repositories';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../../entities/user.entity';
-import { HealthDocument } from '../../entities/health-document.entity';
-import { Gender } from '../../entities/gender.entity';
-import { ExerciseIntensity } from '../../entities/exercise-intensity.entity';
-import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { OtpRecord } from 'src/entities/otp-record.entity';
+import Repositories from 'src/repositories';
+import Services from 'src/services';
+import Controllers from '.';
+import { ExerciseIntensity } from '../../entities/exercise-intensity.entity';
+import { Gender } from '../../entities/gender.entity';
+import { HealthDocument } from '../../entities/health-document.entity';
+import { User } from '../../entities/user.entity';
+import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, HealthDocument, Gender, ExerciseIntensity, OtpRecord]),
-    ConfigModule,
+    TypeOrmModule.forFeature([
+      User,
+      HealthDocument,
+      Gender,
+      ExerciseIntensity,
+      OtpRecord,
+    ]),
   ],
   controllers: [...Controllers],
   providers: [...Services, ...Repositories, CloudinaryProvider],
 })
-export class AdminModule { }
+export class AdminModule {}

@@ -52,24 +52,21 @@ export class UserRepository {
       relations: {
         HEALTH_DOCUMENTS: {
           GENDER: true,
-          EXERCISE_INTENSITY: true
-        }
-      }
+          EXERCISE_INTENSITY: true,
+        },
+      },
     });
     return result;
   }
 
   async updateFaceImage(userId: number, faceImageUrl: string): Promise<User> {
-    await this.repo.update(
-      { USER_ID: userId },
-      { FACE_IMAGE: faceImageUrl }
-    );
-    
+    await this.repo.update({ USER_ID: userId }, { FACE_IMAGE: faceImageUrl });
+
     const updatedUser = await this.findById(userId);
     if (!updatedUser) {
       throw new Error(`User with id ${userId} not found after update`);
     }
-    
+
     return updatedUser;
   }
 }

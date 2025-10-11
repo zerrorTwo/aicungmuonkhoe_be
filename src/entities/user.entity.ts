@@ -17,7 +17,13 @@ export class User {
   @Column({ type: 'varchar', length: 255, name: 'PHONE', nullable: true })
   PHONE: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'EMAIL', nullable: false, unique: true })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    name: 'EMAIL',
+    nullable: false,
+    unique: true,
+  })
   EMAIL: string;
 
   @Column({ type: 'varchar', length: 255, name: 'PASSWORD', nullable: false })
