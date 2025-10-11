@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 import { BadRequestException } from '@nestjs/common';
 import loadEnv from '../configs/configuration';
 import { ErrorMessages } from '../constants/message.constants';
-import { pick } from 'lodash'
+import { pick } from 'lodash';
 
 const env = loadEnv();
 
@@ -55,6 +55,15 @@ export const parseJwt = (token) => {
 };
 
 export const pickUser = (user) => {
-  if (!user) return {}
-  return pick(user, ['USER_ID', 'EMAIL', 'START_TOUR', 'STATUS_ACTIVE', 'FACE_IMAGE', 'CREATED_AT', 'UPDATED_AT', 'PHONE']);
-}
+  if (!user) return {};
+  return pick(user, [
+    'USER_ID',
+    'EMAIL',
+    'START_TOUR',
+    'STATUS_ACTIVE',
+    'FACE_IMAGE',
+    'CREATED_AT',
+    'UPDATED_AT',
+    'PHONE',
+  ]);
+};

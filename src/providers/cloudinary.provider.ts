@@ -13,7 +13,10 @@ export class CloudinaryProvider {
     });
   }
 
-  async uploadStream(file: Express.Multer.File, folderName: string = 'avatarHealth'): Promise<any> {
+  async uploadStream(
+    file: Express.Multer.File,
+    folderName: string = 'avatarHealth',
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: folderName },
@@ -23,7 +26,7 @@ export class CloudinaryProvider {
           } else {
             reject(error);
           }
-        }
+        },
       );
 
       streamifier.createReadStream(file.buffer).pipe(uploadStream);

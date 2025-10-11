@@ -21,21 +21,27 @@ export class OtpRepository {
   /**
    * Find OTP by phone number and code
    */
-  async findByPhoneAndCode(phoneNumber: string, otpCode: string): Promise<OtpRecord | null> {
+  async findByPhoneAndCode(
+    phoneNumber: string,
+    otpCode: string,
+  ): Promise<OtpRecord | null> {
     return await this.otpRepository.findOne({
       where: {
         PHONE_NUMBER: phoneNumber,
         OTP_CODE: otpCode,
-        STATUS: OtpStatus.PENDING
+        STATUS: OtpStatus.PENDING,
       },
-      relations: ['USER']
+      relations: ['USER'],
     });
   }
 
   /**
    * Find OTP by email (through user relation) and code
    */
-  async findByEmailAndCode(email: string, otpCode: string): Promise<OtpRecord | null> {
+  async findByEmailAndCode(
+    email: string,
+    otpCode: string,
+  ): Promise<OtpRecord | null> {
     return await this.otpRepository
       .createQueryBuilder('otp')
       .leftJoinAndSelect('otp.USER_ID_MNMN', 'user')
@@ -48,12 +54,15 @@ export class OtpRepository {
   /**
    * Count verification attempts for phone number
    */
-  async countVerificationAttempts(phoneNumber: string, otpCode: string): Promise<number> {
+  async countVerificationAttempts(
+    phoneNumber: string,
+    otpCode: string,
+  ): Promise<number> {
     return await this.otpRepository.count({
       where: {
         PHONE_NUMBER: phoneNumber,
-        OTP_CODE: otpCode
-      }
+        OTP_CODE: otpCode,
+      },
     });
   }
 
@@ -74,17 +83,18 @@ export class OtpRepository {
   /**
    * Find active OTP by user ID and type
    */
-  async findActiveOtpByUser(userId: number, type: OtpType): Promise<OtpRecord | null> {
+  async findActiveOtpByUser(
+    userId: number,
+    type: OtpType,
+  ): Promise<OtpRecord | null> {
     return await this.otpRepository.findOne({
       where: {
         USER_ID_MNMN: userId,
         TYPE: type,
-        STATUS: OtpStatus.PENDING
-      }
+        STATUS: OtpStatus.PENDING,
+      },
     });
   }
-
- 
 
   /**
    * Delete expired OTPs (cleanup)

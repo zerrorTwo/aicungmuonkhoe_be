@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MulterOptionsFactory, MulterModuleOptions } from '@nestjs/platform-express';
+import {
+  MulterOptionsFactory,
+  MulterModuleOptions,
+} from '@nestjs/platform-express';
 import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
@@ -14,15 +17,17 @@ export class MulterConfigService implements MulterOptionsFactory {
         // Chỉ accept image files
         const allowedMimeTypes = [
           'image/jpeg',
-          'image/jpg', 
+          'image/jpg',
           'image/png',
-          'image/webp'
+          'image/webp',
         ];
 
         if (!allowedMimeTypes.includes(file.mimetype)) {
           return callback(
-            new BadRequestException('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG, WEBP'),
-            false
+            new BadRequestException(
+              'Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG, WEBP',
+            ),
+            false,
           );
         }
 
@@ -30,7 +35,7 @@ export class MulterConfigService implements MulterOptionsFactory {
         if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/i)) {
           return callback(
             new BadRequestException('Định dạng file không hợp lệ'),
-            false
+            false,
           );
         }
 

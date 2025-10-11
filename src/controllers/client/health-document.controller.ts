@@ -13,7 +13,10 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
-import { CreateHealthDocumentDto, UpdateHealthDocumentDto } from 'src/dtos/health-document.dto';
+import {
+  CreateHealthDocumentDto,
+  UpdateHealthDocumentDto,
+} from 'src/dtos/health-document.dto';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import { HealthDocumentService } from 'src/services/health-document.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
@@ -24,11 +27,14 @@ import { SuccessResponse } from 'src/utils/format';
 @Controller('health-document')
 @UseGuards(AuthGuard)
 export class HealthDocumentController {
-  constructor(private readonly healthDocumentService: HealthDocumentService) { }
+  constructor(private readonly healthDocumentService: HealthDocumentService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new health document' })
-  @ApiResponse({ status: 200, description: 'Successfully created health document' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully created health document',
+  })
   @ApiResponse({
     status: 401,
     description: 'Health document not found or unauthorized',
@@ -38,11 +44,14 @@ export class HealthDocumentController {
     console.log('=== CREATE HEALTH DOCUMENT ===');
     console.log('user_id:', user_id);
     console.log('createDto:', createDto);
-    
+
     try {
-      const result = await this.healthDocumentService.createHealthDocument(user_id, createDto);
+      const result = await this.healthDocumentService.createHealthDocument(
+        user_id,
+        createDto,
+      );
       console.log('Create result:', result);
-      
+
       return Builder<SuccessResponse<HealthDocument>>()
         .data(result)
         .message(SuccessMessages.CREATE_SUCCESSFULLY)
@@ -56,7 +65,9 @@ export class HealthDocumentController {
 
   // ĐẶT /myself TRƯỚC /:id để tránh conflict
   @Get('/myself')
-  @ApiOperation({ summary: 'Get health document information for the authenticated user' })
+  @ApiOperation({
+    summary: 'Get health document information for the authenticated user',
+  })
   @ApiResponse({
     status: 200,
     description: 'Successfully retrieved health document information',
@@ -65,16 +76,25 @@ export class HealthDocumentController {
   async getHealthDocumentMySelf(@Req() req) {
     try {
       const user_id = req.user.user_id;
-      
+
       if (!user_id) {
-        throw new HttpException('User not authenticated', HttpStatus.UNAUTHORIZED);
+        throw new HttpException(
+          'User not authenticated',
+          HttpStatus.UNAUTHORIZED,
+        );
       }
-      
-      const result = await this.healthDocumentService.findHealthDocumentMySelfByUserID(user_id);
+
+      const result =
+        await this.healthDocumentService.findHealthDocumentMySelfByUserID(
+          user_id,
+        );
 
       if (!result) {
         console.log('No health document found for user:', user_id);
-        throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Health document not found',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       return Builder<SuccessResponse<HealthDocument>>()
@@ -82,7 +102,6 @@ export class HealthDocumentController {
         .message(SuccessMessages.GET_SUCCESSFULLY)
         .status(StatusCodes.OK)
         .build();
-        
     } catch (error) {
       console.error('Get myself error:', error);
       throw error;
@@ -91,13 +110,22 @@ export class HealthDocumentController {
 
   @Put('/:id')
   @ApiOperation({ summary: 'Update a health document by ID' })
-  @ApiResponse({ status: 200, description: 'Successfully updated health document' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated health document',
+  })
   @ApiResponse({
     status: 401,
     description: 'Health document not found or unauthorized',
   })
-  async update(@Param('id') id: number, @Body() updateDto: UpdateHealthDocumentDto) {
-    const result = await this.healthDocumentService.updateHealthDocument(id, updateDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateDto: UpdateHealthDocumentDto,
+  ) {
+    const result = await this.healthDocumentService.updateHealthDocument(
+      id,
+      updateDto,
+    );
 
     return Builder<SuccessResponse<HealthDocument>>()
       .data(result)
@@ -116,13 +144,17 @@ export class HealthDocumentController {
   async getHealthDocumentById(@Param('id') id: number) {
     console.log('=== GET BY ID ENDPOINT CALLED ===');
     console.log('id:', id);
-    
+
     try {
-      const result = await this.healthDocumentService.findHealthDocumentByID(id);
+      const result =
+        await this.healthDocumentService.findHealthDocumentByID(id);
       console.log('Get by ID result:', result);
 
       if (!result) {
-        throw new HttpException('Health document not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Health document not found',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       return Builder<SuccessResponse<HealthDocument>>()

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateHealthDocumentDto, UpdateHealthDocumentDto } from 'src/dtos/health-document.dto';
+import {
+  CreateHealthDocumentDto,
+  UpdateHealthDocumentDto,
+} from 'src/dtos/health-document.dto';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -9,7 +12,9 @@ import { plainToInstance } from 'class-transformer';
 export class HealthDocumentRepository {
   private repo: Repository<HealthDocument>;
 
-  constructor(@InjectRepository(HealthDocument) repo: Repository<HealthDocument>) {
+  constructor(
+    @InjectRepository(HealthDocument) repo: Repository<HealthDocument>,
+  ) {
     this.repo = repo;
   }
 
@@ -21,7 +26,7 @@ export class HealthDocumentRepository {
   async update(id: number, updateData: any): Promise<HealthDocument> {
     const existingEntity = await this.repo.findOne({
       where: { ID: id },
-      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY']
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
 
     if (!existingEntity) {
@@ -49,7 +54,7 @@ export class HealthDocumentRepository {
   async findByUserId(userId: number): Promise<HealthDocument | null> {
     const result = await this.repo.findOne({
       where: { USER: { USER_ID: userId, IS_DELETED: 0 } },
-      relations: ['USER']
+      relations: ['USER'],
     });
     return result;
   }
@@ -59,9 +64,9 @@ export class HealthDocumentRepository {
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 },
         IS_MYSELF: true,
-        IS_DELETED: false
+        IS_DELETED: false,
       },
-      relations: ['USER']
+      relations: ['USER'],
     });
     return result;
   }
@@ -69,9 +74,8 @@ export class HealthDocumentRepository {
   async findMySelfById(id: number) {
     const result = await this.repo.findOne({
       where: { ID: id, IS_MYSELF: true, IS_DELETED: false },
-      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY']
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
     return result;
   }
-
 }

@@ -24,9 +24,7 @@ import Jwt from 'jsonwebtoken';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(
-    private readonly _userRepository: UserRepository,
-  ) { }
+  constructor(private readonly _userRepository: UserRepository) {}
 
   async login(authLogin: AuthLoginDto, res: Response) {
     const user = await this._userRepository.findByEmail(authLogin.EMAIL);
@@ -109,7 +107,10 @@ export class AuthService {
     return { user: pickUser(createdUser), access_token };
   }
 
-  async refreshToken(req: any, res: Response): Promise<{ user: User; access_token: string }> {
+  async refreshToken(
+    req: any,
+    res: Response,
+  ): Promise<{ user: User; access_token: string }> {
     const refresh_token = req.cookies.refresh_token;
     if (!refresh_token) {
       throw new UnauthorizedException('No refresh token provided');
@@ -161,5 +162,4 @@ export class AuthService {
 
     return { user, access_token };
   }
-
 }
