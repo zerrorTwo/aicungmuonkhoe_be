@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { ConfigModule } from '@nestjs/config';
 import Controllers from '.';
 import Services from 'src/services';
 import Repositories from 'src/repositories';
@@ -15,13 +14,18 @@ import { MulterConfigService } from '../../config/multer.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, HealthDocument, Gender, ExerciseIntensity, OtpRecord]),
+    TypeOrmModule.forFeature([
+      User,
+      HealthDocument,
+      Gender,
+      ExerciseIntensity,
+      OtpRecord,
+    ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,
     }),
-    ConfigModule,
   ],
   controllers: [...Controllers],
   providers: [...Services, ...Repositories, CloudinaryProvider],
 })
-export class ClientModule { }
+export class ClientModule {}

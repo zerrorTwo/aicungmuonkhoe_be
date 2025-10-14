@@ -1,11 +1,20 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import loadEnv from '../utils/configs/configuration';
 import { SendVerificationDto } from 'src/dtos/mail.dto';
 import { UserRepository } from 'src/repositories/user.repository';
 import { OtpRepository } from 'src/repositories/otp.repository';
 import { OtpStatus, OtpType } from 'src/entities/otp-record.entity';
-import { generateOtpCode, generateOtpExpiry, isOtpExpired } from 'src/utils/otp';
+import {
+  generateOtpCode,
+  generateOtpExpiry,
+  isOtpExpired,
+} from 'src/utils/otp';
 
 @Injectable()
 export class MailService {
@@ -13,7 +22,7 @@ export class MailService {
   private transporter: nodemailer.Transporter;
   private config: any;
   private readonly MAX_VERIFY_ATTEMPTS = 4;
-  
+
   constructor(
     private readonly otpRepository: OtpRepository,
     private readonly userRepository: UserRepository,
@@ -27,8 +36,8 @@ export class MailService {
       service: 'gmail',
       auth: {
         user: this.config.GMAIL_USER,
-        pass: this.config.GMAIL_PASSWORD
-      }
+        pass: this.config.GMAIL_PASSWORD,
+      },
     });
   }
 
@@ -41,12 +50,12 @@ export class MailService {
     console.log(user);
     if (!user) {
       throw new NotFoundException('User not found');
-    } 
+    }
 
     // Generate new OTP
     const otpCode = generateOtpCode();
     const expiryTime = generateOtpExpiry(5); // 5 minutes
-    
+
     // Save OTP to database
     await this.otpRepository.create({
       USER_ID_MNMN: user.USER_ID,
@@ -54,8 +63,8 @@ export class MailService {
       OTP_CODE: otpCode,
       EXPIRES_AT: expiryTime,
       STATUS: OtpStatus.PENDING,
-      TYPE: type,
-      SENT_COUNT: 1
+      TYPE: OtpType.UPDATE_EMAIL,
+      SENT_COUNT: 1,
     });
     const mailOptions = {
       from: this.config.GMAIL_USER,
@@ -76,9 +85,9 @@ export class MailService {
             Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
           </p>
         </div>
-  `
-  };
-  await this.transporter.sendMail(mailOptions);
+  `,
+    };
+    await this.transporter.sendMail(mailOptions);
   }
 
   /**
@@ -89,7 +98,7 @@ export class MailService {
     const user = await this.userRepository.findById(idNumber);
     if (!user) {
       throw new NotFoundException('User not found');
-    } 
+    }
 
     // Generate new OTP
     const otpCode = generateOtpCode();
@@ -103,7 +112,7 @@ export class MailService {
       EXPIRES_AT: expiryTime,
       STATUS: OtpStatus.PENDING,
       TYPE: OtpType.UPDATE_PHONE,
-      SENT_COUNT: 1
+      SENT_COUNT: 1,
     });
 
     const mailOptions = {
@@ -125,16 +134,19 @@ export class MailService {
             Email này được gửi tự động từ hệ thống. Vui lòng không trả lời email này.
           </p>
         </div>
-  `
-  };
+  `,
+    };
 
-  await this.transporter.sendMail(mailOptions);
-}
+    await this.transporter.sendMail(mailOptions);
+  }
 
-   /**
+  /**
    * Send phone verification SMS (placeholder - would integrate with SMS service)
    */
-  async sendVerification(data: SendVerificationDto, userId: string): Promise<string> {
+  async sendVerification(
+    data: SendVerificationDto,
+    userId: string,
+  ): Promise<string> {
     const { phone, email } = data;
     if (!phone && !email) {
       throw new Error('Either phone or email must be provided');
@@ -149,7 +161,7 @@ export class MailService {
       await this.sendVerificationEmail(userId, OtpType.UPDATE_EMAIL);
     }
 
-    return 'Send code successfully!!'
+    return 'Send code successfully!!';
   }
 
   /**
@@ -167,51 +179,54 @@ export class MailService {
   }
 
   /**
-     * Verify email OTP
-     */
-    async verifyEmail(email: string, code: string): Promise<{ success: boolean; message: string }> {
-      // Find OTP record
-      const otpRecord = await this.otpRepository.findByEmailAndCode(email, code);
-      if (!otpRecord) {
-        throw new BadRequestException('Invalid verification code');
-      }
-  
-      // Check if OTP is expired
-      if (isOtpExpired(otpRecord.EXPIRES_AT)) {
-        await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.EXPIRED);
-        throw new BadRequestException('Verification code has expired');
-      }
-  
-      // Check verification attempts
-      const attemptCount = await this.otpRepository.countVerificationAttempts(
-        otpRecord.PHONE_NUMBER, 
-        code
-      );
-      
-      if (attemptCount >= this.MAX_VERIFY_ATTEMPTS) {
-        await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.EXPIRED);
-        throw new BadRequestException('Maximum verification attempts exceeded');
-      }
-  
-      // Mark OTP as verified
-      await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.VERIFIED);
-  
-      // Here you can add logic to update user's email if this was for email change
-      // await this.userRepository.updateEmail(otpRecord.USER_ID_MNMN, newEmail);
-  
-      this.logger.log(`Email verification successful for: ${email}`);
-  
-      return {
-        success: true,
-        message: 'Email verified successfully'
-      };
+   * Verify email OTP
+   */
+  async verifyEmail(
+    email: string,
+    code: string,
+  ): Promise<{ success: boolean; message: string }> {
+    // Find OTP record
+    const otpRecord = await this.otpRepository.findByEmailAndCode(email, code);
+    if (!otpRecord) {
+      throw new BadRequestException('Invalid verification code');
     }
-  
-    /**
-     * Cleanup expired OTPs (can be called by cron job)
-     */
-    async cleanupExpiredOtps(): Promise<void> {
-      await this.otpRepository.deleteExpiredOtps();
-      this.logger.log('Expired OTPs cleaned up');
+
+    // Check if OTP is expired
+    if (isOtpExpired(otpRecord.EXPIRES_AT)) {
+      await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.EXPIRED);
+      throw new BadRequestException('Verification code has expired');
     }
+
+    // Check verification attempts
+    const attemptCount = await this.otpRepository.countVerificationAttempts(
+      otpRecord.PHONE_NUMBER,
+      code,
+    );
+
+    if (attemptCount >= this.MAX_VERIFY_ATTEMPTS) {
+      await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.EXPIRED);
+      throw new BadRequestException('Maximum verification attempts exceeded');
+    }
+
+    // Mark OTP as verified
+    await this.otpRepository.updateStatus(otpRecord.ID, OtpStatus.VERIFIED);
+
+    // Here you can add logic to update user's email if this was for email change
+    // await this.userRepository.updateEmail(otpRecord.USER_ID_MNMN, newEmail);
+
+    this.logger.log(`Email verification successful for: ${email}`);
+
+    return {
+      success: true,
+      message: 'Email verified successfully',
+    };
+  }
+
+  /**
+   * Cleanup expired OTPs (can be called by cron job)
+   */
+  async cleanupExpiredOtps(): Promise<void> {
+    await this.otpRepository.deleteExpiredOtps();
+    this.logger.log('Expired OTPs cleaned up');
+  }
 }

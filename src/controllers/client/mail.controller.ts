@@ -1,11 +1,11 @@
-import { Body, Controller, Post, HttpException, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { StatusCodes } from 'http-status-codes';
 import { Builder } from 'builder-pattern';
-import { SendVerificationDto, VerifyEmailDto } from '../../dtos/mail.dto';
-import { SuccessResponse } from 'src/utils/format';
+import { StatusCodes } from 'http-status-codes';
 import { MailService } from 'src/services/mail.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
+import { SuccessResponse } from 'src/utils/format';
+import { SendVerificationDto, VerifyEmailDto } from '../../dtos/mail.dto';
 
 @ApiTags('Mail')
 @Controller('mail')
@@ -21,9 +21,15 @@ export class MailController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async sendVerification(@Req() req, @Body() sendVerificationDto: SendVerificationDto) { 
+  async sendVerification(
+    @Req() req,
+    @Body() sendVerificationDto: SendVerificationDto,
+  ) {
     const userId = req.user.user_id;
-    const responseMessage = await this.mailService.sendVerification(sendVerificationDto, userId);
+    const responseMessage = await this.mailService.sendVerification(
+      sendVerificationDto,
+      userId,
+    );
 
     return Builder<SuccessResponse>()
       .data(null)
@@ -40,7 +46,10 @@ export class MailController {
   })
   @ApiResponse({ status: 400, description: 'Invalid verification code' })
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    const result = await this.mailService.verifyEmail(verifyEmailDto.email, verifyEmailDto.code);
+    const result = await this.mailService.verifyEmail(
+      verifyEmailDto.email,
+      verifyEmailDto.code,
+    );
 
     return Builder<SuccessResponse>()
       .data(result)

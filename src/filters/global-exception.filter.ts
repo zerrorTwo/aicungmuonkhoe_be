@@ -23,13 +23,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const exceptionResponse = exception.getResponse();
 
       // Handle validation errors (BadRequestException with validation details)
-      if (exception instanceof BadRequestException && typeof exceptionResponse === 'object') {
+      if (
+        exception instanceof BadRequestException &&
+        typeof exceptionResponse === 'object'
+      ) {
         const responseObj = exceptionResponse as any;
         // Extract only the message array from validation errors
         message = responseObj.message || exceptionResponse;
       } else if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && 'message' in exceptionResponse) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        'message' in exceptionResponse
+      ) {
         message = (exceptionResponse as any).message;
       } else {
         message = exception.message;

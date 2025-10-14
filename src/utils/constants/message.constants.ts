@@ -22,7 +22,8 @@ export const SuccessMessages = {
   CHANGE_PASSWORD_SUCCESSFULLY: 'Đổi mật khẩu thành công.',
   SUCCESSFULLY: 'Thành công',
   SETTING_SUCCESSFULLY: 'Cài đặt thành công!',
-  ADD_DEPARTMENT_TO_MEALTIME_SUCCESSFULLY: 'Đã thêm phòng ban vào thiết lập giờ ăn',
+  ADD_DEPARTMENT_TO_MEALTIME_SUCCESSFULLY:
+    'Đã thêm phòng ban vào thiết lập giờ ăn',
 };
 
 export const importErrorMessages = {
@@ -31,9 +32,11 @@ export const importErrorMessages = {
   FULL_NAME_INPUT_ERROR: 'Dữ liệu Họ và tên chưa phù hợp',
   MEAL_TYPE_INPUT_ERROR: 'User nhập vào khác các bữa: TRƯA, TỐI, KHUYA',
   SHIFT_INPUT_ERROR: 'User nhập vào khác ca làm việc ca 1, 2, 3, D',
-  TIME_RANGE_INPUT_ERROR: 'User nhập vào khung giờ mà trong CMS chưa thiết lập khung giờ ăn đó',
+  TIME_RANGE_INPUT_ERROR:
+    'User nhập vào khung giờ mà trong CMS chưa thiết lập khung giờ ăn đó',
   MENU_INPUT_ERROR: 'User nhập Thực đơn khác 4 thực đơn hiện tại',
-  INVALID_SHIFT_OR_TIME_FOR_MEAL: 'Ca làm việc và Giờ ăn không hợp lệ cho Bữa ăn {meal}',
+  INVALID_SHIFT_OR_TIME_FOR_MEAL:
+    'Ca làm việc và Giờ ăn không hợp lệ cho Bữa ăn {meal}',
   DATE_MUST_BE_GREATER_THAN_TODAY: 'Dữ liệu ngày phải lớn hơn ngày hôm nay',
   MEAL_TIME_NOT_VALID: 'Dữ liệu Giờ ăn chưa phù hợp',
 };
