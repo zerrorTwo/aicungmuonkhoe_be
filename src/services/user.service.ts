@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import {
   CreateNewUserDto,
@@ -10,6 +10,7 @@ import { HealthDocumentRepository } from 'src/repositories/health-document.repos
 import { CloudinaryProvider } from '../providers/cloudinary.provider';
 import { checkPassword, HashPassword, pickUser } from 'src/utils/auth/common';
 import { MailService } from './mail.service';
+import { OtpType } from 'src/entities/otp-record.entity';
 
 @Injectable()
 export class UserService {
@@ -401,5 +402,56 @@ export class UserService {
     }
 
     return pickUser(updatedUser);
+  }
+
+  async forgotPassword(email: string) {
+    // 1. Tìm user theo email
+    const user = await this._userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    // 2. check mail đã active chưa
+    if (user.STATUS_ACTIVE !== 1) {
+      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+    }
+
+    // 3. Tạo mã OTP, save vào cơ sở dữ liệu và gửi email
+    await this.mailService.sendVerificationEmail(user.USER_ID.toString(), OtpType.FORGOT_PASSWORD);
+
+    return {
+      success: true,
+      message: 'OTP sent to email if it exists in our system'
+    }
+  }
+
+  async resetPassword(email: string, otpCode: string, newPassword: string) {
+    // 1. Tìm user theo email
+    const user = await this._userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    // 2. check mail đã active chưa
+    if (user.STATUS_ACTIVE !== 1) {
+      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+    }
+
+    // 3. Kiểm tra mã OTP
+    const isValidOtp = await this.mailService.verifyEmail(email, otpCode);
+    if (!isValidOtp) {
+      throw new UnauthorizedException('Invalid or expired OTP');
+    }
+
+    // 4. Cập nhật mật khẩu
+    const hashedPassword = await HashPassword(newPassword);
+    await this._userRepository.update(user.USER_ID, { 
+        ...user, 
+        PASSWORD: hashedPassword, 
+        UPDATED_AT: new Date() 
+      });
+
+    return {
+      success: true,
+      message: 'Password reset successfully'
+    };
   }
 }

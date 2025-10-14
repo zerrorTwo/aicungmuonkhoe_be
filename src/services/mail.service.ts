@@ -44,7 +44,7 @@ export class MailService {
   /**
    * Send verification email with OTP
    */
-  async sendVerificationEmail(userId: string): Promise<void> {
+  async sendVerificationEmail(userId: string, type: OtpType): Promise<void> {
     const idNumber = parseInt(userId, 10);
     const user = await this.userRepository.findById(idNumber);
     console.log(user);
@@ -158,7 +158,7 @@ export class MailService {
     if (phone) {
       await this.sendVerificationPhone(userId);
     } else if (email) {
-      await this.sendVerificationEmail(userId);
+      await this.sendVerificationEmail(userId, OtpType.UPDATE_EMAIL);
     }
 
     return 'Send code successfully!!';
