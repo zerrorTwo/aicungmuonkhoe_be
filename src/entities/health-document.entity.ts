@@ -14,9 +14,6 @@ export class HealthDocument {
   @PrimaryGeneratedColumn()
   ID: number;
 
-  @Column({ name: 'IS_DELETED', type: 'tinyint', width: 1, default: 0 })
-  IS_DELETED: boolean;
-
   // Quan hệ với bảng users
   @ManyToOne(() => User, (user) => user.HEALTH_DOCUMENTS, {
     nullable: true,

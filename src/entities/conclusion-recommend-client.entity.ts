@@ -11,7 +11,7 @@ import { HealthDocument } from './health-document.entity';
 @Entity('conclusion_recommend_client')
 export class ConclusionRecommendClient {
   @PrimaryGeneratedColumn()
-  id: number;
+  ID: number;
 
   @Column({ name: 'MODEL', type: 'varchar', length: 255, nullable: true })
   MODEL: string;

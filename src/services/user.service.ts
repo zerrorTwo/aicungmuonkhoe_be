@@ -55,8 +55,7 @@ export class UserService {
     const myHealthDocument = user.HEALTH_DOCUMENTS?.find((hd) => {
       // Sử dụng utility functions để xử lý boolean
       const isMyself = this.isTruthy(hd.IS_MYSELF);
-      const isNotDeleted = this.isFalsy(hd.IS_DELETED);
-      return isMyself && isNotDeleted;
+      return isMyself;
     });
 
     // Tạo response object thuần túy
@@ -130,8 +129,7 @@ export class UserService {
     // 5. Find and update health document
     let myHealthDocument = user.HEALTH_DOCUMENTS?.find((hd) => {
       const isMyself = this.isTruthy(hd.IS_MYSELF);
-      const isNotDeleted = this.isFalsy(hd.IS_DELETED);
-      return isMyself && isNotDeleted;
+      return isMyself;
     });
 
     if (!myHealthDocument) {
@@ -205,7 +203,7 @@ export class UserService {
         const avatarUrl = cloudinaryResult.secure_url;
 
         // Thêm avatar URL vào data để update
-        finalUpdateData.avatar = avatarUrl;
+        finalUpdateData.AVATAR = avatarUrl;
 
         // Đồng bộ User.FACE_IMAGE
         await this._userRepository.updateFaceImage(userId, avatarUrl);
@@ -214,8 +212,7 @@ export class UserService {
       // 3. Tìm health document của chính user (IS_MYSELF = 1)
       let myHealthDocument = user.HEALTH_DOCUMENTS?.find((hd) => {
         const isMyself = this.isTruthy(hd.IS_MYSELF);
-        const isNotDeleted = this.isFalsy(hd.IS_DELETED);
-        return isMyself && isNotDeleted;
+        return isMyself;
       });
 
       // 4. Nếu chưa có health document, tạo mới
@@ -224,15 +221,17 @@ export class UserService {
           USER: user,
           IS_MYSELF: 1,
           IS_DELETED: 0,
-          FULL_NAME: finalUpdateData.fullName || user.EMAIL.split('@')[0],
-          PHONE: finalUpdateData.phone || user.PHONE || '',
-          DOB: finalUpdateData.birthDate || '',
-          PROVINCE: finalUpdateData.address || '',
-          AVATAR: finalUpdateData.avatar || '',
+          FULL_NAME:
+            `${finalUpdateData.FIRST_NAME || ''} ${finalUpdateData.LAST_NAME || ''}`.trim() ||
+            user.EMAIL.split('@')[0],
+          PHONE: finalUpdateData.PHONE || user.PHONE || '',
+          DOB: finalUpdateData.DOB || '',
+          PROVINCE: finalUpdateData.ADDRESS || '',
+          AVATAR: finalUpdateData.AVATAR || '',
         } as any;
 
-        if (finalUpdateData.genderId) {
-          newHealthDoc.GENDER = { ID: finalUpdateData.genderId };
+        if (finalUpdateData.GENDER_ID) {
+          newHealthDoc.GENDER = { ID: finalUpdateData.GENDER_ID };
         }
 
         myHealthDocument =
@@ -243,49 +242,52 @@ export class UserService {
         let hasChanges = false;
 
         if (
-          finalUpdateData.fullName !== undefined &&
-          finalUpdateData.fullName !== myHealthDocument.FULL_NAME
+          (finalUpdateData.FIRST_NAME !== undefined ||
+            finalUpdateData.LAST_NAME !== undefined) &&
+          `${finalUpdateData.FIRST_NAME || ''} ${finalUpdateData.LAST_NAME || ''}`.trim() !==
+            myHealthDocument.FULL_NAME
         ) {
-          updatedFields.FULL_NAME = finalUpdateData.fullName;
+          updatedFields.FULL_NAME =
+            `${finalUpdateData.FIRST_NAME || ''} ${finalUpdateData.LAST_NAME || ''}`.trim();
           hasChanges = true;
         }
 
         if (
-          finalUpdateData.phone !== undefined &&
-          finalUpdateData.phone !== myHealthDocument.PHONE
+          finalUpdateData.PHONE !== undefined &&
+          finalUpdateData.PHONE !== myHealthDocument.PHONE
         ) {
-          updatedFields.PHONE = finalUpdateData.phone;
+          updatedFields.PHONE = finalUpdateData.PHONE;
           hasChanges = true;
         }
 
         if (
-          finalUpdateData.birthDate !== undefined &&
-          finalUpdateData.birthDate !== myHealthDocument.DOB
+          finalUpdateData.DOB !== undefined &&
+          finalUpdateData.DOB !== myHealthDocument.DOB
         ) {
-          updatedFields.DOB = finalUpdateData.birthDate;
+          updatedFields.DOB = finalUpdateData.DOB;
           hasChanges = true;
         }
 
         if (
-          finalUpdateData.address !== undefined &&
-          finalUpdateData.address !== myHealthDocument.PROVINCE
+          finalUpdateData.ADDRESS !== undefined &&
+          finalUpdateData.ADDRESS !== myHealthDocument.PROVINCE
         ) {
-          updatedFields.PROVINCE = finalUpdateData.address;
+          updatedFields.PROVINCE = finalUpdateData.ADDRESS;
           hasChanges = true;
         }
 
         if (
-          finalUpdateData.avatar !== undefined &&
-          finalUpdateData.avatar !== myHealthDocument.AVATAR
+          finalUpdateData.AVATAR !== undefined &&
+          finalUpdateData.AVATAR !== myHealthDocument.AVATAR
         ) {
-          updatedFields.AVATAR = finalUpdateData.avatar;
+          updatedFields.AVATAR = finalUpdateData.AVATAR;
           hasChanges = true;
         }
 
-        if (finalUpdateData.genderId !== undefined) {
+        if (finalUpdateData.GENDER_ID !== undefined) {
           const currentGenderId = myHealthDocument.GENDER?.ID;
-          if (finalUpdateData.genderId !== currentGenderId) {
-            updatedFields.GENDER = { ID: finalUpdateData.genderId };
+          if (finalUpdateData.GENDER_ID !== currentGenderId) {
+            updatedFields.GENDER = { ID: finalUpdateData.GENDER_ID };
             hasChanges = true;
           }
         }

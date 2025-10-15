@@ -27,25 +27,52 @@ export class CreateNewUserDto {
   PHONE: string;
 
   @ApiProperty({
-    description: 'Password of the user',
-    example: 'StrongPassword123!',
-    minLength: 6,
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(6)
-  PASSWORD: string;
-}
-
-export class UpdateUserProfileDto {
-  @ApiProperty({
-    description: 'Full name of the user',
-    example: 'Nguyễn Văn A',
+    description: 'First name of the user',
+    example: 'John',
     required: false,
   })
   @IsOptional()
   @IsString()
-  fullName?: string;
+  FIRST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Doe',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  LAST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Password of the user',
+    example: 'StrongPassword123!',
+    minLength: 6,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  PASSWORD?: string;
+}
+
+export class UpdateUserProfileDto {
+  @ApiProperty({
+    description: 'First name of the user',
+    example: 'Nguyễn',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  FIRST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Văn A',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  LAST_NAME?: string;
 
   @ApiProperty({
     description: 'Phone number of the user',
@@ -54,7 +81,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  phone?: string;
+  PHONE?: string;
 
   @ApiProperty({
     description: 'Date of birth (YYYY-MM-DD format)',
@@ -63,7 +90,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  birthDate?: string;
+  DOB?: string;
 
   @ApiProperty({
     description: 'Address/Province of the user',
@@ -72,16 +99,17 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  address?: string;
+  ADDRESS?: string;
 
   @ApiProperty({
-    description: 'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
+    description:
+      'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
     example: 'https://cloudinary.com/avatar.jpg',
     required: false,
   })
   @IsOptional()
   @IsString()
-  avatar?: string;
+  AVATAR?: string;
 
   @ApiProperty({
     description: 'Gender ID (1: Nam, 2: Nữ, etc.)',
@@ -91,11 +119,11 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  genderId?: number;
+  GENDER_ID?: number;
 }
 
 export class UpdateSecuritySetting {
-   @ApiProperty({
+  @ApiProperty({
     description: 'New Password of the user',
     example: 'StrongPassword123!',
     minLength: 6,
@@ -116,9 +144,9 @@ export class UpdateSecuritySetting {
   CURRENT_PASSWORD: string;
 
   @ApiProperty({
-  description: 'Phone number of the user',
-  example: '0123456789',
-  required: false,
+    description: 'Phone number of the user',
+    example: '0123456789',
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -138,5 +166,5 @@ export class UpdateSecuritySetting {
   })
   @IsOptional()
   @IsString()
-  OTP_CODE?: string; 
+  OTP_CODE?: string;
 }

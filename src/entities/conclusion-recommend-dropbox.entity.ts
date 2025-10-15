@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('conclusion_recommend_dropbox')
 export class ConclusionRecommendDropbox {
   @PrimaryGeneratedColumn()
-  id: number;
+  ID: number;
 
   @Column({ name: 'NAME', type: 'varchar', length: 255, nullable: false })
   NAME: string;
