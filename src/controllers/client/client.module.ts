@@ -11,6 +11,7 @@ import { ExerciseIntensity } from '../../entities/exercise-intensity.entity';
 import { OtpRecord } from '../../entities/otp-record.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { MulterConfigService } from '../../config/multer.config';
+import { Province } from 'src/entities/province.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MulterConfigService } from '../../config/multer.config';
       Gender,
       ExerciseIntensity,
       OtpRecord,
+      Province,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

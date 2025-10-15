@@ -53,6 +53,7 @@ export class UserRepository {
         HEALTH_DOCUMENTS: {
           GENDER: true,
           EXERCISE_INTENSITY: true,
+          PROVINCE: true,
         },
       },
     });

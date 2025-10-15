@@ -66,16 +66,18 @@ export class UpdateUserProfileDto {
   birthDate?: string;
 
   @ApiProperty({
-    description: 'Address/Province of the user',
-    example: 'TP. Hồ Chí Minh',
+    description: 'Address/ProvinceID of the user',
+    example: 1,
     required: false,
   })
   @IsOptional()
-  @IsString()
-  address?: string;
+  @IsInt()
+  @Min(1)
+  addressId?: number;
 
   @ApiProperty({
-    description: 'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
+    description:
+      'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
     example: 'https://cloudinary.com/avatar.jpg',
     required: false,
   })
@@ -95,7 +97,7 @@ export class UpdateUserProfileDto {
 }
 
 export class UpdateSecuritySetting {
-   @ApiProperty({
+  @ApiProperty({
     description: 'New Password of the user',
     example: 'StrongPassword123!',
     minLength: 6,
@@ -116,9 +118,9 @@ export class UpdateSecuritySetting {
   CURRENT_PASSWORD: string;
 
   @ApiProperty({
-  description: 'Phone number of the user',
-  example: '0123456789',
-  required: false,
+    description: 'Phone number of the user',
+    example: '0123456789',
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -138,5 +140,5 @@ export class UpdateSecuritySetting {
   })
   @IsOptional()
   @IsString()
-  OTP_CODE?: string; 
+  OTP_CODE?: string;
 }

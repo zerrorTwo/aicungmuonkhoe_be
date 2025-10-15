@@ -9,6 +9,7 @@ import { Gender } from '../../entities/gender.entity';
 import { HealthDocument } from '../../entities/health-document.entity';
 import { User } from '../../entities/user.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
+import { Province } from 'src/entities/province.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CloudinaryProvider } from '../../providers/cloudinary.provider';
       Gender,
       ExerciseIntensity,
       OtpRecord,
+      Province,
     ]),
   ],
   controllers: [...Controllers],
