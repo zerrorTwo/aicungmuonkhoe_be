@@ -72,7 +72,9 @@ export class UserService {
       phone: myHealthDocument?.PHONE || user.PHONE || '',
       birthDate: myHealthDocument?.DOB || '',
       gender: myHealthDocument?.GENDER?.NAME || '',
-      address: myHealthDocument?.PROVINCE || '',
+      address: myHealthDocument?.PROVINCE
+        ? { ID: myHealthDocument.PROVINCE.PROVINCE_ID }
+        : '', // Return object with ID for frontend
       avatar: myHealthDocument?.AVATAR || user.FACE_IMAGE || '',
       isActive: this.isTruthy(user.STATUS_ACTIVE),
       isAdmin: this.isTruthy(user.IS_ADMIN),
@@ -192,6 +194,7 @@ export class UserService {
       // 1. Lấy current user với health document
       const user =
         await this._userRepository.findUserWithHealthDocuments(userId);
+      // console.log('------------------------------------------------', user);
       if (!user) {
         throw new Error(`User with id ${userId} not found`);
       }
@@ -228,12 +231,15 @@ export class UserService {
           FULL_NAME: finalUpdateData.fullName || user.EMAIL.split('@')[0],
           PHONE: finalUpdateData.phone || user.PHONE || '',
           DOB: finalUpdateData.birthDate || '',
-          PROVINCE: finalUpdateData.address || '',
           AVATAR: finalUpdateData.avatar || '',
         } as any;
 
         if (finalUpdateData.genderId) {
           newHealthDoc.GENDER = { ID: finalUpdateData.genderId };
+        }
+
+        if (finalUpdateData.addressId) {
+          newHealthDoc.ADDRESS = { ID: finalUpdateData.addressId };
         }
 
         myHealthDocument =
@@ -268,14 +274,6 @@ export class UserService {
         }
 
         if (
-          finalUpdateData.address !== undefined &&
-          finalUpdateData.address !== myHealthDocument.PROVINCE
-        ) {
-          updatedFields.PROVINCE = finalUpdateData.address;
-          hasChanges = true;
-        }
-
-        if (
           finalUpdateData.avatar !== undefined &&
           finalUpdateData.avatar !== myHealthDocument.AVATAR
         ) {
@@ -291,6 +289,15 @@ export class UserService {
           }
         }
 
+        if (finalUpdateData.addressId !== undefined) {
+          const currentAddressId = myHealthDocument.PROVINCE?.PROVINCE_ID;
+          if (finalUpdateData.addressId !== currentAddressId) {
+            updatedFields.PROVINCE = { ID: finalUpdateData.addressId };
+            hasChanges = true;
+          }
+          hasChanges = true;
+        }
+
         if (hasChanges) {
           const updatedDoc = await this._healthDocumentRepository.update(
             myHealthDocument.ID,
@@ -303,7 +310,6 @@ export class UserService {
       if (!myHealthDocument) {
         throw new Error('Failed to create or update health document');
       }
-
       // 6. Return updated profile data
       const updatedProfile = {
         userId: user.USER_ID,
@@ -315,7 +321,7 @@ export class UserService {
         phone: myHealthDocument.PHONE || user.PHONE || '',
         birthDate: myHealthDocument.DOB || '',
         gender: myHealthDocument.GENDER?.NAME || '',
-        address: myHealthDocument.PROVINCE || '',
+        address: myHealthDocument.PROVINCE,
         avatar: myHealthDocument.AVATAR || user.FACE_IMAGE || '',
         isActive: this.isTruthy(user.STATUS_ACTIVE),
         isAdmin: this.isTruthy(user.IS_ADMIN),
@@ -328,8 +334,6 @@ export class UserService {
           isCompleted: true,
         },
       };
-
-      return updatedProfile;
     } catch (error) {
       this.logger.error('Error updating profile:', error);
       throw new Error(`Không thể cập nhật profile: ${error.message}`);
