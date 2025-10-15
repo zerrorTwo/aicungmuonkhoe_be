@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import {
   CreateNewUserDto,
@@ -10,6 +10,7 @@ import { HealthDocumentRepository } from 'src/repositories/health-document.repos
 import { CloudinaryProvider } from '../providers/cloudinary.provider';
 import { checkPassword, HashPassword, pickUser } from 'src/utils/auth/common';
 import { MailService } from './mail.service';
+import { OtpType } from 'src/entities/otp-record.entity';
 
 @Injectable()
 export class UserService {
@@ -70,7 +71,9 @@ export class UserService {
       phone: myHealthDocument?.PHONE || user.PHONE || '',
       birthDate: myHealthDocument?.DOB || '',
       gender: myHealthDocument?.GENDER?.NAME || '',
-      address: myHealthDocument?.PROVINCE || '',
+      address: myHealthDocument?.PROVINCE
+        ? { ID: myHealthDocument.PROVINCE.PROVINCE_ID }
+        : '', // Return object with ID for frontend
       avatar: myHealthDocument?.AVATAR || user.FACE_IMAGE || '',
       isActive: this.isTruthy(user.STATUS_ACTIVE),
       isAdmin: this.isTruthy(user.IS_ADMIN),
@@ -189,6 +192,7 @@ export class UserService {
       // 1. Lấy current user với health document
       const user =
         await this._userRepository.findUserWithHealthDocuments(userId);
+      // console.log('------------------------------------------------', user);
       if (!user) {
         throw new Error(`User with id ${userId} not found`);
       }
@@ -221,17 +225,18 @@ export class UserService {
           USER: user,
           IS_MYSELF: 1,
           IS_DELETED: 0,
-          FULL_NAME:
-            `${finalUpdateData.FIRST_NAME || ''} ${finalUpdateData.LAST_NAME || ''}`.trim() ||
-            user.EMAIL.split('@')[0],
-          PHONE: finalUpdateData.PHONE || user.PHONE || '',
-          DOB: finalUpdateData.DOB || '',
-          PROVINCE: finalUpdateData.ADDRESS || '',
-          AVATAR: finalUpdateData.AVATAR || '',
+          FULL_NAME: finalUpdateData.fullName || user.EMAIL.split('@')[0],
+          PHONE: finalUpdateData.phone || user.PHONE || '',
+          DOB: finalUpdateData.birthDate || '',
+          AVATAR: finalUpdateData.avatar || '',
         } as any;
 
         if (finalUpdateData.GENDER_ID) {
           newHealthDoc.GENDER = { ID: finalUpdateData.GENDER_ID };
+        }
+
+        if (finalUpdateData.addressId) {
+          newHealthDoc.ADDRESS = { ID: finalUpdateData.addressId };
         }
 
         myHealthDocument =
@@ -279,6 +284,8 @@ export class UserService {
         if (
           finalUpdateData.AVATAR !== undefined &&
           finalUpdateData.AVATAR !== myHealthDocument.AVATAR
+          finalUpdateData.avatar !== undefined &&
+          finalUpdateData.avatar !== myHealthDocument.AVATAR
         ) {
           updatedFields.AVATAR = finalUpdateData.AVATAR;
           hasChanges = true;
@@ -290,6 +297,15 @@ export class UserService {
             updatedFields.GENDER = { ID: finalUpdateData.GENDER_ID };
             hasChanges = true;
           }
+        }
+
+        if (finalUpdateData.addressId !== undefined) {
+          const currentAddressId = myHealthDocument.PROVINCE?.PROVINCE_ID;
+          if (finalUpdateData.addressId !== currentAddressId) {
+            updatedFields.PROVINCE = { ID: finalUpdateData.addressId };
+            hasChanges = true;
+          }
+          hasChanges = true;
         }
 
         if (hasChanges) {
@@ -304,7 +320,6 @@ export class UserService {
       if (!myHealthDocument) {
         throw new Error('Failed to create or update health document');
       }
-
       // 6. Return updated profile data
       const updatedProfile = {
         userId: user.USER_ID,
@@ -316,7 +331,7 @@ export class UserService {
         phone: myHealthDocument.PHONE || user.PHONE || '',
         birthDate: myHealthDocument.DOB || '',
         gender: myHealthDocument.GENDER?.NAME || '',
-        address: myHealthDocument.PROVINCE || '',
+        address: myHealthDocument.PROVINCE,
         avatar: myHealthDocument.AVATAR || user.FACE_IMAGE || '',
         isActive: this.isTruthy(user.STATUS_ACTIVE),
         isAdmin: this.isTruthy(user.IS_ADMIN),
@@ -329,8 +344,6 @@ export class UserService {
           isCompleted: true,
         },
       };
-
-      return updatedProfile;
     } catch (error) {
       this.logger.error('Error updating profile:', error);
       throw new Error(`Không thể cập nhật profile: ${error.message}`);
@@ -403,5 +416,56 @@ export class UserService {
     }
 
     return pickUser(updatedUser);
+  }
+
+  async forgotPassword(email: string) {
+    // 1. Tìm user theo email
+    const user = await this._userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    // 2. check mail đã active chưa
+    if (user.STATUS_ACTIVE !== 1) {
+      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+    }
+
+    // 3. Tạo mã OTP, save vào cơ sở dữ liệu và gửi email
+    await this.mailService.sendVerificationEmail(user.USER_ID.toString(), OtpType.FORGOT_PASSWORD);
+
+    return {
+      success: true,
+      message: 'OTP sent to email if it exists in our system'
+    }
+  }
+
+  async resetPassword(email: string, otpCode: string, newPassword: string) {
+    // 1. Tìm user theo email
+    const user = await this._userRepository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    // 2. check mail đã active chưa
+    if (user.STATUS_ACTIVE !== 1) {
+      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+    }
+
+    // 3. Kiểm tra mã OTP
+    const isValidOtp = await this.mailService.verifyEmail(email, otpCode);
+    if (!isValidOtp) {
+      throw new UnauthorizedException('Invalid or expired OTP');
+    }
+
+    // 4. Cập nhật mật khẩu
+    const hashedPassword = await HashPassword(newPassword);
+    await this._userRepository.update(user.USER_ID, { 
+        ...user, 
+        PASSWORD: hashedPassword, 
+        UPDATED_AT: new Date() 
+      });
+
+    return {
+      success: true,
+      message: 'Password reset successfully'
+    };
   }
 }

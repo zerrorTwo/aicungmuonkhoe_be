@@ -3,6 +3,7 @@ import { HealthDocumentController } from './health-document.controller';
 import { UserController } from './user.controller';
 import { MailController } from './mail.controller';
 import { ConclusionController } from './conclusion.controller';
+import { ProvinceController } from './province.controller';
 
 const Controllers = [
   UserController,
@@ -10,6 +11,7 @@ const Controllers = [
   HealthDocumentController,
   MailController,
   ConclusionController,
+  ProvinceController,
 ];
 
 export default Controllers;

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { HealthDocument } from './health-document.entity';
 import { OtpRecord } from './otp-record.entity';
+import { Province } from './province.entity';
 
 @Entity('users')
 export class User {

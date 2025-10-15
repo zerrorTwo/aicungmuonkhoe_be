@@ -12,6 +12,7 @@ import { ConclusionRecommendClient } from '../../entities/conclusion-recommend-c
 import { ConclusionRecommendManagement } from '../../entities/conclusion-recommend-management.entity';
 import { ConclusionRecommendDropbox } from '../../entities/conclusion-recommend-dropbox.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
+import { Province } from 'src/entities/province.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CloudinaryProvider } from '../../providers/cloudinary.provider';
       ConclusionRecommendClient,
       ConclusionRecommendManagement,
       ConclusionRecommendDropbox,
+      Province,
     ]),
   ],
   controllers: [...Controllers],

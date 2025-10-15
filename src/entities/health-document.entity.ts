@@ -8,6 +8,7 @@ import {
 import { User } from './user.entity';
 import { Gender } from './gender.entity';
 import { ExerciseIntensity } from './exercise-intensity.entity';
+import { Province } from './province.entity';
 
 @Entity('health_document')
 export class HealthDocument {
@@ -91,9 +92,6 @@ export class HealthDocument {
   })
   EXERCISE_FREQUENCY: string;
 
-  @Column({ name: 'PROVINCE', type: 'varchar', length: 100, nullable: true })
-  PROVINCE: string;
-
   @ManyToOne(() => Gender, (gender: Gender) => gender.HEALTH_DOCUMENTS, {
     nullable: true,
   })
@@ -108,4 +106,11 @@ export class HealthDocument {
   )
   @JoinColumn({ name: 'EXERCISE_INTENSITY_ID' })
   EXERCISE_INTENSITY: ExerciseIntensity;
+
+  // Quan hệ với bảng provinces
+  @ManyToOne(() => Province, (province: Province) => province.HealthDocuments, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'PROVINCE_ID' })
+  PROVINCE: Province;
 }

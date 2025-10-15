@@ -14,6 +14,7 @@ import { ConclusionRecommendManagement } from '../../entities/conclusion-recomme
 import { ConclusionRecommendDropbox } from '../../entities/conclusion-recommend-dropbox.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { MulterConfigService } from '../../config/multer.config';
+import { Province } from 'src/entities/province.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MulterConfigService } from '../../config/multer.config';
       ConclusionRecommendClient,
       ConclusionRecommendManagement,
       ConclusionRecommendDropbox,
+      Province,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

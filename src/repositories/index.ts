@@ -4,6 +4,7 @@ import { OtpRepository } from './otp.repository';
 import { ConclusionRecommendClientRepository } from './conclusion-recommend-client.repository';
 import { ConclusionRecommendManagementRepository } from './conclusion-recommend-management.repository';
 import { ConclusionRecommendDropboxRepository } from './conclusion-recommend-dropbox.repository';
+import { ProvinceRepository } from './province.repository';
 
 const Repositories = [
   UserRepository,
@@ -12,6 +13,7 @@ const Repositories = [
   ConclusionRecommendClientRepository,
   ConclusionRecommendManagementRepository,
   ConclusionRecommendDropboxRepository,
+  ProvinceRepository,
 ];
 
 export default Repositories;
