@@ -47,8 +47,8 @@ export class MailController {
   @ApiResponse({ status: 400, description: 'Invalid verification code' })
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     const result = await this.mailService.verifyEmail(
-      verifyEmailDto.email,
-      verifyEmailDto.code,
+      verifyEmailDto.EMAIL,
+      verifyEmailDto.CODE,
     );
 
     return Builder<SuccessResponse>()

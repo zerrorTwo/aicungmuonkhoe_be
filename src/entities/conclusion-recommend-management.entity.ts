@@ -24,7 +24,7 @@ export class ConclusionRecommendManagement {
   IS_DELETED: boolean;
 
   @PrimaryGeneratedColumn()
-  id: number;
+  ID: number;
 
   @Column({ name: 'MODEL', type: 'varchar', length: 255, nullable: true })
   MODEL: string;

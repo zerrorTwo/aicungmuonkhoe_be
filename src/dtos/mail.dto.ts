@@ -1,3 +1,10 @@
+import {
+  IsEmail,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MinLength,
+} from 'class-validator';
 import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -9,7 +16,7 @@ export class SendVerificationDto {
   })
   @IsOptional()
   @IsEmail()
-  email?: string;
+  EMAIL?: string;
 
   @ApiProperty({
     description: 'Phone number to send verification code (optional)',
@@ -18,7 +25,7 @@ export class SendVerificationDto {
   })
   @IsOptional()
   @IsString()
-  phone?: string;
+  PHONE?: string;
 }
 
 export class VerifyEmailDto {
@@ -27,7 +34,7 @@ export class VerifyEmailDto {
     example: 'user@example.com',
   })
   @IsEmail()
-  email: string;
+  EMAIL: string;
 
   @ApiProperty({
     description: '6-digit OTP code',
@@ -37,5 +44,5 @@ export class VerifyEmailDto {
   })
   @IsString()
   @MinLength(6)
-  code: string;
+  CODE: string;
 }

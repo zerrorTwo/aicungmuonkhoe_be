@@ -8,25 +8,24 @@ import {
 @Entity('users_active_log')
 export class UsersActiveLog {
   @PrimaryGeneratedColumn()
-  id: number;
+  ID: number;
 
   @CreateDateColumn({ name: 'CREATED_DATE', type: 'datetime', nullable: true })
-  createdDate: Date;
+  CREATED_DATE: Date;
 
   @Column({
-    name: 'USER_ID_MNMN',
-    type: 'varchar',
-    length: 255,
+    name: 'USER_ID',
+    type: 'int',
     nullable: true,
   })
-  userId: string;
+  USER_ID: number;
 
   @Column({ name: 'FULL_NAME', type: 'varchar', length: 255, nullable: true })
-  fullName: string;
+  FULL_NAME: string;
 
   @Column({ name: 'ACTION', type: 'varchar', length: 255, nullable: true })
-  action: string;
+  ACTION: string;
 
   @Column({ name: 'DEVICE', type: 'varchar', length: 255, nullable: true })
-  device: string;
+  DEVICE: string;
 }

@@ -8,6 +8,9 @@ import { ExerciseIntensity } from '../../entities/exercise-intensity.entity';
 import { Gender } from '../../entities/gender.entity';
 import { HealthDocument } from '../../entities/health-document.entity';
 import { User } from '../../entities/user.entity';
+import { ConclusionRecommendClient } from '../../entities/conclusion-recommend-client.entity';
+import { ConclusionRecommendManagement } from '../../entities/conclusion-recommend-management.entity';
+import { ConclusionRecommendDropbox } from '../../entities/conclusion-recommend-dropbox.entity';
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { Province } from 'src/entities/province.entity';
 
@@ -19,6 +22,9 @@ import { Province } from 'src/entities/province.entity';
       Gender,
       ExerciseIntensity,
       OtpRecord,
+      ConclusionRecommendClient,
+      ConclusionRecommendManagement,
+      ConclusionRecommendDropbox,
       Province,
     ]),
   ],

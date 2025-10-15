@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsBoolean,
   IsNumber,
+  IsDateString,
   Min,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
@@ -140,7 +141,7 @@ export class UpdateHealthDocumentDto extends PartialType(
   @IsNumber()
   @Type(() => Number)
   @Min(1)
-  id: number;
+  ID: number;
 }
 
 export class HealthDocumentResponseDto {

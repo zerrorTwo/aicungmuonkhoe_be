@@ -18,6 +18,7 @@ import {
   UpdateHealthDocumentDto,
 } from 'src/dtos/health-document.dto';
 import { HealthDocument } from 'src/entities/health-document.entity';
+import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
 import { HealthDocumentService } from 'src/services/health-document.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
@@ -157,7 +158,7 @@ export class HealthDocumentController {
         );
       }
 
-      return Builder<SuccessResponse<HealthDocument>>()
+      return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
         .data(result)
         .message(SuccessMessages.GET_SUCCESSFULLY)
         .status(StatusCodes.OK)

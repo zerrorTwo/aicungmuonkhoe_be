@@ -27,25 +27,52 @@ export class CreateNewUserDto {
   PHONE: string;
 
   @ApiProperty({
-    description: 'Password of the user',
-    example: 'StrongPassword123!',
-    minLength: 6,
-  })
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(6)
-  PASSWORD: string;
-}
-
-export class UpdateUserProfileDto {
-  @ApiProperty({
-    description: 'Full name of the user',
-    example: 'Nguyễn Văn A',
+    description: 'First name of the user',
+    example: 'John',
     required: false,
   })
   @IsOptional()
   @IsString()
-  fullName?: string;
+  FIRST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Doe',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  LAST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Password of the user',
+    example: 'StrongPassword123!',
+    minLength: 6,
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  PASSWORD?: string;
+}
+
+export class UpdateUserProfileDto {
+  @ApiProperty({
+    description: 'First name of the user',
+    example: 'Nguyễn',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  FIRST_NAME?: string;
+
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Văn A',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  LAST_NAME?: string;
 
   @ApiProperty({
     description: 'Phone number of the user',
@@ -54,7 +81,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  phone?: string;
+  PHONE?: string;
 
   @ApiProperty({
     description: 'Date of birth (YYYY-MM-DD format)',
@@ -63,7 +90,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  birthDate?: string;
+  DOB?: string;
 
   @ApiProperty({
     description: 'Address/ProvinceID of the user',
@@ -71,9 +98,8 @@ export class UpdateUserProfileDto {
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  addressId?: number;
+  @IsString()
+  ADDRESS?: string;
 
   @ApiProperty({
     description:
@@ -83,7 +109,7 @@ export class UpdateUserProfileDto {
   })
   @IsOptional()
   @IsString()
-  avatar?: string;
+  AVATAR?: string;
 
   @ApiProperty({
     description: 'Gender ID (1: Nam, 2: Nữ, etc.)',
@@ -93,7 +119,7 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsInt()
   @Min(1)
-  genderId?: number;
+  GENDER_ID?: number;
 }
 
 export class UpdateSecuritySetting {
@@ -141,17 +167,6 @@ export class UpdateSecuritySetting {
   @IsOptional()
   @IsString()
   OTP_CODE?: string;
-}
-
-export class forgotPasswordDto {
-  @ApiProperty({
-    description: 'Email of the user',
-    example: 'user@example.com',
-  })
-  @IsNotEmpty()
-  @IsEmail()
-  EMAIL: string;
-
 }
 
 export class resetPasswordDto {
