@@ -18,11 +18,6 @@ export class CreateHealthDocumentDto {
   @Type(() => Number)
   USER_ID?: number;
 
-  @ApiPropertyOptional({ description: 'Tên hiển thị' })
-  @IsOptional()
-  @IsString()
-  NAME?: string;
-
   @ApiPropertyOptional({ description: 'Họ tên đầy đủ' })
   @IsOptional()
   @IsString()
@@ -75,20 +70,19 @@ export class CreateHealthDocumentDto {
   @IsString()
   JOB?: string;
 
-  @ApiPropertyOptional({ description: 'Loại hoạt động' })
+  @ApiPropertyOptional({ description: 'Số phút tập luyện trong ngày làm việc' })
   @IsOptional()
-  @IsString()
-  TYPE_ACTION?: string;
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  DATE_WORKDAY?: number;
 
-  @ApiPropertyOptional({ description: 'Ngày làm việc' })
+  @ApiPropertyOptional({ description: 'Số phút tập luyện trong ngày nghỉ' })
   @IsOptional()
-  @IsString()
-  DATE_WORKDAY?: string;
-
-  @ApiPropertyOptional({ description: 'Ngày nghỉ' })
-  @IsOptional()
-  @IsString()
-  DATE_OFF?: string;
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  DATE_OFF?: number;
 
   @ApiPropertyOptional({ description: 'Là bản thân', default: false })
   @IsOptional()
@@ -129,19 +123,12 @@ export class CreateHealthDocumentDto {
   @IsNumber()
   @Type(() => Number)
   @Min(1)
-  EXERCISE_INTENSITY_ID?: number;
+  EXERCISE_INTENSITY?: number;
 }
 
 export class UpdateHealthDocumentDto extends PartialType(
   CreateHealthDocumentDto,
-) {
-  @ApiProperty({ description: 'ID của health document cần cập nhật' })
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  @Min(1)
-  id: number;
-}
+) {}
 
 export class HealthDocumentResponseDto {
   @ApiProperty()
@@ -181,13 +168,10 @@ export class HealthDocumentResponseDto {
   JOB?: string;
 
   @ApiProperty()
-  TYPE_ACTION?: string;
+  DATE_WORKDAY?: number;
 
   @ApiProperty()
-  DATE_WORKDAY?: string;
-
-  @ApiProperty()
-  DATE_OFF?: string;
+  DATE_OFF?: number;
 
   @ApiProperty()
   IS_MYSELF: boolean;

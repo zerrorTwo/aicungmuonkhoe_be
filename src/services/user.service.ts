@@ -1,4 +1,9 @@
-import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from 'src/entities/user.entity';
 import {
   CreateNewUserDto,
@@ -64,10 +69,7 @@ export class UserService {
     const profile = {
       userId: user.USER_ID,
       fullName:
-        myHealthDocument?.FULL_NAME ||
-        myHealthDocument?.NAME ||
-        user.EMAIL.split('@')[0] ||
-        'Người dùng',
+        myHealthDocument?.FULL_NAME || user.EMAIL.split('@')[0] || 'Người dùng',
       email: user.EMAIL,
       phone: myHealthDocument?.PHONE || user.PHONE || '',
       birthDate: myHealthDocument?.DOB || '',
@@ -292,7 +294,7 @@ export class UserService {
         if (finalUpdateData.addressId !== undefined) {
           const currentAddressId = myHealthDocument.PROVINCE?.PROVINCE_ID;
           if (finalUpdateData.addressId !== currentAddressId) {
-            updatedFields.PROVINCE = { ID: finalUpdateData.addressId };
+            updatedFields.PROVINCE = { PROVINCE_ID: finalUpdateData.addressId };
             hasChanges = true;
           }
           hasChanges = true;
@@ -416,16 +418,21 @@ export class UserService {
     }
     // 2. check mail đã active chưa
     if (user.STATUS_ACTIVE !== 1) {
-      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+      throw new UnauthorizedException(
+        'Email not activated. Please activate your email before resetting password.',
+      );
     }
 
     // 3. Tạo mã OTP, save vào cơ sở dữ liệu và gửi email
-    await this.mailService.sendVerificationEmail(user.USER_ID.toString(), OtpType.FORGOT_PASSWORD);
+    await this.mailService.sendVerificationEmail(
+      user.USER_ID.toString(),
+      OtpType.FORGOT_PASSWORD,
+    );
 
     return {
       success: true,
-      message: 'OTP sent to email if it exists in our system'
-    }
+      message: 'OTP sent to email if it exists in our system',
+    };
   }
 
   async resetPassword(email: string, otpCode: string, newPassword: string) {
@@ -436,7 +443,9 @@ export class UserService {
     }
     // 2. check mail đã active chưa
     if (user.STATUS_ACTIVE !== 1) {
-      throw new UnauthorizedException('Email not activated. Please activate your email before resetting password.');
+      throw new UnauthorizedException(
+        'Email not activated. Please activate your email before resetting password.',
+      );
     }
 
     // 3. Kiểm tra mã OTP
@@ -447,15 +456,15 @@ export class UserService {
 
     // 4. Cập nhật mật khẩu
     const hashedPassword = await HashPassword(newPassword);
-    await this._userRepository.update(user.USER_ID, { 
-        ...user, 
-        PASSWORD: hashedPassword, 
-        UPDATED_AT: new Date() 
-      });
+    await this._userRepository.update(user.USER_ID, {
+      ...user,
+      PASSWORD: hashedPassword,
+      UPDATED_AT: new Date(),
+    });
 
     return {
       success: true,
-      message: 'Password reset successfully'
+      message: 'Password reset successfully',
     };
   }
 }

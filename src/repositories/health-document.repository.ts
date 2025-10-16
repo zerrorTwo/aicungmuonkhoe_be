@@ -23,32 +23,36 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async update(id: number, updateData: any): Promise<HealthDocument> {
+  async update(
+    id: number,
+    updateData: UpdateHealthDocumentDto,
+  ): Promise<HealthDocument> {
     const existingEntity = await this.repo.findOne({
-      where: { ID: id },
+      where: { ID: id, IS_DELETED: false },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
 
     if (!existingEntity) {
       throw new Error(`HealthDocument with id ${id} not found`);
     }
+    // console.log(updateData);
+    console.log(existingEntity);
+    console.log('updateData:', updateData);
 
-    const updatedEntity = {
-      ...existingEntity,
-      ...updateData,
-      ID: id,
-    };
+    // Merge data fields vào existing entity
+    // Object.assign chỉ merge shallow fields, không ảnh hưởng relations
+    Object.assign(existingEntity, updateData);
 
-    const result = await this.repo.save(updatedEntity);
+    // Save và return với relations
+    const result = await this.repo.save(existingEntity);
     return result;
   }
 
   async findById(id: number) {
-    const result = await this.repo.findOne({
-      where: { USER: { USER_ID: id, IS_DELETED: 0 } },
-      relations: ['USER'],
+    return await this.repo.findOne({
+      where: { ID: id, IS_DELETED: false },
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
-    return result;
   }
 
   async findByUserId(userId: number): Promise<HealthDocument | null> {
@@ -64,6 +68,17 @@ export class HealthDocumentRepository {
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 },
         IS_MYSELF: true,
+        IS_DELETED: false,
+      },
+      relations: ['USER'],
+    });
+    return result;
+  }
+
+  async findAllByUserId(userId: number) {
+    const result = await this.repo.find({
+      where: {
+        USER: { USER_ID: userId, IS_DELETED: 0 },
         IS_DELETED: false,
       },
       relations: ['USER'],

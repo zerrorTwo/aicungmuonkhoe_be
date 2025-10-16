@@ -26,9 +26,6 @@ export class HealthDocument {
   @JoinColumn({ name: 'USER_ID' })
   USER: User;
 
-  @Column({ name: 'NAME', type: 'varchar', length: 255, nullable: true })
-  NAME: string;
-
   @Column({ type: 'varchar', length: 255, name: 'FULL_NAME' })
   FULL_NAME: string;
 
@@ -64,19 +61,16 @@ export class HealthDocument {
   @Column({ name: 'JOB', type: 'varchar', length: 100, nullable: true })
   JOB: string;
 
-  @Column({ name: 'TYPE_ACTION', type: 'varchar', length: 100, nullable: true })
-  TYPE_ACTION: string;
-
   @Column({
     name: 'DATE_WORKDAY',
-    type: 'varchar',
-    length: 100,
+    type: 'int',
     nullable: true,
+    default: 0,
   })
-  DATE_WORKDAY: string;
+  DATE_WORKDAY: number;
 
-  @Column({ name: 'DATE_OFF', type: 'varchar', length: 100, nullable: true })
-  DATE_OFF: string;
+  @Column({ name: 'DATE_OFF', type: 'int', nullable: true, default: 0 })
+  DATE_OFF: number;
 
   @Column({ name: 'IS_MYSELF', type: 'tinyint', width: 1, default: 0 })
   IS_MYSELF: boolean;
@@ -90,7 +84,7 @@ export class HealthDocument {
   @Column({
     name: 'EXERCISE_FREQUENCY',
     type: 'varchar',
-    length: 100,
+    length: 255,
     nullable: true,
   })
   EXERCISE_FREQUENCY: string;
