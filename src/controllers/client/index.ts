@@ -2,6 +2,7 @@ import { AuthController } from './auth.controller';
 import { HealthDocumentController } from './health-document.controller';
 import { UserController } from './user.controller';
 import { MailController } from './mail.controller';
+import { ConclusionController } from './conclusion.controller';
 import { ProvinceController } from './province.controller';
 
 const Controllers = [
@@ -9,6 +10,7 @@ const Controllers = [
   AuthController,
   HealthDocumentController,
   MailController,
+  ConclusionController,
   ProvinceController,
 ];
 

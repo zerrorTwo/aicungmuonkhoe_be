@@ -6,6 +6,7 @@ import {
   UpdateHealthDocumentDto,
 } from 'src/dtos/health-document.dto';
 import { plainToInstance } from 'class-transformer';
+import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
 
 @Injectable()
 export class HealthDocumentService {
@@ -29,7 +30,6 @@ export class HealthDocumentService {
     healthDocumentEntity.USER = { USER_ID: user_id } as any;
 
     // Set default values for required fields
-    healthDocumentEntity.IS_DELETED = false;
     if (healthDocumentEntity.IS_MYSELF === undefined) {
       healthDocumentEntity.IS_MYSELF = true;
     }
@@ -64,7 +64,9 @@ export class HealthDocumentService {
     return this._healthDocumentRepository.update(id, healthDocument);
   }
 
-  async findHealthDocumentByID(id: number): Promise<HealthDocument> {
+  async findHealthDocumentByID(
+    id: number,
+  ): Promise<HealthDocumentWithRelationsResponse> {
     const healthDocument = await this._healthDocumentRepository.findById(id);
     if (!healthDocument) {
       throw new Error(`Health document with id ${id} not found`);

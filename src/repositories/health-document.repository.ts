@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  CreateHealthDocumentDto,
-  UpdateHealthDocumentDto,
-} from 'src/dtos/health-document.dto';
 import { HealthDocument } from 'src/entities/health-document.entity';
+import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
 import { Repository } from 'typeorm';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class HealthDocumentRepository {
@@ -48,9 +44,11 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findById(id: number) {
-    return await this.repo.findOne({
-      where: { ID: id, IS_DELETED: false },
+  async findById(
+    id: number,
+  ): Promise<HealthDocumentWithRelationsResponse | null> {
+    const result = await this.repo.findOne({
+      where: { ID: id },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
   }
@@ -63,12 +61,11 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findMySelfByUserId(userId: number) {
+  async findMySelfByUserId(userId: number): Promise<HealthDocument | null> {
     const result = await this.repo.findOne({
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 },
         IS_MYSELF: true,
-        IS_DELETED: false,
       },
       relations: ['USER'],
     });
@@ -86,9 +83,12 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findMySelfById(id: number) {
+  async findMySelfById(
+    id: number,
+  ): Promise<HealthDocumentWithRelationsResponse | null> {
+
     const result = await this.repo.findOne({
-      where: { ID: id, IS_MYSELF: true, IS_DELETED: false },
+      where: { ID: id, IS_MYSELF: true },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
     return result;

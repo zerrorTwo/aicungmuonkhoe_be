@@ -147,18 +147,18 @@ export class MailService {
     data: SendVerificationDto,
     userId: string,
   ): Promise<string> {
-    const { phone, email } = data;
-    if (!phone && !email) {
+    const { PHONE, EMAIL } = data;
+    if (!PHONE && !EMAIL) {
       throw new Error('Either phone or email must be provided');
     }
-    if (phone && email) {
+    if (PHONE && EMAIL) {
       throw new Error('Please provide either phone or email, not both');
     }
 
-    if (phone) {
+    if (PHONE) {
       await this.sendVerificationPhone(userId);
-    } else if (email) {
-      await this.sendVerificationEmail(userId, OtpType.UPDATE_EMAIL);
+    } else if (EMAIL) {
+      await this.sendVerificationEmail(userId);
     }
 
     return 'Send code successfully!!';
