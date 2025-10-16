@@ -39,10 +39,14 @@ export class HealthDocumentService {
       healthDocumentEntity.GENDER = { ID: healthDocument.GENDER_ID } as any;
     }
 
-    if (healthDocument.EXERCISE_INTENSITY_ID) {
+    if (healthDocument.EXERCISE_INTENSITY) {
       healthDocumentEntity.EXERCISE_INTENSITY = {
-        ID: healthDocument.EXERCISE_INTENSITY_ID,
+        ID: healthDocument.EXERCISE_INTENSITY,
       } as any;
+    }
+
+    if (healthDocument.PROVINCE) {
+      healthDocumentEntity.PROVINCE = { ID: healthDocument.PROVINCE } as any;
     }
 
     return this._healthDocumentRepository.create(healthDocumentEntity);
@@ -79,5 +83,18 @@ export class HealthDocumentService {
       throw new Error(`Health document for user with id ${user_id} not found`);
     }
     return healthDocument;
+  }
+
+  async findAllHealthDocumentByUserID(
+    user_id: number,
+  ): Promise<HealthDocument[]> {
+    const allHealthDocument =
+      await this._healthDocumentRepository.findAllByUserId(user_id);
+    if (!allHealthDocument) {
+      throw new Error(
+        `All Health document for user with id ${user_id} not found`,
+      );
+    }
+    return allHealthDocument;
   }
 }
