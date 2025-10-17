@@ -11,6 +11,7 @@ export const ErrorMessages = {
 export const SuccessMessages = {
   SIGN_IN_SUCCESSFULLY: 'Đăng nhập thành công',
   SIGN_UP_SUCCESSFULLY: 'Đăng ký thành công',
+  EMAIL_VERIFICATION_SUCCESSFULLY: 'Xác thực email thành công',
   LOGGED: 'Đăng xuất!',
   ACCESS_TOKEN_SUCCESSFULLY: 'Tải mới access_token thành công!',
   CREATE_SUCCESSFULLY: 'Tạo thành công!',

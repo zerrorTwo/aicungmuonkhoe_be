@@ -48,3 +48,21 @@ export class AuthSignupDto {
   @MinLength(6)
   PASSWORD: string;
 }
+
+export class AuthVerifyEmailDto {
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  EMAIL: string;
+
+  @ApiProperty({
+    description: 'OTP code sent to the email',
+    example: '123456',
+  })
+  @IsNotEmpty()
+  @IsString()
+  OTP_CODE: string;
+}

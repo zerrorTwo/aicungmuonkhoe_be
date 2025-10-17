@@ -13,7 +13,6 @@ export class MailController {
   constructor(private readonly mailService: MailService) {}
 
   @Post('/send-verification')
-  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Send verification code to email or phone' })
   @ApiResponse({
     status: 200,
@@ -25,10 +24,8 @@ export class MailController {
     @Req() req,
     @Body() sendVerificationDto: SendVerificationDto,
   ) {
-    const userId = req.user.user_id;
     const responseMessage = await this.mailService.sendVerification(
-      sendVerificationDto,
-      userId,
+      sendVerificationDto
     );
 
     return Builder<SuccessResponse>()

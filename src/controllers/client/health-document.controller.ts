@@ -75,38 +75,25 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentMySelf(@Req() req) {
-    try {
-      const user_id = req.user.user_id;
+    const user_id = req.user.user_id;
 
-      if (!user_id) {
-        throw new HttpException(
-          'User not authenticated',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      const result =
-        await this.healthDocumentService.findHealthDocumentMySelfByUserID(
-          user_id,
-        );
-
-      if (!result) {
-        console.log('No health document found for user:', user_id);
-        throw new HttpException(
-          'Health document not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return Builder<SuccessResponse<HealthDocument>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Get myself error:', error);
-      throw error;
+    if (!user_id) {
+      throw new HttpException(
+        'User not authenticated',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
+
+    const result =
+      await this.healthDocumentService.findHealthDocumentMySelfByUserID(
+        user_id,
+      );
+
+    return Builder<SuccessResponse<HealthDocument>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
   }
 
   @Get('/all')
@@ -119,37 +106,23 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocument(@Req() req) {
-    try {
-      const user_id = req.user.user_id;
+    const user_id = req.user.user_id;
 
-      if (!user_id) {
-        throw new HttpException(
-          'User not authenticated',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      const result =
-        await this.healthDocumentService.findAllHealthDocumentByUserID(user_id);
-
-      if (!result) {
-        console.log('No health document found for user:', user_id);
-        throw new HttpException(
-          'Health document not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      console.log('Get all result:', result);
-
-      return Builder<SuccessResponse<HealthDocument[]>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Get myself error:', error);
-      throw error;
+    if (!user_id) {
+      throw new HttpException(
+        'User not authenticated',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
+
+    const result =
+      await this.healthDocumentService.findAllHealthDocumentByUserID(user_id);
+
+    return Builder<SuccessResponse<HealthDocument[]>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
   }
 
   @Put('/:id')
@@ -186,29 +159,14 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentById(@Param('id') id: number) {
-    console.log('=== GET BY ID ENDPOINT CALLED ===');
-    console.log('id:', id);
-
-    try {
       const result =
         await this.healthDocumentService.findHealthDocumentByID(id);
-      console.log('Get by ID result:', result);
-
-      if (!result) {
-        throw new HttpException(
-          'Health document not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
+      
 
       return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
         .data(result)
         .message(SuccessMessages.GET_SUCCESSFULLY)
         .status(StatusCodes.OK)
         .build();
-    } catch (error) {
-      console.error('Get by ID error:', error);
-      throw error;
-    }
   }
 }

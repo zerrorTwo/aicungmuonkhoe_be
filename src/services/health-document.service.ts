@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HealthDocumentRepository } from 'src/repositories/health-document.repository';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import {
@@ -69,7 +69,7 @@ export class HealthDocumentService {
   ): Promise<HealthDocumentWithRelationsResponse> {
     const healthDocument: HealthDocumentWithRelationsResponse | null = await this._healthDocumentRepository.findById(id);
     if (!healthDocument) {
-      throw new Error(`Health document with id ${id} not found`);
+      throw new NotFoundException(`Health document with id ${id} not found`);
     }
     return healthDocument;
   }
@@ -80,7 +80,7 @@ export class HealthDocumentService {
     const healthDocument =
       await this._healthDocumentRepository.findMySelfByUserId(user_id);
     if (!healthDocument) {
-      throw new Error(`Health document for user with id ${user_id} not found`);
+      throw new NotFoundException(`Health document for user with id ${user_id} not found`);
     }
     return healthDocument;
   }
@@ -91,7 +91,7 @@ export class HealthDocumentService {
     const allHealthDocument =
       await this._healthDocumentRepository.findAllByUserId(user_id);
     if (!allHealthDocument) {
-      throw new Error(
+      throw new NotFoundException(
         `All Health document for user with id ${user_id} not found`,
       );
     }

@@ -93,7 +93,7 @@ export class MailService {
   /**
    * Send phone verification SMS (placeholder - would integrate with SMS service)
    */
-  async sendVerificationPhone(userId: string): Promise<void> {
+  async sendVerificationPhone(userId: string, otpType: OtpType): Promise<void> {
     const idNumber = parseInt(userId, 10);
     const user = await this.userRepository.findById(idNumber);
     if (!user) {
@@ -111,7 +111,7 @@ export class MailService {
       OTP_CODE: otpCode,
       EXPIRES_AT: expiryTime,
       STATUS: OtpStatus.PENDING,
-      TYPE: OtpType.UPDATE_PHONE,
+      TYPE: otpType,
       SENT_COUNT: 1,
     });
 
@@ -144,21 +144,26 @@ export class MailService {
    * Send phone verification SMS (placeholder - would integrate with SMS service)
    */
   async sendVerification(
-    data: SendVerificationDto,
-    userId: string,
+    data: SendVerificationDto
   ): Promise<string> {
-    const { PHONE, EMAIL } = data;
+    const { USER_ID,PHONE, EMAIL, OTP_TYPE } = data;
     if (!PHONE && !EMAIL) {
       throw new Error('Either phone or email must be provided');
     }
     if (PHONE && EMAIL) {
       throw new Error('Please provide either phone or email, not both');
     }
-
     if (PHONE) {
-      await this.sendVerificationPhone(userId);
+      await this.sendVerificationPhone(USER_ID, OTP_TYPE);
     } else if (EMAIL) {
-      await this.sendVerificationEmail(userId, OtpType.UPDATE_EMAIL);
+      const result = await this.userRepository.findByEmail(EMAIL);
+      if (result) {
+        await this.sendVerificationEmail(result.USER_ID.toString(), OTP_TYPE);
+      } else if(USER_ID){
+        await this.sendVerificationEmail(USER_ID, OTP_TYPE);
+      } else {
+        throw new NotFoundException('User not found');
+      }
     }
 
     return 'Send code successfully!!';

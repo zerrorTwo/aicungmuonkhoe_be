@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
 import type { Response } from 'express';
-import { AuthLoginDto, AuthSignupDto } from 'src/dtos/auth.dto';
+import { AuthLoginDto, AuthSignupDto, AuthVerifyEmailDto } from 'src/dtos/auth.dto';
 import { AuthService } from 'src/services/auth.service';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
 import { SuccessResponse } from 'src/utils/format';
@@ -52,6 +52,24 @@ export class AuthController {
     return Builder<SuccessResponse<{ user: User; access_token: string }>>()
       .data(result)
       .message(SuccessMessages.SIGN_UP_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
+  }
+
+  @Post('/verify-email')
+  @ApiOperation({ summary: 'Verify email with OTP code' })
+  @ApiResponse({ status: 200, description: 'Successfully verified email' })
+  async verifyEmailRegistration(
+    @Body() verifyEmailDto: AuthVerifyEmailDto,
+  ) {
+    await this.authService.verifyEmailRegistration(
+      verifyEmailDto.EMAIL,
+      verifyEmailDto.OTP_CODE,
+    );
+    
+    return Builder<SuccessResponse<null>>()
+      .data(null)
+      .message(SuccessMessages.EMAIL_VERIFICATION_SUCCESSFULLY)
       .status(StatusCodes.OK)
       .build();
   }
