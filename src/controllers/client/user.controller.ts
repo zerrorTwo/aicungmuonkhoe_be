@@ -33,6 +33,7 @@ import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
 import { SuccessResponse } from 'src/utils/format';
 import { User } from '../../entities/user.entity';
+import { UpdateUserResponse, UserResponse, UserProfileResponse } from 'src/interfaces/user.interface';
 
 @ApiTags('User')
 @Controller('user')
@@ -100,7 +101,7 @@ export class UserController {
 
     const profile = await this.userService.getUserProfile(userId);
 
-    return Builder<SuccessResponse<any>>()
+    return Builder<SuccessResponse<UserProfileResponse>>()
       .data(profile)
       .message(SuccessMessages.GET_SUCCESSFULLY)
       .status(StatusCodes.OK)
@@ -121,7 +122,7 @@ export class UserController {
   async updateCurrentUserProfile(
     @Req() req,
     @Body() updateData: UpdateUserProfileDto,
-  ) {
+  ): Promise<SuccessResponse<UpdateUserResponse>> {
     const userId = req.user.user_id;
 
     if (!userId) {
@@ -137,7 +138,7 @@ export class UserController {
       updateData,
     );
 
-    return Builder<SuccessResponse<any>>()
+    return Builder<SuccessResponse<UpdateUserResponse>>()
       .data(updatedProfile)
       .message('Profile updated successfully')
       .status(StatusCodes.OK)
@@ -158,7 +159,7 @@ export class UserController {
   async updateUserAvatar(
     @Req() req,
     @UploadedFile() avatarFile: Express.Multer.File,
-  ) {
+  ): Promise<SuccessResponse<UpdateUserResponse>> {
     const userId = req.user.user_id;
 
     if (!userId) {
@@ -181,7 +182,7 @@ export class UserController {
       avatarFile,
     );
 
-    return Builder<SuccessResponse<any>>()
+    return Builder<SuccessResponse<UpdateUserResponse>>()
       .data(updatedProfile)
       .message('Avatar updated successfully')
       .status(StatusCodes.OK)
@@ -204,7 +205,7 @@ export class UserController {
     status: 400,
     description: 'Bad request - Invalid OTP or validation error',
   })
-  async securitySetting(@Req() req: any, @Body() data: UpdateSecuritySetting) {
+  async securitySetting(@Req() req: any, @Body() data: UpdateSecuritySetting): Promise<SuccessResponse<UserResponse>> {
     const userId = req.user.user_id;
     console.log('userId: ', userId);
     if (!userId) {
@@ -218,7 +219,7 @@ export class UserController {
     const updatedSecuritySettings =
       await this.userService.updateUserSecuritySettings(userId, data);
 
-    return Builder<SuccessResponse<any>>()
+    return Builder<SuccessResponse<UserResponse>>()
       .data(updatedSecuritySettings)
       .message('Security settings updated successfully')
       .status(StatusCodes.OK)

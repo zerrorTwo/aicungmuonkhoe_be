@@ -63,7 +63,7 @@ export class MailService {
       OTP_CODE: otpCode,
       EXPIRES_AT: expiryTime,
       STATUS: OtpStatus.PENDING,
-      TYPE: OtpType.UPDATE_EMAIL,
+      TYPE: type,
       SENT_COUNT: 1,
     });
     const mailOptions = {
@@ -158,7 +158,7 @@ export class MailService {
     if (PHONE) {
       await this.sendVerificationPhone(userId);
     } else if (EMAIL) {
-      await this.sendVerificationEmail(userId);
+      await this.sendVerificationEmail(userId, OtpType.UPDATE_EMAIL);
     }
 
     return 'Send code successfully!!';

@@ -57,22 +57,13 @@ export class CreateNewUserDto {
 
 export class UpdateUserProfileDto {
   @ApiProperty({
-    description: 'First name of the user',
-    example: 'Nguyễn',
+    description: 'Full name of the user',
+    example: 'Nguyễn Văn A',
     required: false,
   })
   @IsOptional()
   @IsString()
-  FIRST_NAME?: string;
-
-  @ApiProperty({
-    description: 'Last name of the user',
-    example: 'Văn A',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  LAST_NAME?: string;
+  FULL_NAME?: string;
 
   @ApiProperty({
     description: 'Phone number of the user',
@@ -93,23 +84,13 @@ export class UpdateUserProfileDto {
   DOB?: string;
 
   @ApiProperty({
-    description: 'Address/ProvinceID of the user',
+    description: 'ProvinceID of the user',
     example: 1,
     required: false,
   })
   @IsOptional()
-  @IsString()
-  ADDRESS?: string;
-
-  @ApiProperty({
-    description:
-      'Avatar URL of the user (for JSON requests) or avatar file (for multipart requests)',
-    example: 'https://cloudinary.com/avatar.jpg',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  AVATAR?: string;
+  @IsInt()
+  PROVINCE_ID?: number;
 
   @ApiProperty({
     description: 'Gender ID (1: Nam, 2: Nữ, etc.)',
@@ -167,6 +148,16 @@ export class UpdateSecuritySetting {
   @IsOptional()
   @IsString()
   OTP_CODE?: string;
+}
+
+export class forgotPasswordDto {
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  EMAIL: string;
 }
 
 export class resetPasswordDto {

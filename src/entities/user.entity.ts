@@ -27,24 +27,6 @@ export class User {
   })
   EMAIL: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'FIRST_NAME', nullable: true })
-  FIRST_NAME?: string;
-
-  @Column({ type: 'varchar', length: 255, name: 'LAST_NAME', nullable: true })
-  LAST_NAME?: string;
-
-  @Column({ type: 'varchar', length: 255, name: 'DOB', nullable: true })
-  DOB?: string;
-
-  @Column({ type: 'varchar', length: 255, name: 'ADDRESS', nullable: true })
-  ADDRESS?: string;
-
-  @Column({ type: 'varchar', length: 255, name: 'AVATAR', nullable: true })
-  AVATAR?: string;
-
-  @Column({ type: 'int', name: 'GENDER_ID', nullable: true })
-  GENDER_ID?: number;
-
   @Column({ type: 'varchar', length: 255, name: 'PASSWORD', nullable: false })
   PASSWORD: string;
 
