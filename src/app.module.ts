@@ -1,14 +1,20 @@
 import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { dbConfig } from './utils/configs/database';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { RouterModule } from '@nestjs/core';
 import { AdminModule } from './controllers/admin/admin.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientModule } from './controllers/client/client.module';
+import loadEnv from './utils/configs/configuration';
 
 @Global()
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [loadEnv],
+    }),
     TypeOrmModule.forRoot(dbConfig()),
     AdminModule,
     ClientModule,

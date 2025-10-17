@@ -1,55 +1,85 @@
 import {
-  Entity,
   Column,
-  UpdateDateColumn,
   CreateDateColumn,
+  Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { HealthDocument } from './health-document.entity';
+import { OtpRecord } from './otp-record.entity';
+import { Province } from './province.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn({ name: 'user_id' })
-  user_id: number;
+  @PrimaryGeneratedColumn({ name: 'USER_ID' })
+  USER_ID: number;
 
-  @Column({ type: 'varchar', length: 255, name: 'first_name' })
-  first_name: string;
+  @Column({ type: 'varchar', length: 255, name: 'PHONE', nullable: true })
+  PHONE: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'last_name', nullable: true })
-  last_name: string;
+  @Column({
+    type: 'varchar',
+    length: 255,
+    name: 'EMAIL',
+    nullable: false,
+    unique: true,
+  })
+  EMAIL: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'phone', nullable: true })
-  phone: string;
+  @Column({ type: 'varchar', length: 255, name: 'FIRST_NAME', nullable: true })
+  FIRST_NAME?: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'email', nullable: true })
-  email: string;
+  @Column({ type: 'varchar', length: 255, name: 'LAST_NAME', nullable: true })
+  LAST_NAME?: string;
 
-  @Column({ type: 'date', name: 'dob', nullable: true })
-  dob: Date;
+  @Column({ type: 'varchar', length: 255, name: 'DOB', nullable: true })
+  DOB?: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'province', nullable: true })
-  province: string;
+  @Column({ type: 'varchar', length: 255, name: 'ADDRESS', nullable: true })
+  ADDRESS?: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'start_tour', nullable: true })
-  start_tour?: string;
+  @Column({ type: 'varchar', length: 255, name: 'AVATAR', nullable: true })
+  AVATAR?: string;
 
-  @Column({ type: 'varchar', length: 50, name: 'gender', nullable: true })
-  gender: string;
+  @Column({ type: 'int', name: 'GENDER_ID', nullable: true })
+  GENDER_ID?: number;
 
-  @Column({ type: 'tinyint', name: 'status_active', nullable: true })
-  status_active: number;
+  @Column({ type: 'varchar', length: 255, name: 'PASSWORD', nullable: false })
+  PASSWORD: string;
 
-  @Column({ type: 'tinyint', name: 'is_admin', nullable: true, default: 0 })
-  is_admin: number;
+  @Column({ type: 'varchar', length: 255, name: 'START_TOUR', nullable: true })
+  START_TOUR?: string;
 
-  @Column({ type: 'tinyint', name: 'is_deleted', nullable: true, default: 0 })
-  is_deleted: number;
+  @Column({ type: 'tinyint', name: 'STATUS_ACTIVE', nullable: true })
+  STATUS_ACTIVE: number;
 
-  @Column({ type: 'longtext', name: 'face_image', nullable: true })
-  face_image: string;
+  @Column({ type: 'tinyint', name: 'IS_ADMIN', nullable: true, default: 0 })
+  IS_ADMIN: number;
 
-  @CreateDateColumn({ name: 'created_at', nullable: true })
-  created_at?: Date;
+  @Column({ type: 'tinyint', name: 'IS_DELETED', nullable: true, default: 0 })
+  IS_DELETED: number;
 
-  @UpdateDateColumn({ name: 'updated_at', nullable: true })
-  updated_at?: Date;
+  @Column({ type: 'longtext', name: 'FACE_IMAGE', nullable: true })
+  FACE_IMAGE: string;
+
+  @CreateDateColumn({ name: 'CREATED_AT', nullable: true })
+  CREATED_AT?: Date;
+
+  @UpdateDateColumn({ name: 'UPDATED_AT', nullable: true })
+  UPDATED_AT?: Date;
+
+  // 1 user có nhiều health documents
+  @OneToMany(() => HealthDocument, (healthDocument) => healthDocument.USER, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  HEALTH_DOCUMENTS: HealthDocument[];
+
+  // 1 user có nhiều OTP records
+  @OneToMany(() => OtpRecord, (otpRecord) => otpRecord.USER_ID_MNMN, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  OTP_RECORDS: OtpRecord[];
 }
