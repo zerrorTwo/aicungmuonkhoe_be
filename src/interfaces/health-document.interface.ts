@@ -31,7 +31,6 @@ export interface ExerciseIntensityResponse {
 
 export interface HealthDocumentResponse {
   ID: number;
-  NAME?: string;
   FULL_NAME: string;
   DOB?: string;
   PHONE?: string;
@@ -43,8 +42,8 @@ export interface HealthDocumentResponse {
   HEALTH_STATUS?: string;
   JOB?: string;
   TYPE_ACTION?: string;
-  DATE_WORKDAY?: string;
-  DATE_OFF?: string;
+  DATE_WORKDAY?: number;
+  DATE_OFF?: number;
   IS_MYSELF: boolean;
   IS_UPDATE: boolean;
   AVATAR?: string;
