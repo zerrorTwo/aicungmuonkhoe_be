@@ -75,7 +75,6 @@ export class UserService {
       USER_ID: user.USER_ID,
       FULL_NAME:
         myHealthDocument?.FULL_NAME ||
-        myHealthDocument?.NAME ||
         user.EMAIL.split('@')[0] ||
         'Người dùng',
       EMAIL: user.EMAIL,

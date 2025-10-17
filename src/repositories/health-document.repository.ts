@@ -21,10 +21,10 @@ export class HealthDocumentRepository {
 
   async update(
     id: number,
-    updateData: UpdateHealthDocumentDto,
+    updateData: any,
   ): Promise<HealthDocument> {
     const existingEntity = await this.repo.findOne({
-      where: { ID: id, IS_DELETED: false },
+      where: { ID: id },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
     });
 
@@ -61,6 +61,7 @@ export class HealthDocumentRepository {
     };
   }
 
+
   async findByUserId(userId: number): Promise<HealthDocument | null> {
     const result = await this.repo.findOne({
       where: { USER: { USER_ID: userId, IS_DELETED: 0 } },
@@ -83,8 +84,7 @@ export class HealthDocumentRepository {
   async findAllByUserId(userId: number) {
     const result = await this.repo.find({
       where: {
-        USER: { USER_ID: userId, IS_DELETED: 0 },
-        IS_DELETED: false,
+        USER: { USER_ID: userId, IS_DELETED: 0 }
       },
       relations: ['USER'],
     });
