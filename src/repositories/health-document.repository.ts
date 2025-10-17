@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
@@ -29,7 +29,7 @@ export class HealthDocumentRepository {
     });
 
     if (!existingEntity) {
-      throw new Error(`HealthDocument with id ${id} not found`);
+      throw new NotFoundException(`HealthDocument with id ${id} not found`);
     }
     // console.log(updateData);
     console.log(existingEntity);

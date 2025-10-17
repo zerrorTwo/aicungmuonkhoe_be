@@ -5,6 +5,8 @@ import {
   UnauthorizedException,
   ConflictException,
   InternalServerErrorException,
+  BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthLoginDto, AuthSignupDto } from 'src/dtos/auth.dto';
@@ -20,11 +22,15 @@ import {
   pickUser,
 } from 'src/utils/auth/common';
 import Jwt from 'jsonwebtoken';
+import { MailService } from './mail.service';
+import { OtpType } from 'src/entities/otp-record.entity';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private readonly _userRepository: UserRepository) {}
+  constructor(private readonly _userRepository: UserRepository
+    , private readonly mailService: MailService
+  ) {}
 
   async login(authLogin: AuthLoginDto, res: Response) {
     const user = await this._userRepository.findByEmail(authLogin.EMAIL);
@@ -37,6 +43,10 @@ export class AuthService {
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.STATUS_ACTIVE) {
+      throw new ForbiddenException('User account is inactive');
     }
 
     const access_token = generateAccessToken({
@@ -84,6 +94,11 @@ export class AuthService {
     if (!createdUser) {
       throw new InternalServerErrorException('Failed to create user');
     }
+    // gửi otp xác thực email
+    await this.mailService.sendVerificationEmail(
+          createdUser.USER_ID.toString(),
+          OtpType.SIGN_UP,
+        );
 
     const access_token = generateAccessToken({
       user_id: createdUser.USER_ID,
@@ -102,9 +117,25 @@ export class AuthService {
       sameSite: 'lax',
     });
 
-    this.logger.log(`User signed up: ${createdUser.EMAIL}`);
-
     return { user: pickUser(createdUser), access_token };
+  }
+
+  async verifyEmailRegistration(email: string, code: string): Promise<void> {
+    const user = await this._userRepository.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    // kiểm tra otp và cập nhật bảng otp record
+    const otpResult = await this.mailService.verifyEmail(user.EMAIL, code)
+    if (!otpResult.success) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    // Cập nhật trạng thái người dùng
+    user.STATUS_ACTIVE = 1;
+    user.UPDATED_AT = new Date();
+    await this._userRepository.update(user.USER_ID, user);
   }
 
   async refreshToken(

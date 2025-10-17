@@ -319,7 +319,14 @@ async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promi
       if (!otpResult.success) {
         throw new Error(`OTP verification failed: ${otpResult.message}`);
       }
-
+      // cập nhật phone cho health document
+      const health = await this._healthDocumentRepository.findByUserId(userId);
+      if (!health) {
+        throw new NotFoundException(`Health document for user id ${userId} not found`);
+      }
+      await this._healthDocumentRepository.update(health.ID, {
+        PHONE: data.PHONE,
+      });
       // Tiến hành cho phép thay đổi số điện thoại
       updatedUser = await this._userRepository.update(userId, {
         ...user,
