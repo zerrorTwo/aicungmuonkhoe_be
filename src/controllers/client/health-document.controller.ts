@@ -109,6 +109,49 @@ export class HealthDocumentController {
     }
   }
 
+  @Get('/all')
+  @ApiOperation({
+    summary: 'Get all health document information',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved health document information',
+  })
+  @ApiResponse({ status: 404, description: 'Health document not found' })
+  async getHealthDocument(@Req() req) {
+    try {
+      const user_id = req.user.user_id;
+
+      if (!user_id) {
+        throw new HttpException(
+          'User not authenticated',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      const result =
+        await this.healthDocumentService.findAllHealthDocumentByUserID(user_id);
+
+      if (!result) {
+        console.log('No health document found for user:', user_id);
+        throw new HttpException(
+          'Health document not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      console.log('Get all result:', result);
+
+      return Builder<SuccessResponse<HealthDocument[]>>()
+        .data(result)
+        .message(SuccessMessages.GET_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+    } catch (error) {
+      console.error('Get myself error:', error);
+      throw error;
+    }
+  }
+
   @Put('/:id')
   @ApiOperation({ summary: 'Update a health document by ID' })
   @ApiResponse({
