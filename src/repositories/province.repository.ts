@@ -15,4 +15,9 @@ export class ProvinceRepository {
     const result = await this.repo.find();
     return result;
   }
+
+  async findById(id?: number): Promise<Province | null> {
+    const result = await this.repo.findOne({ where: { PROVINCE_ID: id } });
+    return result;
+  }
 }

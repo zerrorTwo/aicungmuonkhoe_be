@@ -187,7 +187,7 @@ export class HealthDocumentResponseDto {
   EXERCISE_FREQUENCY?: string;
 
   @ApiProperty()
-  PROVINCE?: string;
+  PROVINCE?: string | null;
 
   @ApiProperty({ type: () => Object, description: 'Thông tin user' })
   USER?: {

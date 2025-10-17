@@ -49,8 +49,16 @@ export class HealthDocumentRepository {
   ): Promise<HealthDocumentWithRelationsResponse | null> {
     const result = await this.repo.findOne({
       where: { ID: id },
-      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY', 'PROVINCE'],
     });
+    if (!result) {
+      return null;
+    }
+
+    return {
+      ...result,
+      PROVINCE: result.PROVINCE?.NAME
+    };
   }
 
   async findByUserId(userId: number): Promise<HealthDocument | null> {
@@ -89,8 +97,14 @@ export class HealthDocumentRepository {
 
     const result = await this.repo.findOne({
       where: { ID: id, IS_MYSELF: true },
-      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
+      relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY', 'PROVINCE'],
     });
-    return result;
+    if (!result) {
+      return null;
+    }
+    return {
+      ...result,
+      PROVINCE: result.PROVINCE?.NAME
+    };
   }
 }
