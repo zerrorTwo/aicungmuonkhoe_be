@@ -24,6 +24,18 @@ export class ConclusionRecommendDropboxRepository {
     });
   }
 
+  async findByModelAndType(
+    model: HealthModel,
+    type: string,
+  ): Promise<ConclusionDropboxResponse[]> {
+    return await this.repository.find({
+      where: {
+        MODEL: model,
+        TYPE: type,
+      },
+    });
+  }
+
   async findByTypeAndIndex(
     type: DropboxType,
     index: number,

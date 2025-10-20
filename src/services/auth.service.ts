@@ -28,11 +28,13 @@ import { OtpType } from 'src/entities/otp-record.entity';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private readonly _userRepository: UserRepository
-    , private readonly mailService: MailService
+  constructor(
+    private readonly _userRepository: UserRepository,
+    private readonly mailService: MailService,
   ) {}
 
   async login(authLogin: AuthLoginDto, res: Response) {
+    console.log('authLogin:', authLogin);
     const user = await this._userRepository.findByEmail(authLogin.EMAIL);
 
     if (!user) {
@@ -45,9 +47,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    if (!user.STATUS_ACTIVE) {
-      throw new ForbiddenException('User account is inactive');
-    }
+    // if (!user.STATUS_ACTIVE) {
+    //   throw new ForbiddenException('User account is inactive');
+    // }
 
     const access_token = generateAccessToken({
       user_id: user.USER_ID,
@@ -75,49 +77,54 @@ export class AuthService {
     authSignup: AuthSignupDto,
     res: Response,
   ): Promise<{ user: User; access_token: string }> {
-    const user = await this._userRepository.findByEmail(authSignup.EMAIL);
+    try {
+      const user = await this._userRepository.findByEmail(authSignup.EMAIL);
 
-    if (user) {
-      throw new ConflictException('User already exists');
+      if (user) {
+        throw new ConflictException('User already exists');
+      }
+
+      const hashedPassword = await HashPassword(authSignup.PASSWORD);
+
+      const newUser: CreateNewUserDto = {
+        EMAIL: authSignup.EMAIL,
+        PHONE: authSignup.PHONE,
+        PASSWORD: hashedPassword,
+      };
+
+      const createdUser = await this._userRepository.create(newUser);
+
+      if (!createdUser) {
+        throw new InternalServerErrorException('Failed to create user');
+      }
+      // gửi otp xác thực email
+      // await this.mailService.sendVerificationEmail(
+      //   createdUser.USER_ID.toString(),
+      //   OtpType.SIGN_UP,
+      // );
+
+      const access_token = generateAccessToken({
+        user_id: createdUser.USER_ID,
+        email: createdUser.EMAIL,
+      });
+      const refresh_token = generateRefreshToken({
+        user_id: createdUser.USER_ID,
+        email: createdUser.EMAIL,
+      });
+
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return { user: pickUser(createdUser), access_token };
+    } catch (error) {
+      this.logger.error('Error in signup:', error);
+      throw new InternalServerErrorException(error);
     }
-
-    const hashedPassword = await HashPassword(authSignup.PASSWORD);
-
-    const newUser: CreateNewUserDto = {
-      EMAIL: authSignup.EMAIL,
-      PHONE: authSignup.PHONE,
-      PASSWORD: hashedPassword,
-    };
-
-    const createdUser = await this._userRepository.create(newUser);
-
-    if (!createdUser) {
-      throw new InternalServerErrorException('Failed to create user');
-    }
-    // gửi otp xác thực email
-    await this.mailService.sendVerificationEmail(
-          createdUser.USER_ID.toString(),
-          OtpType.SIGN_UP,
-        );
-
-    const access_token = generateAccessToken({
-      user_id: createdUser.USER_ID,
-      email: createdUser.EMAIL,
-    });
-    const refresh_token = generateRefreshToken({
-      user_id: createdUser.USER_ID,
-      email: createdUser.EMAIL,
-    });
-
-    res.cookie('refresh_token', refresh_token, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    });
-
-    return { user: pickUser(createdUser), access_token };
   }
 
   async verifyEmailRegistration(email: string, code: string): Promise<void> {
@@ -127,7 +134,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     // kiểm tra otp và cập nhật bảng otp record
-    const otpResult = await this.mailService.verifyEmail(user.EMAIL, code)
+    const otpResult = await this.mailService.verifyEmail(user.EMAIL, code);
     if (!otpResult.success) {
       throw new BadRequestException('Invalid OTP');
     }

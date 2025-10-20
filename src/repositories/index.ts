@@ -5,6 +5,7 @@ import { ConclusionRecommendClientRepository } from './conclusion-recommend-clie
 import { ConclusionRecommendManagementRepository } from './conclusion-recommend-management.repository';
 import { ConclusionRecommendDropboxRepository } from './conclusion-recommend-dropbox.repository';
 import { ProvinceRepository } from './province.repository';
+import { GenderRepository } from './gender.repository';
 
 const Repositories = [
   UserRepository,
@@ -14,6 +15,7 @@ const Repositories = [
   ConclusionRecommendManagementRepository,
   ConclusionRecommendDropboxRepository,
   ProvinceRepository,
+  GenderRepository,
 ];
 
 export default Repositories;

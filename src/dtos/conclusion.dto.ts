@@ -22,7 +22,8 @@ export class CreateConclusionClientDto {
   VALUE_DIA?: number;
 
   @IsNumber()
-  VALUE: number;
+  @IsOptional()
+  VALUE?: number;
 
   @IsOptional()
   @IsString()

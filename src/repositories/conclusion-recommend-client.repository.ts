@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConclusionRecommendClient } from 'src/entities/conclusion-recommend-client.entity';
+import { ConclusionRecommendClientResponse } from 'src/interfaces/conclusion.interface';
 
 @Injectable()
 export class ConclusionRecommendClientRepository {
@@ -141,7 +142,7 @@ export class ConclusionRecommendClientRepository {
     MODEL?: string;
     AGE_TYPE?: string | string[];
     SORT?: string;
-  }): Promise<ConclusionRecommendClient[]> {
+  }): Promise<ConclusionRecommendClientResponse[]> {
     const queryBuilder = this.repo
       .createQueryBuilder('conclusion')
       .leftJoinAndSelect('conclusion.HEALTH_DOCUMENT', 'healthDocument');
@@ -180,10 +181,9 @@ export class ConclusionRecommendClientRepository {
 
     // Add sorting
     if (options.SORT) {
-      const [field, direction] = options.SORT.split(':');
       queryBuilder.orderBy(
-        `conclusion.${field}`,
-        (direction?.toUpperCase() as 'ASC' | 'DESC') || 'DESC',
+        'conclusion.CREATED_DATE',
+        options.SORT.toUpperCase() as 'ASC' | 'DESC',
       );
     } else {
       queryBuilder.orderBy('conclusion.CREATED_DATE', 'DESC');
@@ -191,6 +191,26 @@ export class ConclusionRecommendClientRepository {
 
     const data = await queryBuilder.getMany();
 
-    return data;
+    // Map data to ConclusionRecommendClientResponse interface
+    const mappedData: ConclusionRecommendClientResponse[] = data.map(
+      (item) => ({
+        ID: item.ID,
+        MODEL: item.MODEL,
+        DATE: item.DATE,
+        VALUE_SYS: item.VALUE_SYS,
+        VALUE_DIA: item.VALUE_DIA,
+        VALUE: item.VALUE,
+        VALUE_WEIGHT: item.VALUE_WEIGHT,
+        VALUE_HEIGHT: item.VALUE_HEIGHT,
+        INDICATOR: item.INDICATOR,
+        TIME: item.TIME,
+        HEALTH_DOCUMENT_ID: item.HEALTH_DOCUMENT_ID,
+        CREATED_DATE: item.CREATED_DATE,
+        AGE_TYPE: item.AGE_TYPE,
+        CREATED_BY: item.CREATED_BY,
+      }),
+    );
+
+    return mappedData;
   }
 }

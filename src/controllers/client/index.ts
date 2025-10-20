@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { MailController } from './mail.controller';
 import { ConclusionController } from './conclusion.controller';
 import { ProvinceController } from './province.controller';
+import { GenderController } from './gender.controller';
 
 const Controllers = [
   UserController,
@@ -12,6 +13,7 @@ const Controllers = [
   MailController,
   ConclusionController,
   ProvinceController,
+  GenderController,
 ];
 
 export default Controllers;

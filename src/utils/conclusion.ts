@@ -127,7 +127,7 @@ export const Conclusion = {
     dropBoxs: any[],
     models: any[],
     totalMonthAge: number,
-    ageType: string,
+    ageType?: string,
   ) => {
     let index = 0;
     let valueBMI =
@@ -139,19 +139,18 @@ export const Conclusion = {
       index = heightBMI(item.VALUE_HEIGHT, totalMonthAge, gender);
     }
     if (type === ACTIVE_TAB.WEIGHT_HEIGHT) {
-      index =
-        ageType === AGE_TYPE.FROM_0_LESS_THAN_2
-          ? weightHeightBMI02(item.VALUE_WEIGHT, item.VALUE_HEIGHT, gender)
-          : weightHeightBMI25(item.VALUE_WEIGHT, item.VALUE_HEIGHT, gender);
+      if (ageType === AGE_TYPE.FROM_0_LESS_THAN_2) {
+        index = weightHeightBMI02(item.VALUE_WEIGHT, item.VALUE_HEIGHT, gender);
+      } else {
+        index = weightHeightBMI25(item.VALUE_WEIGHT, item.VALUE_HEIGHT, gender);
+      }
     }
-
     if (
       ageType === AGE_TYPE.FROM_5_LESS_THAN_12 ||
       ageType === AGE_TYPE.FROM_12_LESS_THAN_20
     ) {
       index = bmi519(valueBMI, totalMonthAge, gender);
     }
-
     const dropBox = dropBoxs.find(
       (dropBox) =>
         dropBox.INDEX === index && dropBox.TYPE === DROPBOX_TYPE.TYPE,

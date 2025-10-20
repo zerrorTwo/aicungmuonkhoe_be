@@ -28,6 +28,7 @@ import { Province } from 'src/entities/province.entity';
       ConclusionRecommendManagement,
       ConclusionRecommendDropbox,
       Province,
+      Gender,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

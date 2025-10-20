@@ -42,9 +42,6 @@ export class HealthDocumentController {
   })
   async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
     const user_id = req.user.user_id;
-    console.log('=== CREATE HEALTH DOCUMENT ===');
-    console.log('user_id:', user_id);
-    console.log('createDto:', createDto);
 
     try {
       const result = await this.healthDocumentService.createHealthDocument(
@@ -159,14 +156,12 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentById(@Param('id') id: number) {
-      const result =
-        await this.healthDocumentService.findHealthDocumentByID(id);
-      
+    const result = await this.healthDocumentService.findHealthDocumentByID(id);
 
-      return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
+    return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
   }
 }

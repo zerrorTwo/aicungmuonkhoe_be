@@ -34,7 +34,6 @@ export interface ConclusionModelResponse {
   CREATED_BY?: number;
   MODIFIED_DATE?: Date;
   MODIFIED_BY?: number;
-  IS_DELETED?: boolean;
 }
 
 export interface ConclusionDropboxResponse {

@@ -36,84 +36,6 @@ export class ConclusionController {
     private readonly conclusionService: ConclusionService,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new conclusion document' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully created conclusion document',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Conclusion document not found or unauthorized',
-  })
-  async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
-    const user_id = req.user.user_id;
-    console.log('=== CREATE CONCLUSION DOCUMENT ===');
-    console.log('user_id:', user_id);
-    console.log('createDto:', createDto);
-
-    try {
-      const result = await this.healthDocumentService.createHealthDocument(
-        user_id,
-        createDto,
-      );
-      console.log('Create result:', result);
-
-      return Builder<SuccessResponse<HealthDocument>>()
-        .data(result)
-        .message(SuccessMessages.CREATE_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Create error:', error);
-      throw error;
-    }
-  }
-
-  @Get('/myself')
-  @ApiOperation({
-    summary: 'Get health document information for the authenticated user',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved health document information',
-  })
-  @ApiResponse({ status: 404, description: 'Health document not found' })
-  async getHealthDocumentMySelf(@Req() req) {
-    try {
-      const user_id = req.user.user_id;
-
-      if (!user_id) {
-        throw new HttpException(
-          'User not authenticated',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      const result =
-        await this.healthDocumentService.findHealthDocumentMySelfByUserID(
-          user_id,
-        );
-
-      if (!result) {
-        console.log('No health document found for user:', user_id);
-        throw new HttpException(
-          'Health document not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return Builder<SuccessResponse<HealthDocument>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Get myself error:', error);
-      throw error;
-    }
-  }
-
   @Post('/client')
   @ApiOperation({ summary: 'Create a new conclusion for client' })
   @ApiResponse({
@@ -129,8 +51,10 @@ export class ConclusionController {
     @Req() req,
   ) {
     try {
-      const result =
-        await this.conclusionService.createConclusionClient(createDto);
+      const result = await this.conclusionService.createConclusionClient(
+        createDto,
+        req,
+      );
 
       return Builder<SuccessResponse<boolean>>()
         .data(result)
@@ -138,7 +62,6 @@ export class ConclusionController {
         .status(StatusCodes.OK)
         .build();
     } catch (error) {
-      console.error('Create conclusion error:', error);
       throw new HttpException(
         error.message || 'Failed to create conclusion',
         HttpStatus.BAD_REQUEST,
@@ -226,10 +149,7 @@ export class ConclusionController {
     status: 400,
     description: 'Bad request - invalid parameters',
   })
-  async getConclusionsRange(
-    @Query() queryParams: ConclusionQueryDto,
-    @Req() req,
-  ) {
+  async getConclusionsRange(@Query() queryParams: ConclusionQueryDto) {
     try {
       const result =
         await this.conclusionService.getConclusionsRange(queryParams);
