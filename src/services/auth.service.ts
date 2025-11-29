@@ -24,12 +24,15 @@ import {
 import Jwt from 'jsonwebtoken';
 import { MailService } from './mail.service';
 import { OtpType } from 'src/entities/otp-record.entity';
+import { UserActiveLogService } from './user-active-log.service';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private readonly _userRepository: UserRepository
-    , private readonly mailService: MailService
+  constructor(
+    private readonly _userRepository: UserRepository,
+    private readonly mailService: MailService,
+    private readonly userActiveLogService: UserActiveLogService,
   ) {}
 
   async login(authLogin: AuthLoginDto, res: Response) {
@@ -67,6 +70,10 @@ export class AuthService {
     });
 
     this.logger.log(`User logged in: ${user.EMAIL}`);
+
+    // Log login activity
+    const device = authLogin.DEVICE || 'Unknown';
+    await this.userActiveLogService.logLogin(user.USER_ID, device);
 
     return { user: pickUser(user), access_token };
   }
