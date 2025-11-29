@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthLoginDto {
@@ -19,6 +19,15 @@ export class AuthLoginDto {
   @IsString()
   @MinLength(6)
   PASSWORD: string;
+
+  @ApiProperty({
+    description: 'Device information for activity logging',
+    example: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  DEVICE?: string;
 }
 
 export class AuthSignupDto {

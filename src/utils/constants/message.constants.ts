@@ -26,6 +26,7 @@ export const SuccessMessages = {
   ADD_DEPARTMENT_TO_MEALTIME_SUCCESSFULLY:
     'Đã thêm phòng ban vào thiết lập giờ ăn',
   FETCH_PROVINCES_SUCCESSFULLY: 'Lấy dữ liệu các tỉnh thành công',
+  FETCH_GENDERS_SUCCESSFULLY: 'Lấy dữ liệu giới tính thành công',
 };
 
 export const importErrorMessages = {

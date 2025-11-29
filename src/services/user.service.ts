@@ -21,6 +21,7 @@ import { HealthDocument } from 'src/entities/health-document.entity';
 import { DeepPartial } from 'typeorm';
 import { Gender } from 'src/entities/gender.entity';
 import { UpdateUserResponse, UserResponse, UserProfileResponse } from 'src/interfaces/user.interface';
+import { UserActiveLogService } from './user-active-log.service';
 
 @Injectable()
 export class UserService {
@@ -32,6 +33,7 @@ export class UserService {
     private readonly _provinceRepository: ProvinceRepository,
     private readonly cloudinaryProvider: CloudinaryProvider,
     private readonly mailService: MailService,
+    private readonly userActiveLogService: UserActiveLogService,
   ) {}
 
   // Utility function để xử lý boolean từ database (tinyint có thể trả về 0/1 hoặc true/false)
@@ -347,6 +349,9 @@ async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promi
         PASSWORD: hashedPassword,
         UPDATED_AT: new Date(),
       });
+
+      // Log password change activity
+      await this.userActiveLogService.logChangePassword(userId);
     } else if (data.EMAIL) {
       // Check OTP từ email đã gửi
       const otpResult = await this.mailService.verifyEmail(
@@ -389,6 +394,9 @@ async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promi
       OtpType.FORGOT_PASSWORD,
     );
 
+    // Log forgot password activity
+    await this.userActiveLogService.logForgotPassword(user.USER_ID);
+
     return {
       success: true,
       message: 'OTP sent to email if it exists in our system',
@@ -421,6 +429,9 @@ async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promi
       PASSWORD: hashedPassword,
       UPDATED_AT: new Date(),
     });
+
+    // Log password reset activity (same as change password)
+    await this.userActiveLogService.logChangePassword(user.USER_ID);
 
     return {
       success: true,

@@ -53,7 +53,7 @@ export class ConclusionRecommendClient {
   CREATED_BY: string;
 
   // Liên kết với bảng HealthDocument
-  @ManyToOne(() => HealthDocument, { nullable: true })
+  @ManyToOne(() => HealthDocument, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'HEALTH_DOCUMENT_ID' })
   HEALTH_DOCUMENT: HealthDocument;
 }
