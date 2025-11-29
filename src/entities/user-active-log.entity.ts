@@ -20,9 +20,6 @@ export class UsersActiveLog {
   })
   USER_ID: number;
 
-  @Column({ name: 'FULL_NAME', type: 'varchar', length: 255, nullable: true })
-  FULL_NAME: string;
-
   @Column({ name: 'ACTION', type: 'varchar', length: 255, nullable: true })
   ACTION: string;
 
