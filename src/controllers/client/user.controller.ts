@@ -23,7 +23,7 @@ import { Builder } from 'builder-pattern';
 import { StatusCodes } from 'http-status-codes';
 import {
   CreateNewUserDto,
-  forgotPasswordDto, 
+  forgotPasswordDto,
   resetPasswordDto,
   UpdateSecuritySetting,
   UpdateUserProfileDto,
@@ -33,7 +33,11 @@ import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
 import { SuccessResponse } from 'src/utils/format';
 import { User } from '../../entities/user.entity';
-import { UpdateUserResponse, UserResponse, UserProfileResponse } from 'src/interfaces/user.interface';
+import {
+  UpdateUserResponse,
+  UserResponse,
+  UserProfileResponse,
+} from 'src/interfaces/user.interface';
 
 @ApiTags('User')
 @Controller('user')
@@ -205,7 +209,10 @@ export class UserController {
     status: 400,
     description: 'Bad request - Invalid OTP or validation error',
   })
-  async securitySetting(@Req() req: any, @Body() data: UpdateSecuritySetting): Promise<SuccessResponse<UserResponse>> {
+  async securitySetting(
+    @Req() req: any,
+    @Body() data: UpdateSecuritySetting,
+  ): Promise<SuccessResponse<UserResponse>> {
     const userId = req.user.user_id;
     console.log('userId: ', userId);
     if (!userId) {
@@ -228,7 +235,10 @@ export class UserController {
 
   @Post('/forgot-password')
   @ApiOperation({ summary: 'Send forgot password email' })
-  @ApiResponse({ status: 200, description: 'Password reset email sent successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent successfully',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'Bad request - Invalid email' })
   async forgotPassword(@Body() forgotPasswordDto: forgotPasswordDto) {
@@ -244,7 +254,10 @@ export class UserController {
   @ApiOperation({ summary: 'Reset user password using OTP' })
   @ApiResponse({ status: 200, description: 'Password reset successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 400, description: 'Bad request - Invalid OTP or validation error' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid OTP or validation error',
+  })
   async resetPassword(@Body() resetPassword: resetPasswordDto) {
     const { EMAIL, OTP_CODE, NEW_PASSWORD } = resetPassword;
     // Call service to handle password reset

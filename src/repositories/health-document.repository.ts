@@ -86,7 +86,7 @@ export class HealthDocumentRepository {
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 }
       },
-      relations: ['USER'],
+      relations: ['USER', 'USER_LINK', 'GENDER'],
     });
     return result;
   }

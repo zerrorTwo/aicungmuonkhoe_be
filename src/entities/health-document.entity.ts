@@ -4,6 +4,9 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Gender } from './gender.entity';
@@ -14,14 +17,20 @@ import { Province } from './province.entity';
 export class HealthDocument {
   @PrimaryGeneratedColumn()
   ID: number;
-
-  // Quan hệ với bảng users
+  // Xem xét về sau nên xét unique cho cặp USER_ID và USER_LINK_ID
   @ManyToOne(() => User, (user) => user.HEALTH_DOCUMENTS, {
     nullable: true,
-    onDelete: 'CASCADE', // Khi xóa user sẽ xóa luôn health document này
+    createForeignKeyConstraints: false,
   })
   @JoinColumn({ name: 'USER_ID' })
-  USER: User;
+  USER: User; // tài khoản chính
+
+  @ManyToOne(() => User, (user) => user.HEALTH_DOCUMENTS, {
+    nullable: true,
+    createForeignKeyConstraints: false,
+  })
+  @JoinColumn({ name: 'USER_LINK_ID' })
+  USER_LINK: User; // tài khoản liên kết
 
   @Column({ type: 'varchar', length: 255, name: 'FULL_NAME' })
   FULL_NAME: string;
@@ -39,7 +48,7 @@ export class HealthDocument {
   IS_SYNC: boolean;
 
   @Column({ name: 'TYPE', type: 'varchar', length: 255, nullable: true })
-  TYPE: string;
+  TYPE: string; // account_autonomouse hoặc account_linked
 
   @Column({ name: 'HEIGHT', type: 'varchar', length: 100, nullable: true })
   HEIGHT: string;
@@ -107,4 +116,13 @@ export class HealthDocument {
   })
   @JoinColumn({ name: 'PROVINCE_ID' })
   PROVINCE: Province;
+
+  @DeleteDateColumn()
+  DELETED_AT: Date;
+
+  @CreateDateColumn()
+  CREATED_AT: Date;
+
+  @UpdateDateColumn()
+  UPDATED_AT: Date;
 }
