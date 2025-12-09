@@ -7,6 +7,7 @@ import {
 } from 'src/dtos/health-document.dto';
 import { plainToInstance } from 'class-transformer';
 import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
+import { pickUser } from 'src/utils/auth/common';
 
 @Injectable()
 export class HealthDocumentService {
@@ -57,7 +58,8 @@ export class HealthDocumentService {
     healthDocument: UpdateHealthDocumentDto,
   ) {
     // Ensure the ID is set in the DTO
-    const exist: HealthDocumentWithRelationsResponse | null = await this._healthDocumentRepository.findById(id);
+    const exist: HealthDocumentWithRelationsResponse | null =
+      await this._healthDocumentRepository.findById(id);
     if (!exist) {
       throw new Error(`Health document with id ${id} not found`);
     }
@@ -67,22 +69,34 @@ export class HealthDocumentService {
   async findHealthDocumentByID(
     id: number,
   ): Promise<HealthDocumentWithRelationsResponse> {
-    const healthDocument: HealthDocumentWithRelationsResponse | null = await this._healthDocumentRepository.findById(id);
+    const healthDocument: HealthDocumentWithRelationsResponse | null =
+      await this._healthDocumentRepository.findById(id);
     if (!healthDocument) {
       throw new NotFoundException(`Health document with id ${id} not found`);
     }
     return healthDocument;
   }
 
+  /**
+   * Find health document where IS_MYSELF = true by user_id
+   * @param user_id The ID of the user
+   * @returns health document
+   */
   async findHealthDocumentMySelfByUserID(
     user_id: number,
   ): Promise<HealthDocument> {
     const healthDocument =
       await this._healthDocumentRepository.findMySelfByUserId(user_id);
     if (!healthDocument) {
-      throw new NotFoundException(`Health document for user with id ${user_id} not found`);
+      throw new NotFoundException(
+        `Health document for user with id ${user_id} not found`,
+      );
     }
-    return healthDocument;
+    const result = {
+      ...healthDocument,
+      USER: pickUser(healthDocument.USER),
+    }
+    return result;
   }
 
   async findAllHealthDocumentByUserID(
@@ -95,6 +109,12 @@ export class HealthDocumentService {
         `All Health document for user with id ${user_id} not found`,
       );
     }
-    return allHealthDocument;
+
+    const result = allHealthDocument.map((doc) => ({
+      ...doc,
+      USER: pickUser(doc.USER),
+      USER_LINK: doc.USER_LINK ? pickUser(doc.USER_LINK) : null,
+    }));
+    return result;
   }
 }

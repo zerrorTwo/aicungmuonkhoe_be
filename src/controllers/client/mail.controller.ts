@@ -24,9 +24,8 @@ export class MailController {
     @Req() req,
     @Body() sendVerificationDto: SendVerificationDto,
   ) {
-    const responseMessage = await this.mailService.sendVerification(
-      sendVerificationDto
-    );
+    const responseMessage =
+      await this.mailService.sendVerification(sendVerificationDto);
 
     return Builder<SuccessResponse>()
       .data(null)

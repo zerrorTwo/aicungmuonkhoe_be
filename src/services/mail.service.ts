@@ -16,18 +16,17 @@ import {
   isOtpExpired,
 } from 'src/utils/otp';
 
+const env = loadEnv();
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
   private transporter: nodemailer.Transporter;
-  private config: any;
   private readonly MAX_VERIFY_ATTEMPTS = 4;
 
   constructor(
     private readonly otpRepository: OtpRepository,
     private readonly userRepository: UserRepository,
   ) {
-    this.config = loadEnv();
     this.initializeTransporter();
   }
 
@@ -35,8 +34,8 @@ export class MailService {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: this.config.GMAIL_USER,
-        pass: this.config.GMAIL_PASSWORD,
+        user: env.GMAIL_USER,
+        pass: env.GMAIL_PASSWORD,
       },
     });
   }
@@ -67,7 +66,7 @@ export class MailService {
       SENT_COUNT: 1,
     });
     const mailOptions = {
-      from: this.config.GMAIL_USER,
+      from: env.GMAIL_USER,
       to: user.EMAIL,
       subject: 'Xác nhận địa chỉ email',
       html: `
@@ -116,7 +115,7 @@ export class MailService {
     });
 
     const mailOptions = {
-      from: this.config.GMAIL_USER,
+      from: env.GMAIL_USER,
       to: user.EMAIL || '',
       subject: 'Xác nhận số điện thoại',
       html: `
