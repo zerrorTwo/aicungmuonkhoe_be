@@ -14,7 +14,7 @@ export const dbConfig = (): DataSourceOptions => {
     database: env.NAME,
     entities: [path.join(__dirname, '../../entities/**/*.entity.{js,ts}')],
     synchronize: true, // nhớ để true khi dev, false khi prod
-    logging: false, // log query khi dev
+    logging: ['error'], // log query khi dev
     // Performance optimization
     extra: {
       connectionLimit: 10,

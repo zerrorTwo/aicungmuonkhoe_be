@@ -159,14 +159,12 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentById(@Param('id') id: number) {
-      const result =
-        await this.healthDocumentService.findHealthDocumentByID(id);
-      
+    const result = await this.healthDocumentService.findHealthDocumentByID(id);
 
-      return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
+    return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
   }
 }
