@@ -16,6 +16,18 @@ import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { MulterConfigService } from '../../config/multer.config';
 import { Province } from 'src/entities/province.entity';
 import { UsersActiveLog } from 'src/entities/user-active-log.entity';
+import { AgeRange } from '../../entities/age-range.entity';
+import { HealthStatus } from '../../entities/health-status.entity';
+import { MealType } from '../../entities/meal-type.entity';
+import { Food } from '../../entities/food.entity';
+import { Dish } from '../../entities/dish.entity';
+import { NutritionalStandard } from '../../entities/nutritional-standard.entity';
+import { NutritionalMealDistribution } from '../../entities/nutritional-meal-distribution.entity';
+import { NutritionalIngredientDistribution } from '../../entities/nutritional-ingredient-distribution.entity';
+import { FoodRecommendation } from '../../entities/food-recommendation.entity';
+import { MealPlanner } from '../../entities/meal-planner.entity';
+import { MealPlannerMeal } from '../../entities/meal-planner-meal.entity';
+import { MealPlannerMealDish } from '../../entities/meal-planner-meal-dish.entity';
 
 @Module({
   imports: [
@@ -30,6 +42,18 @@ import { UsersActiveLog } from 'src/entities/user-active-log.entity';
       ConclusionRecommendDropbox,
       Province,
       UsersActiveLog,
+      AgeRange,
+      HealthStatus,
+      MealType,
+      Food,
+      Dish,
+      NutritionalStandard,
+      NutritionalMealDistribution,
+      NutritionalIngredientDistribution,
+      FoodRecommendation,
+      MealPlanner,
+      MealPlannerMeal,
+      MealPlannerMealDish,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

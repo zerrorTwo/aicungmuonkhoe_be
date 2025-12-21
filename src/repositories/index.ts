@@ -7,6 +7,13 @@ import { ConclusionRecommendDropboxRepository } from './conclusion-recommend-dro
 import { ProvinceRepository } from './province.repository';
 import { UserActiveLogRepository } from './user-active-log.repository';
 import { GenderRepository } from './gender.repository';
+import { NutritionalStandardRepository } from './nutritional-standard.repository';
+import { NutritionalMealDistributionRepository } from './nutritional-meal-distribution.repository';
+import { NutritionalIngredientDistributionRepository } from './nutritional-ingredient-distribution.repository';
+import { FoodRecommendationRepository } from './food-recommendation.repository';
+import { MealPlannerRepository } from './meal-planner.repository';
+import { MealPlannerMealRepository } from './meal-planner-meal.repository';
+import { MealPlannerMealDishRepository } from './meal-planner-meal-dish.repository';
 
 const Repositories = [
   UserRepository,
@@ -18,6 +25,13 @@ const Repositories = [
   ProvinceRepository,
   UserActiveLogRepository,
   GenderRepository,
+  NutritionalStandardRepository,
+  NutritionalMealDistributionRepository,
+  NutritionalIngredientDistributionRepository,
+  FoodRecommendationRepository,
+  MealPlannerRepository,
+  MealPlannerMealRepository,
+  MealPlannerMealDishRepository,
 ];
 
 export default Repositories;

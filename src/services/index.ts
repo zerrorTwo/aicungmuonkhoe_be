@@ -6,6 +6,9 @@ import { ConclusionService } from './conclusion.service';
 import { ProvinceService } from './province.service';
 import { UserActiveLogService } from './user-active-log.service';
 import { GenderService } from './gender.service';
+import { NutritionService } from './nutrition.service';
+import { FoodRecommendationService } from './food-recommendation.service';
+import { MealPlannerService } from './meal-planner.service';
 
 const Services = [
   UserService,
@@ -16,6 +19,9 @@ const Services = [
   ProvinceService,
   UserActiveLogService,
   GenderService,
+  NutritionService,
+  FoodRecommendationService,
+  MealPlannerService,
 ];
 
 export default Services;
