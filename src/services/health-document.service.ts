@@ -8,6 +8,7 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
 import { pickUser } from 'src/utils/auth/common';
+import { UserRepository } from 'src/repositories/user.repository';
 
 @Injectable()
 export class HealthDocumentService {
@@ -54,6 +55,7 @@ export class HealthDocumentService {
   }
 
   async updateHealthDocument(
+    user_id: number,
     id: number,
     healthDocument: UpdateHealthDocumentDto,
   ) {
@@ -63,6 +65,22 @@ export class HealthDocumentService {
     if (!exist) {
       throw new Error(`Health document with id ${id} not found`);
     }
+    const healthDocumentByUserId = this._healthDocumentRepository.findOne(
+      user_id,
+      id,
+    );
+
+    if (!healthDocumentByUserId) {
+      throw new NotFoundException(
+        `Health document with id ${id} for user with id ${user_id} not found`,
+      );
+    }
+    // Ensure the ID is set in the DTO
+    // const exist: HealthDocumentWithRelationsResponse | null =
+    //   await this._healthDocumentRepository.findById(user_id, id);
+    // if (!exist) {
+    //   throw new Error(`Health document with id ${id} not found`);
+    // }
     return this._healthDocumentRepository.update(id, healthDocument);
   }
 
@@ -95,14 +113,14 @@ export class HealthDocumentService {
     const result = {
       ...healthDocument,
       USER: pickUser(healthDocument.USER),
-    }
+    };
     return result;
   }
 
   async findAllHealthDocumentByUserID(
     user_id: number,
-  ): Promise<HealthDocument[]> {
-    const allHealthDocument =
+  ): Promise<HealthDocumentWithRelationsResponse[] | null> {
+    const allHealthDocument: HealthDocumentWithRelationsResponse[] | null =
       await this._healthDocumentRepository.findAllByUserId(user_id);
     if (!allHealthDocument) {
       throw new NotFoundException(
@@ -113,7 +131,7 @@ export class HealthDocumentService {
     const result = allHealthDocument.map((doc) => ({
       ...doc,
       USER: pickUser(doc.USER),
-      USER_LINK: doc.USER_LINK ? pickUser(doc.USER_LINK) : null,
+      // USER_LINK: doc.USER_LINK ? pickUser(doc.USER_LINK) : null,
     }));
     return result;
   }

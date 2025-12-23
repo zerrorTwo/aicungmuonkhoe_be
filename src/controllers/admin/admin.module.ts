@@ -26,6 +26,7 @@ import { FoodRecommendation } from '../../entities/food-recommendation.entity';
 import { MealPlanner } from '../../entities/meal-planner.entity';
 import { MealPlannerMeal } from '../../entities/meal-planner-meal.entity';
 import { MealPlannerMealDish } from '../../entities/meal-planner-meal-dish.entity';
+import { Tips } from 'src/entities/tips.entity';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MealPlannerMealDish } from '../../entities/meal-planner-meal-dish.entit
       MealPlanner,
       MealPlannerMeal,
       MealPlannerMealDish,
+      Tips,
     ]),
   ],
   controllers: [...Controllers],

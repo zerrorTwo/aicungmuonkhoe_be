@@ -52,10 +52,7 @@ export class HealthDocumentRepository {
       return null;
     }
 
-    return {
-      ...result,
-      PROVINCE: result.PROVINCE?.NAME,
-    };
+    return result;
   }
 
   async findByUserId(userId: number): Promise<HealthDocument | null> {
@@ -77,7 +74,9 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findAllByUserId(userId: number) {
+  async findAllByUserId(
+    userId: number,
+  ): Promise<HealthDocumentWithRelationsResponse[] | null> {
     const result = await this.repo.find({
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 },
@@ -97,9 +96,17 @@ export class HealthDocumentRepository {
     if (!result) {
       return null;
     }
-    return {
-      ...result,
-      PROVINCE: result.PROVINCE?.NAME,
-    };
+    return result;
+  }
+
+  async findOne(userId: number, id: number): Promise<HealthDocument | null> {
+    const result = await this.repo.findOne({
+      where: { USER: { USER_ID: userId, IS_DELETED: 0 }, ID: id },
+      relations: ['USER'],
+    });
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

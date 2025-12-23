@@ -8,6 +8,8 @@ import { GenderController } from './gender.controller';
 import { NutritionController } from './nutrition.controller';
 import { FoodRecommendationController } from './food-recommendation.controller';
 import { MealPlannerController } from './meal-planner.controller';
+import { TipController } from './tip.controller';
+import { ChatbotController } from './chatbot.controller';
 
 const Controllers = [
   UserController,
@@ -20,6 +22,8 @@ const Controllers = [
   NutritionController,
   FoodRecommendationController,
   MealPlannerController,
+  TipController,
+  ChatbotController,
 ];
 
 export default Controllers;
