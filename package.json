@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mistralai/mistralai": "^1.11.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -30,6 +31,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/multer": "^2.0.0",
     "@types/nodemailer": "^7.0.2",
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "builder-pattern": "^2.2.0",
     "class-transformer": "^0.5.1",

@@ -118,7 +118,9 @@ export class HealthDocumentController {
     const result =
       await this.healthDocumentService.findAllHealthDocumentByUserID(user_id);
 
-    return Builder<SuccessResponse<HealthDocument[]>>()
+    return Builder<
+      SuccessResponse<HealthDocumentWithRelationsResponse[] | null>
+    >()
       .data(result)
       .message(SuccessMessages.GET_SUCCESSFULLY)
       .status(StatusCodes.OK)
@@ -136,10 +138,13 @@ export class HealthDocumentController {
     description: 'Health document not found or unauthorized',
   })
   async update(
+    @Req() req,
     @Param('id') id: number,
     @Body() updateDto: UpdateHealthDocumentDto,
   ) {
+    const user_id = req.user.user_id;
     const result = await this.healthDocumentService.updateHealthDocument(
+      user_id,
       id,
       updateDto,
     );
@@ -159,14 +164,12 @@ export class HealthDocumentController {
   })
   @ApiResponse({ status: 404, description: 'Health document not found' })
   async getHealthDocumentById(@Param('id') id: number) {
-      const result =
-        await this.healthDocumentService.findHealthDocumentByID(id);
-      
+    const result = await this.healthDocumentService.findHealthDocumentByID(id);
 
-      return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
+    return Builder<SuccessResponse<HealthDocumentWithRelationsResponse>>()
+      .data(result)
+      .message(SuccessMessages.GET_SUCCESSFULLY)
+      .status(StatusCodes.OK)
+      .build();
   }
 }

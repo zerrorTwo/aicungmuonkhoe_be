@@ -7,6 +7,7 @@ import { ConclusionRecommendDropboxRepository } from './conclusion-recommend-dro
 import { ProvinceRepository } from './province.repository';
 import { UserActiveLogRepository } from './user-active-log.repository';
 import { GenderRepository } from './gender.repository';
+import { TipRepository } from './tip.repository';
 
 const Repositories = [
   UserRepository,
@@ -18,6 +19,7 @@ const Repositories = [
   ProvinceRepository,
   UserActiveLogRepository,
   GenderRepository,
+  TipRepository,
 ];
 
 export default Repositories;

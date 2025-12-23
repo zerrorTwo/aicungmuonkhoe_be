@@ -40,7 +40,7 @@ export interface UpdateUserResponse {
   };
 }
 
-export interface UserResponse { 
+export interface UserResponse {
   USER_ID: number;
   EMAIL: string;
   START_TOUR?: boolean;
@@ -50,4 +50,3 @@ export interface UserResponse {
   UPDATED_AT: Date;
   PHONE?: string;
 }
-

@@ -29,6 +29,15 @@ export interface ExerciseIntensityResponse {
   DISPLAY_NAME: string;
 }
 
+export interface ProvinceResponse {
+  PROVINCE_ID: number;
+  NAME: string;
+  CODE: string;
+  TYPE: string;
+  NAME_WITH_TYPE: string;
+  CREATED_AT?: Date;
+  UPDATED_AT?: Date;
+}
 export interface HealthDocumentResponse {
   ID: number;
   FULL_NAME: string;
@@ -41,14 +50,12 @@ export interface HealthDocumentResponse {
   WEIGHT?: string;
   HEALTH_STATUS?: string;
   JOB?: string;
-  TYPE_ACTION?: string;
   DATE_WORKDAY?: number;
   DATE_OFF?: number;
   IS_MYSELF: boolean;
   IS_UPDATE: boolean;
   AVATAR?: string;
   EXERCISE_FREQUENCY?: string;
-  PROVINCE?: string;
 }
 
 export interface HealthDocumentWithRelationsResponse
@@ -56,4 +63,5 @@ export interface HealthDocumentWithRelationsResponse
   USER?: UserResponse;
   GENDER?: GenderResponse;
   EXERCISE_INTENSITY?: ExerciseIntensityResponse;
+  PROVINCE?: ProvinceResponse;
 }

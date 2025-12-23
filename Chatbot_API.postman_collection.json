@@ -1,0 +1,457 @@
+{
+  "info": {
+    "name": "Health Chatbot API",
+    "_postman_id": "chatbot-api-collection",
+    "description": "API collection for testing Health Chatbot endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Chat Endpoints",
+      "item": [
+        {
+          "name": "1. Chào hỏi đơn giản",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Chào bạn, bạn là ai?\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "2. BMI - Người trưởng thành bình thường",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Chỉ số BMI của tôi thế nào?\",\n  \"healthData\": {\n    \"weight\": 70,\n    \"height\": 170,\n    \"age\": 25,\n    \"gender\": \"nam\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "3. BMI - Không có dữ liệu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"BMI của tôi là bao nhiêu?\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "4. BMI - Người thừa cân",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Tôi cao 165cm, nặng 75kg, 35 tuổi. Tôi có béo không?\",\n  \"healthData\": {\n    \"weight\": 75,\n    \"height\": 165,\n    \"age\": 35,\n    \"gender\": \"nữ\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "5. BMI - Trẻ em (10 tuổi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Con tôi 10 tuổi, cao 140cm, nặng 50kg. Có béo không?\",\n  \"healthData\": {\n    \"weight\": 50,\n    \"height\": 140,\n    \"age\": 10,\n    \"gender\": \"nam\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "6. BMI - Người cao tuổi (75 tuổi)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Cân nặng của tôi có phù hợp không?\",\n  \"healthData\": {\n    \"weight\": 65,\n    \"height\": 165,\n    \"age\": 75,\n    \"gender\": \"nữ\"\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "7. Huyết áp - Tiền cao huyết áp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Huyết áp của tôi có bình thường không?\",\n  \"healthData\": {\n    \"bloodPressureSys\": 130,\n    \"bloodPressureDia\": 85\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "8. Huyết áp - Cao huyết áp độ 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Huyết áp 145/95 có nguy hiểm không?\",\n  \"healthData\": {\n    \"bloodPressureSys\": 145,\n    \"bloodPressureDia\": 95\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "9. Đường huyết - Bình thường",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Đường huyết của tôi thế nào?\",\n  \"healthData\": {\n    \"bloodSugar\": 95\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "10. Đường huyết - Tiền tiểu đường",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Đường huyết đói 110mg/dL có cao không?\",\n  \"healthData\": {\n    \"bloodSugar\": 110\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "11. Đường huyết - Tiểu đường",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Đường huyết 140mg/dL có nguy hiểm không?\",\n  \"healthData\": {\n    \"bloodSugar\": 140\n  }\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "12. Conversation - Câu 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"BMI của tôi là bao nhiêu?\",\n  \"healthData\": {\n    \"weight\": 70,\n    \"height\": 170,\n    \"age\": 25,\n    \"gender\": \"nam\"\n  },\n  \"conversationId\": \"test_conv_001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        },
+        {
+          "name": "13. Conversation - Câu 2 (Follow-up)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Vậy tôi nên làm gì để duy trì?\",\n  \"conversationId\": \"test_conv_001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/chat",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "chat"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze Endpoints",
+      "item": [
+        {
+          "name": "1. Phân tích - Tất cả chỉ số tốt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 65,\n  \"height\": 170,\n  \"age\": 28,\n  \"gender\": \"nữ\",\n  \"bloodPressureSys\": 115,\n  \"bloodPressureDia\": 75,\n  \"bloodSugar\": 90\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "2. Phân tích - Nguy cơ trung bình",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 78,\n  \"height\": 170,\n  \"age\": 40,\n  \"gender\": \"nam\",\n  \"bloodPressureSys\": 135,\n  \"bloodPressureDia\": 88,\n  \"bloodSugar\": 105\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "3. Phân tích - Nguy cơ cao",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 95,\n  \"height\": 170,\n  \"age\": 50,\n  \"gender\": \"nam\",\n  \"bloodPressureSys\": 155,\n  \"bloodPressureDia\": 100,\n  \"bloodSugar\": 140\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "4. Phân tích - Chỉ có BMI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 70,\n  \"height\": 175,\n  \"age\": 30,\n  \"gender\": \"nam\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "5. Phân tích - Trẻ em",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 45,\n  \"height\": 150,\n  \"age\": 12,\n  \"gender\": \"nữ\",\n  \"bloodPressureSys\": 110,\n  \"bloodPressureDia\": 70,\n  \"bloodSugar\": 85\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "6. Phân tích - Người cao tuổi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weight\": 68,\n  \"height\": 168,\n  \"age\": 72,\n  \"gender\": \"nam\",\n  \"bloodPressureSys\": 140,\n  \"bloodPressureDia\": 85,\n  \"bloodSugar\": 110\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/client/chatbot/analyze",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["client", "chatbot", "analyze"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

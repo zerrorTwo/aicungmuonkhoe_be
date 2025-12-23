@@ -5,6 +5,8 @@ import { MailController } from './mail.controller';
 import { ConclusionController } from './conclusion.controller';
 import { ProvinceController } from './province.controller';
 import { GenderController } from './gender.controller';
+import { TipController } from './tip.controller';
+import { ChatbotController } from './chatbot.controller';
 
 const Controllers = [
   UserController,
@@ -14,6 +16,8 @@ const Controllers = [
   ConclusionController,
   ProvinceController,
   GenderController,
+  TipController,
+  ChatbotController,
 ];
 
 export default Controllers;

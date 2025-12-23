@@ -6,6 +6,9 @@ import { ConclusionService } from './conclusion.service';
 import { ProvinceService } from './province.service';
 import { UserActiveLogService } from './user-active-log.service';
 import { GenderService } from './gender.service';
+import { TipsService } from './tip.service';
+import { HealthChatbotService } from './health-chatbot.service';
+import { AIChatbotService } from './ai-chatbot.service';
 
 const Services = [
   UserService,
@@ -16,6 +19,9 @@ const Services = [
   ProvinceService,
   UserActiveLogService,
   GenderService,
+  TipsService,
+  HealthChatbotService,
+  AIChatbotService,
 ];
 
 export default Services;

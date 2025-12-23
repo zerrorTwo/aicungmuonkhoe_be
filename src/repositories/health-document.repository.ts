@@ -19,10 +19,7 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async update(
-    id: number,
-    updateData: any,
-  ): Promise<HealthDocument> {
+  async update(id: number, updateData: any): Promise<HealthDocument> {
     const existingEntity = await this.repo.findOne({
       where: { ID: id },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY'],
@@ -55,12 +52,8 @@ export class HealthDocumentRepository {
       return null;
     }
 
-    return {
-      ...result,
-      PROVINCE: result.PROVINCE?.NAME
-    };
+    return result;
   }
-
 
   async findByUserId(userId: number): Promise<HealthDocument | null> {
     const result = await this.repo.findOne({
@@ -81,10 +74,12 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findAllByUserId(userId: number) {
+  async findAllByUserId(
+    userId: number,
+  ): Promise<HealthDocumentWithRelationsResponse[] | null> {
     const result = await this.repo.find({
       where: {
-        USER: { USER_ID: userId, IS_DELETED: 0 }
+        USER: { USER_ID: userId, IS_DELETED: 0 },
       },
       relations: ['USER', 'USER_LINK', 'GENDER'],
     });
@@ -94,7 +89,6 @@ export class HealthDocumentRepository {
   async findMySelfById(
     id: number,
   ): Promise<HealthDocumentWithRelationsResponse | null> {
-
     const result = await this.repo.findOne({
       where: { ID: id, IS_MYSELF: true },
       relations: ['USER', 'GENDER', 'EXERCISE_INTENSITY', 'PROVINCE'],
@@ -102,9 +96,17 @@ export class HealthDocumentRepository {
     if (!result) {
       return null;
     }
-    return {
-      ...result,
-      PROVINCE: result.PROVINCE?.NAME
-    };
+    return result;
+  }
+
+  async findOne(userId: number, id: number): Promise<HealthDocument | null> {
+    const result = await this.repo.findOne({
+      where: { USER: { USER_ID: userId, IS_DELETED: 0 }, ID: id },
+      relations: ['USER'],
+    });
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }

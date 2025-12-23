@@ -14,6 +14,7 @@ import { ConclusionRecommendDropbox } from '../../entities/conclusion-recommend-
 import { CloudinaryProvider } from '../../providers/cloudinary.provider';
 import { Province } from 'src/entities/province.entity';
 import { UsersActiveLog } from 'src/entities/user-active-log.entity';
+import { Tips } from 'src/entities/tips.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersActiveLog } from 'src/entities/user-active-log.entity';
       ConclusionRecommendDropbox,
       Province,
       UsersActiveLog,
+      Tips,
     ]),
   ],
   controllers: [...Controllers],
