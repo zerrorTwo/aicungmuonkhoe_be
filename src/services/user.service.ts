@@ -20,7 +20,11 @@ import { ProvinceRepository } from 'src/repositories/province.repository';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import { DeepPartial } from 'typeorm';
 import { Gender } from 'src/entities/gender.entity';
-import { UpdateUserResponse, UserResponse, UserProfileResponse } from 'src/interfaces/user.interface';
+import {
+  UpdateUserResponse,
+  UserResponse,
+  UserProfileResponse,
+} from 'src/interfaces/user.interface';
 import { UserActiveLogService } from './user-active-log.service';
 
 @Injectable()
@@ -76,9 +80,7 @@ export class UserService {
     const profile = {
       USER_ID: user.USER_ID,
       FULL_NAME:
-        myHealthDocument?.FULL_NAME ||
-        user.EMAIL.split('@')[0] ||
-        'Người dùng',
+        myHealthDocument?.FULL_NAME || user.EMAIL.split('@')[0] || 'Người dùng',
       EMAIL: user.EMAIL,
       PHONE: myHealthDocument?.PHONE || user.PHONE || '',
       DOB: myHealthDocument?.DOB || '',
@@ -94,7 +96,7 @@ export class UserService {
             HEIGHT: myHealthDocument.HEIGHT,
             WEIGHT: myHealthDocument.WEIGHT,
             HEALTH_STATUS: myHealthDocument.HEALTH_STATUS,
-            EXERCISE_FREQUENCY: myHealthDocument.EXERCISE_FREQUENCY
+            EXERCISE_FREQUENCY: myHealthDocument.EXERCISE_FREQUENCY,
           }
         : undefined,
     };
@@ -102,7 +104,10 @@ export class UserService {
     return profile;
   }
 
-  async updateUserAvatar(userId: number, avatarFile: Express.Multer.File): Promise<UpdateUserResponse> {
+  async updateUserAvatar(
+    userId: number,
+    avatarFile: Express.Multer.File,
+  ): Promise<UpdateUserResponse> {
     // 1. Validate avatar file
     const allowedMimeTypes = [
       'image/jpeg',
@@ -191,111 +196,114 @@ export class UserService {
     return updatedProfile;
   }
 
-async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promise<UpdateUserResponse> {
-  // 1️ Lấy user cùng health document
-  const user = await this._userRepository.findUserWithHealthDocuments(userId);
-  if (!user) throw new NotFoundException(`User with id ${userId} not found`);
+  async updateUserProfile(
+    userId: number,
+    updateData: UpdateUserProfileDto,
+  ): Promise<UpdateUserResponse> {
+    // 1️ Lấy user cùng health document
+    const user = await this._userRepository.findUserWithHealthDocuments(userId);
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
-  // 2️ Lấy dữ liệu tỉnh (nếu có)
-  const province = updateData.PROVINCE_ID
-    ? await this._provinceRepository.findById(updateData.PROVINCE_ID)
-    : null;
+    // 2️ Lấy dữ liệu tỉnh (nếu có)
+    const province = updateData.PROVINCE_ID
+      ? await this._provinceRepository.findById(updateData.PROVINCE_ID)
+      : null;
 
-  // 3️  Tìm health document của chính user (IS_MYSELF = 1)
-  let myHealthDocument = user.HEALTH_DOCUMENTS?.find(
-    (hd) => this.isTruthy(hd.IS_MYSELF),
-  );
+    // 3️  Tìm health document của chính user (IS_MYSELF = 1)
+    let myHealthDocument = user.HEALTH_DOCUMENTS?.find((hd) =>
+      this.isTruthy(hd.IS_MYSELF),
+    );
 
-  // 4️ Nếu chưa có thì tạo mới
-  if (!myHealthDocument) {
-    const newHealthDoc: DeepPartial<HealthDocument> = {
-      USER: user,
-      IS_MYSELF: true,
-      FULL_NAME: updateData.FULL_NAME || user.EMAIL.split('@')[0],
-      PHONE: updateData.PHONE || user.PHONE || '',
-      DOB: updateData.DOB || '',
-      PROVINCE: province || undefined,
-      GENDER: updateData.GENDER_ID ? ({ ID: updateData.GENDER_ID } as DeepPartial<Gender>) : undefined,
+    // 4️ Nếu chưa có thì tạo mới
+    if (!myHealthDocument) {
+      const newHealthDoc: DeepPartial<HealthDocument> = {
+        USER: user,
+        IS_MYSELF: true,
+        FULL_NAME: updateData.FULL_NAME || user.EMAIL.split('@')[0],
+        PHONE: updateData.PHONE || user.PHONE || '',
+        DOB: updateData.DOB || '',
+        PROVINCE: province || undefined,
+        GENDER: updateData.GENDER_ID
+          ? ({ ID: updateData.GENDER_ID } as DeepPartial<Gender>)
+          : undefined,
+      };
+
+      myHealthDocument = await this._healthDocumentRepository.create(
+        newHealthDoc as any,
+      );
+    } else {
+      // 5️ Nếu có rồi → chỉ update những field có thay đổi
+      const updatedFields: Partial<typeof myHealthDocument> = {}; // Tạo một object updatedFields rỗng ban đầu, nhưng nó chỉ được phép chứa các field có trong myHealthDocument, và mỗi field là tùy chọn.
+
+      if (
+        updateData.FULL_NAME &&
+        updateData.FULL_NAME !== myHealthDocument.FULL_NAME
+      ) {
+        updatedFields.FULL_NAME = updateData.FULL_NAME;
+      }
+
+      if (updateData.PHONE && updateData.PHONE !== myHealthDocument.PHONE) {
+        updatedFields.PHONE = updateData.PHONE;
+      }
+
+      if (updateData.DOB && updateData.DOB !== myHealthDocument.DOB) {
+        updatedFields.DOB = updateData.DOB;
+      }
+
+      if (
+        province &&
+        province.PROVINCE_ID !== myHealthDocument.PROVINCE?.PROVINCE_ID
+      ) {
+        updatedFields.PROVINCE = province;
+      }
+
+      console.log(myHealthDocument);
+      console.log(UpdateUserProfileDto);
+
+      if (
+        updateData.GENDER_ID &&
+        updateData.GENDER_ID !== myHealthDocument.GENDER?.ID
+      ) {
+        updatedFields.GENDER = { ID: updateData.GENDER_ID } as any;
+      }
+
+      // Nếu có thay đổi thì update
+      if (Object.keys(updatedFields).length > 0) {
+        myHealthDocument = await this._healthDocumentRepository.update(
+          myHealthDocument.ID,
+          updatedFields,
+        );
+      }
+    }
+
+    if (!myHealthDocument)
+      throw new Error('Failed to create or update health document');
+
+    // 6️ Chuẩn hoá dữ liệu trả về
+    const updatedProfile = {
+      USER_ID: user.USER_ID,
+      FULL_NAME:
+        myHealthDocument.FULL_NAME || user.EMAIL.split('@')[0] || 'Người dùng',
+      EMAIL: user.EMAIL,
+      PHONE: myHealthDocument.PHONE || user.PHONE || '',
+      DOB: myHealthDocument.DOB || '',
+      GENDER: myHealthDocument.GENDER?.NAME || '',
+      PROVINCE: myHealthDocument.PROVINCE?.NAME || '',
+      PROVINCE_ID: myHealthDocument.PROVINCE?.PROVINCE_ID || null,
+      AVATAR: myHealthDocument.AVATAR || user.FACE_IMAGE || '',
+      IS_ACTIVE: this.isTruthy(user.STATUS_ACTIVE),
+      IS_ADMIN: this.isTruthy(user.IS_ADMIN),
+      HEALTH_DOCUMENT: {
+        ID: myHealthDocument.ID,
+        HEIGHT: myHealthDocument.HEIGHT,
+        WEIGHT: myHealthDocument.WEIGHT,
+        HEALTH_STATUS: myHealthDocument.HEALTH_STATUS,
+        EXERCISE_FREQUENCY: myHealthDocument.EXERCISE_FREQUENCY,
+      },
     };
 
-    myHealthDocument = await this._healthDocumentRepository.create(newHealthDoc as any);
-  } else {
-    // 5️ Nếu có rồi → chỉ update những field có thay đổi
-    const updatedFields: Partial<typeof myHealthDocument> = {}; // Tạo một object updatedFields rỗng ban đầu, nhưng nó chỉ được phép chứa các field có trong myHealthDocument, và mỗi field là tùy chọn.
-
-    if (
-      updateData.FULL_NAME &&
-      updateData.FULL_NAME !== myHealthDocument.FULL_NAME
-    ) {
-      updatedFields.FULL_NAME = updateData.FULL_NAME;
-    }
-
-    if (
-      updateData.PHONE &&
-      updateData.PHONE !== myHealthDocument.PHONE
-    ) {
-      updatedFields.PHONE = updateData.PHONE;
-    }
-
-    if (
-      updateData.DOB &&
-      updateData.DOB !== myHealthDocument.DOB
-    ) {
-      updatedFields.DOB = updateData.DOB;
-    }
-
-    if (
-      province &&
-      province.PROVINCE_ID !== myHealthDocument.PROVINCE?.PROVINCE_ID
-    ) {
-      updatedFields.PROVINCE = province;
-    }
-
-    if (
-      updateData.GENDER_ID &&
-      updateData.GENDER_ID !== myHealthDocument.GENDER?.ID
-    ) {
-      updatedFields.GENDER = { ID: updateData.GENDER_ID } as any;
-    }
-
-    // Nếu có thay đổi thì update
-    if (Object.keys(updatedFields).length > 0) {
-      myHealthDocument = await this._healthDocumentRepository.update(
-        myHealthDocument.ID,
-        updatedFields,
-      );
-    }
+    return updatedProfile;
   }
-
-  if (!myHealthDocument)
-    throw new Error('Failed to create or update health document');
-
-  // 6️ Chuẩn hoá dữ liệu trả về
-  const updatedProfile = {
-    USER_ID: user.USER_ID,
-    FULL_NAME:
-      myHealthDocument.FULL_NAME || user.EMAIL.split('@')[0] || 'Người dùng',
-    EMAIL: user.EMAIL,
-    PHONE: myHealthDocument.PHONE || user.PHONE || '',
-    DOB: myHealthDocument.DOB || '',
-    GENDER: myHealthDocument.GENDER?.NAME || '',
-    PROVINCE: myHealthDocument.PROVINCE?.NAME || '',
-    PROVINCE_ID: myHealthDocument.PROVINCE?.PROVINCE_ID || null,
-    AVATAR: myHealthDocument.AVATAR || user.FACE_IMAGE || '',
-    IS_ACTIVE: this.isTruthy(user.STATUS_ACTIVE),
-    IS_ADMIN: this.isTruthy(user.IS_ADMIN),
-    HEALTH_DOCUMENT: {
-      ID: myHealthDocument.ID,
-      HEIGHT: myHealthDocument.HEIGHT,
-      WEIGHT: myHealthDocument.WEIGHT,
-      HEALTH_STATUS: myHealthDocument.HEALTH_STATUS,
-      EXERCISE_FREQUENCY: myHealthDocument.EXERCISE_FREQUENCY,
-    },
-  };
-
-  return updatedProfile;
-}
-
 
   async updateUserSecuritySettings(
     userId: number,
@@ -324,7 +332,9 @@ async updateUserProfile(userId: number, updateData: UpdateUserProfileDto): Promi
       // cập nhật phone cho health document
       const health = await this._healthDocumentRepository.findByUserId(userId);
       if (!health) {
-        throw new NotFoundException(`Health document for user id ${userId} not found`);
+        throw new NotFoundException(
+          `Health document for user id ${userId} not found`,
+        );
       }
       await this._healthDocumentRepository.update(health.ID, {
         PHONE: data.PHONE,

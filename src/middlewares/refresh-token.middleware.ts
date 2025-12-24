@@ -6,7 +6,6 @@ import Jwt from 'jsonwebtoken';
 export class RefreshTokenMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const refreshToken = req.cookies?.refresh_token;
-    console.log(refreshToken);
     if (!refreshToken) {
       throw new GoneException('No refresh token provided');
     }

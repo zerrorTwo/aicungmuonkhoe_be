@@ -131,21 +131,12 @@ export class ConclusionService {
       }
 
       // Prepare age type filter
-      const validWeightHeight0to5 =
-        queryParams.ACTIVE_TAB &&
-        (queryParams.ACTIVE_TAB === ACTIVE_TAB.HEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT);
-      const ageTypeFilter = validWeightHeight0to5
-        ? [AGE_TYPE.FROM_0_LESS_THAN_2, AGE_TYPE.FROM_2_LESS_THAN_5]
-        : queryParams.AGE_TYPE;
+      const ageTypeFilter = queryParams.AGE_TYPE;
 
       // Get paginated results
       const result = await this._conclusionRecommendClientRepository.pagination(
         {
           ID: queryParams.ID,
-          START_TIME: queryParams.START_TIME,
-          END_TIME: queryParams.END_TIME,
           MODEL: queryParams.MODEL,
           OFFSET: queryParams.OFFSET,
           LIMIT: queryParams.LIMIT,
@@ -204,8 +195,7 @@ export class ConclusionService {
       const validWeightHeight0to5 =
         queryParams.ACTIVE_TAB &&
         (queryParams.ACTIVE_TAB === ACTIVE_TAB.HEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT);
+          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT);
       const validBMI5to19 =
         queryParams.AGE_TYPE &&
         (queryParams.AGE_TYPE === AGE_TYPE.FROM_5_LESS_THAN_12 ||
@@ -219,9 +209,7 @@ export class ConclusionService {
         queryParams.AGE_TYPE || '',
       );
 
-      const ageTypeFilter = validWeightHeight0to5
-        ? [AGE_TYPE.FROM_0_LESS_THAN_2, AGE_TYPE.FROM_2_LESS_THAN_5]
-        : (queryParams.AGE_TYPE as AgeType);
+      const ageTypeFilter = queryParams.AGE_TYPE;
 
       // Get range results
       const result = await this._conclusionRecommendClientRepository.range({
@@ -233,30 +221,6 @@ export class ConclusionService {
         SORT: queryParams.SORT,
       });
 
-      // Handle weight-height model for cross-age-type comparisons
-      let weightHeightModel: ConclusionModelResponse[] = [];
-      if (
-        queryParams.AGE_TYPE === AGE_TYPE.FROM_2_LESS_THAN_5 &&
-        queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT
-      ) {
-        // Fetch weight-height model for FROM_0_LESS_THAN_2
-        weightHeightModel = await this.getConclusionModel(
-          currentModel || HEALTH_MODEL.BMI,
-          gender,
-          AGE_TYPE.FROM_0_LESS_THAN_2,
-        );
-      } else if (
-        queryParams.AGE_TYPE === AGE_TYPE.FROM_0_LESS_THAN_2 &&
-        queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT
-      ) {
-        // Fetch weight-height model for FROM_2_LESS_THAN_5
-        weightHeightModel = await this.getConclusionModel(
-          currentModel || HEALTH_MODEL.BMI,
-          gender,
-          AGE_TYPE.FROM_2_LESS_THAN_5,
-        );
-      }
-
       // Fetch models, dropboxes, and user profile in parallel
       const [userProfileResult, models, dropboxs]: [
         HealthDocumentWithRelationsResponse | null,
@@ -267,10 +231,12 @@ export class ConclusionService {
         this.getConclusionModel(
           currentModel || HEALTH_MODEL.BMI,
           gender,
-          (queryParams.AGE_TYPE as AgeType) || AGE_TYPE.FROM_0_LESS_THAN_2,
+          (ageTypeFilter as AgeType) || AGE_TYPE.FROM_0_LESS_THAN_2,
         ),
-        this.getConclusionDropBox(),
+        this.getConclusionDropBoxByModel(currentModel || HEALTH_MODEL.BMI),
       ]);
+
+      console.log(userProfileResult, models, dropboxs);
 
       const userProfile: HealthDocumentWithRelationsResponse | null =
         userProfileResult;
@@ -294,10 +260,6 @@ export class ConclusionService {
               userProfile.DOB || new Date(),
               new Date(item.DATE),
             );
-            const modelTemplate =
-              isWeightHeightTab && itemAgeType !== queryParams.AGE_TYPE
-                ? weightHeightModel
-                : models;
 
             // Use the conclusion logic to process BMI type
             return Conclusion.getConclusionByBMIType(
@@ -305,7 +267,7 @@ export class ConclusionService {
               currentModel || '',
               gender,
               dropboxs,
-              modelTemplate || models,
+              models,
               currentMonthAge,
               itemAgeType,
             );
@@ -418,9 +380,13 @@ export class ConclusionService {
     }
   }
 
-  private async getConclusionDropBox(): Promise<ConclusionDropboxResponse[]> {
+  private async getConclusionDropBoxByModel(
+    model: HealthModel,
+  ): Promise<ConclusionDropboxResponse[]> {
     try {
-      return await this._conclusionRecommendDropboxRepository.findAll();
+      return await this._conclusionRecommendDropboxRepository.findByModel(
+        model,
+      );
     } catch (error) {
       this.logger.error('Error in getConclusionDropBox:', error);
       return [];

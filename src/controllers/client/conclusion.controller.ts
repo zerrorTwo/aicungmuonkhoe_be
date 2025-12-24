@@ -48,16 +48,12 @@ export class ConclusionController {
   })
   async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
     const user_id = req.user.user_id;
-    console.log('=== CREATE CONCLUSION DOCUMENT ===');
-    console.log('user_id:', user_id);
-    console.log('createDto:', createDto);
 
     try {
       const result = await this.healthDocumentService.createHealthDocument(
         user_id,
         createDto,
       );
-      console.log('Create result:', result);
 
       return Builder<SuccessResponse<HealthDocument>>()
         .data(result)

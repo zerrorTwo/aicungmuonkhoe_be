@@ -214,7 +214,6 @@ export class UserController {
     @Body() data: UpdateSecuritySetting,
   ): Promise<SuccessResponse<UserResponse>> {
     const userId = req.user.user_id;
-    console.log('userId: ', userId);
     if (!userId) {
       throw new HttpException(
         'User not authenticated',

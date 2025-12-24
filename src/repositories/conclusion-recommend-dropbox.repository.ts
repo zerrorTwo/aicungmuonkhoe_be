@@ -21,6 +21,9 @@ export class ConclusionRecommendDropboxRepository {
       where: {
         MODEL: model,
       },
+      order: {
+        INDEX: 'DESC', // Sắp xếp giảm dần theo INDEX
+      },
     });
   }
 

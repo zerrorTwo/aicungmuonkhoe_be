@@ -68,8 +68,6 @@ export class ConclusionRecommendClientRepository {
 
   async pagination(options: {
     ID?: string;
-    START_TIME?: string;
-    END_TIME?: string;
     MODEL?: string;
     OFFSET?: string;
     LIMIT?: string;
@@ -80,26 +78,21 @@ export class ConclusionRecommendClientRepository {
       .createQueryBuilder('conclusion')
       .leftJoinAndSelect('conclusion.HEALTH_DOCUMENT', 'healthDocument');
 
-    // Add where conditions
+    // Filter by HEALTH_DOCUMENT_ID
     if (options.ID) {
       queryBuilder.andWhere('conclusion.HEALTH_DOCUMENT_ID = :id', {
         id: options.ID,
       });
     }
 
-    if (options.START_TIME && options.END_TIME) {
-      queryBuilder.andWhere('conclusion.DATE BETWEEN :startTime AND :endTime', {
-        startTime: options.START_TIME,
-        endTime: options.END_TIME,
-      });
-    }
-
+    // Filter by MODEL
     if (options.MODEL) {
       queryBuilder.andWhere('conclusion.MODEL = :model', {
         model: options.MODEL,
       });
     }
 
+    // Filter by AGE_TYPE
     if (options.AGE_TYPE) {
       if (Array.isArray(options.AGE_TYPE)) {
         queryBuilder.andWhere('conclusion.AGE_TYPE IN (:...ageTypes)', {
@@ -112,23 +105,30 @@ export class ConclusionRecommendClientRepository {
       }
     }
 
-    // Add sorting
+    // Sorting
     if (options.SORT) {
-      const [field, direction] = options.SORT.split(':');
-      queryBuilder.orderBy(
-        `conclusion.${field}`,
-        (direction?.toUpperCase() as 'ASC' | 'DESC') || 'DESC',
-      );
+      const sortParts = options.SORT.split(':');
+      if (sortParts.length === 2) {
+        const [field, direction] = sortParts;
+        const validDirection =
+          direction.toUpperCase() === 'ASC' ||
+          direction.toUpperCase() === 'DESC'
+            ? (direction.toUpperCase() as 'ASC' | 'DESC')
+            : 'DESC';
+        queryBuilder.orderBy(`conclusion.${field}`, validDirection);
+      } else {
+        queryBuilder.orderBy('conclusion.DATE', 'DESC');
+      }
     } else {
-      queryBuilder.orderBy('conclusion.CREATED_DATE', 'DESC');
+      queryBuilder.orderBy('conclusion.DATE', 'DESC');
     }
 
-    // Add pagination
-    const offset = parseInt(options.OFFSET || '0');
-    const limit = parseInt(options.LIMIT || '10');
-
+    // Pagination
+    const offset = parseInt(options.OFFSET || '0', 10);
+    const limit = parseInt(options.LIMIT || '10', 10);
     queryBuilder.skip(offset * limit).take(limit);
 
+    // Execute query
     const [data, total] = await queryBuilder.getManyAndCount();
 
     return { data, total };
@@ -180,13 +180,24 @@ export class ConclusionRecommendClientRepository {
 
     // Add sorting
     if (options.SORT) {
-      const [field, direction] = options.SORT.split(':');
-      queryBuilder.orderBy(
-        `conclusion.${field}`,
-        (direction?.toUpperCase() as 'ASC' | 'DESC') || 'DESC',
-      );
+      const sortParts = options.SORT.split(':');
+
+      // Validate SORT format: should be "FIELD:DIRECTION" (e.g., "DATE:ASC")
+      if (sortParts.length === 2) {
+        const [field, direction] = sortParts;
+        const validDirection =
+          direction?.toUpperCase() === 'ASC' ||
+          direction?.toUpperCase() === 'DESC'
+            ? (direction.toUpperCase() as 'ASC' | 'DESC')
+            : 'DESC';
+
+        queryBuilder.orderBy(`conclusion.${field}`, validDirection);
+      } else {
+        // Invalid format, use default sorting
+        queryBuilder.orderBy('conclusion.DATE', 'DESC');
+      }
     } else {
-      queryBuilder.orderBy('conclusion.CREATED_DATE', 'DESC');
+      queryBuilder.orderBy('conclusion.DATE', 'DESC');
     }
 
     const data = await queryBuilder.getMany();
