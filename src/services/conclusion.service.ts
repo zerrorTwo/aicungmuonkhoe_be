@@ -137,7 +137,7 @@ export class ConclusionService {
       const result = await this._conclusionRecommendClientRepository.pagination(
         {
           ID: queryParams.ID,
-          MODEL: queryParams.MODEL,
+          MODEL: queryParams.ACTIVE_TAB || queryParams.MODEL,
           OFFSET: queryParams.OFFSET,
           LIMIT: queryParams.LIMIT,
           AGE_TYPE: ageTypeFilter,
@@ -201,9 +201,7 @@ export class ConclusionService {
         (queryParams.AGE_TYPE === AGE_TYPE.FROM_5_LESS_THAN_12 ||
           queryParams.AGE_TYPE === AGE_TYPE.FROM_12_LESS_THAN_20);
 
-      const currentModel = validWeightHeight0to5
-        ? (queryParams.ACTIVE_TAB as HealthModel)
-        : (queryParams.MODEL as HealthModel);
+      const currentModel = queryParams.ACTIVE_TAB as HealthModel;
       const ageType0to5 = this.getAgeType0to5(
         currentModel || HEALTH_MODEL.BMI,
         queryParams.AGE_TYPE || '',
@@ -216,7 +214,7 @@ export class ConclusionService {
         ID: queryParams.ID,
         START_TIME: queryParams.START_TIME,
         END_TIME: queryParams.END_TIME,
-        MODEL: queryParams.MODEL,
+        MODEL: queryParams.ACTIVE_TAB || queryParams.MODEL,
         AGE_TYPE: ageTypeFilter,
         SORT: queryParams.SORT,
       });
@@ -235,8 +233,6 @@ export class ConclusionService {
         ),
         this.getConclusionDropBoxByModel(currentModel || HEALTH_MODEL.BMI),
       ]);
-
-      console.log(userProfileResult, models, dropboxs);
 
       const userProfile: HealthDocumentWithRelationsResponse | null =
         userProfileResult;
