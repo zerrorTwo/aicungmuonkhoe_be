@@ -17,9 +17,12 @@ export class ConclusionRecommendDropboxRepository {
   }
 
   async findByModel(model: HealthModel): Promise<ConclusionDropboxResponse[]> {
-    return await this.repository.find({
+    return this.repository.find({
       where: {
         MODEL: model,
+      },
+      order: {
+        INDEX: 'ASC', // hoặc 'DESC' nếu nghiệp vụ yêu cầu
       },
     });
   }
