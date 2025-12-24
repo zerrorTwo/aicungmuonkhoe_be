@@ -133,4 +133,9 @@ export class HealthDataAnalysisDto {
   @IsOptional()
   @IsNumber()
   bloodSugar?: number;
+
+  @ApiPropertyOptional({ description: 'ID conversation để lưu lịch sử' })
+  @IsOptional()
+  @IsString()
+  conversationId?: string;
 }

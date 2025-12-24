@@ -1,4 +1,12 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AIChatbotService } from '../../services/ai-chatbot.service';
 import {
@@ -6,9 +14,11 @@ import {
   ChatResponseDto,
   HealthDataAnalysisDto,
 } from '../../dtos/chatbot.dto';
+import { AuthGuard } from '../../utils/auth/auth.guard';
 
 @ApiTags('Chatbot')
 @Controller('client/chatbot')
+@UseGuards(AuthGuard)
 export class ChatbotController {
   constructor(private readonly aiChatbotService: AIChatbotService) {}
 
@@ -28,11 +38,17 @@ export class ChatbotController {
     status: 400,
     description: 'Dữ liệu không hợp lệ',
   })
-  async chat(@Body() chatMessageDto: ChatMessageDto): Promise<ChatResponseDto> {
+  async chat(
+    @Req() req,
+    @Body() chatMessageDto: ChatMessageDto,
+  ): Promise<ChatResponseDto> {
+    const userId = req.user.user_id;
+
     const result = await this.aiChatbotService.chat(
       chatMessageDto.message,
       chatMessageDto.healthData,
       chatMessageDto.conversationId,
+      userId,
     );
 
     return {
@@ -55,8 +71,14 @@ export class ChatbotController {
     status: 200,
     description: 'Phân tích thành công',
   })
-  async analyzeHealth(@Body() healthData: HealthDataAnalysisDto) {
-    const result = await this.aiChatbotService.analyzeHealth(healthData);
+  async analyzeHealth(@Req() req, @Body() healthData: HealthDataAnalysisDto) {
+    const userId = req.user.user_id;
+
+    const result = await this.aiChatbotService.analyzeHealth(
+      healthData,
+      healthData.conversationId,
+      userId,
+    );
 
     return {
       message: result.message,

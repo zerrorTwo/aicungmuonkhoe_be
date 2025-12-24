@@ -137,11 +137,7 @@ export class HealthDocumentController {
     status: 401,
     description: 'Health document not found or unauthorized',
   })
-  async update(
-    @Req() req,
-    @Param('id') id: number,
-    @Body() updateDto: UpdateHealthDocumentDto,
-  ) {
+  async update(@Req() req, @Param('id') id: number, @Body() updateDto: any) {
     const user_id = req.user.user_id;
     const result = await this.healthDocumentService.updateHealthDocument(
       user_id,

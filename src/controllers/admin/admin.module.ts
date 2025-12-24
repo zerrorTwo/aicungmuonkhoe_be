@@ -27,6 +27,8 @@ import { MealPlanner } from '../../entities/meal-planner.entity';
 import { MealPlannerMeal } from '../../entities/meal-planner-meal.entity';
 import { MealPlannerMealDish } from '../../entities/meal-planner-meal-dish.entity';
 import { Tips } from 'src/entities/tips.entity';
+import { ChatConversation } from '../../entities/chat-conversation.entity';
+import { ChatMessage } from '../../entities/chat-message.entity';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { Tips } from 'src/entities/tips.entity';
       MealType,
       Food,
       Dish,
+      ChatConversation,
+      ChatMessage,
       NutritionalStandard,
       NutritionalMealDistribution,
       NutritionalIngredientDistribution,

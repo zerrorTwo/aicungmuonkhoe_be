@@ -3,16 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import { HealthChatbotService } from './health-chatbot.service';
 import { ChatbotIntentEnum } from '../dtos/chatbot.dto';
 import { Mistral } from '@mistralai/mistralai';
+import { ChatMessageRepository } from '../repositories/chat-message.repository';
+import { ChatConversationRepository } from '../repositories/chat-conversation.repository';
 
 @Injectable()
 export class AIChatbotService {
   private readonly logger = new Logger(AIChatbotService.name);
   private readonly mistralClient: Mistral;
-  private readonly conversationHistory = new Map<string, any[]>();
 
   constructor(
     private readonly healthChatbotService: HealthChatbotService,
     private readonly configService: ConfigService,
+    private readonly chatMessageRepository: ChatMessageRepository,
+    private readonly chatConversationRepository: ChatConversationRepository,
   ) {
     const apiKey = this.configService.get<string>('MISTRAL_API_KEY');
 
@@ -32,6 +35,7 @@ export class AIChatbotService {
     userMessage: string,
     healthData?: any,
     conversationId?: string,
+    userId?: number,
   ): Promise<{
     message: string;
     intent: ChatbotIntentEnum;
@@ -39,6 +43,34 @@ export class AIChatbotService {
     conversationId: string;
   }> {
     try {
+      if (!conversationId) {
+        throw new Error('Conversation ID is required');
+      }
+
+      // Verify conversation exists and belongs to user
+      const conversation =
+        await this.chatConversationRepository.findByConversationId(
+          conversationId,
+        );
+      if (!conversation) {
+        throw new Error('Invalid conversation ID');
+      }
+
+      // Validate user ownership if userId provided
+      if (userId && conversation.USER_ID !== userId) {
+        throw new Error(
+          'Unauthorized: Conversation does not belong to this user',
+        );
+      }
+
+      // Save user message
+      await this.chatMessageRepository.create({
+        conversationId,
+        role: 'user',
+        content: userMessage,
+        mode: 'qna',
+      });
+
       // 1. Phát hiện intent
       const intent = this.healthChatbotService.detectIntent(userMessage);
       this.logger.log(`Detected intent: ${intent}`);
@@ -49,71 +81,162 @@ export class AIChatbotService {
         healthData,
       );
 
-      // 3. Nếu có kết quả từ rules, dùng AI để tạo câu trả lời tự nhiên
-      let aiResponse = '';
-      const convId = conversationId || this.generateConversationId();
+      // 3. Get conversation history from DB
+      const history =
+        await this.chatMessageRepository.getHistory(conversationId);
 
+      // 4. Generate response
+      let aiResponse = '';
       if (ruleBasedResult) {
         aiResponse = await this.generateNaturalResponse(
           userMessage,
           ruleBasedResult,
           intent,
-          convId,
+          conversationId,
+          history,
         );
       } else {
-        // 4. Nếu không match rules, để AI trả lời trực tiếp
         aiResponse = await this.generateGeneralResponse(
           userMessage,
           intent,
-          convId,
+          conversationId,
+          history,
         );
       }
+
+      // Save assistant message
+      await this.chatMessageRepository.create({
+        conversationId,
+        role: 'assistant',
+        content: aiResponse,
+        intent,
+        mode: 'qna',
+      });
 
       return {
         message: aiResponse,
         intent,
         data: ruleBasedResult,
-        conversationId: convId,
+        conversationId,
       };
     } catch (error) {
       this.logger.error('Error in chat:', error);
       return {
         message: this.getFallbackResponse(userMessage),
         intent: ChatbotIntentEnum.UNKNOWN,
-        conversationId: conversationId || this.generateConversationId(),
+        conversationId: conversationId || '',
       };
     }
   }
 
-  //Phân tích tổng quan sức khỏe - Gọi trực tiếp không qua AI
-  async analyzeHealth(healthData: any): Promise<{
+  //Phân tích tổng quan sức khỏe
+  async analyzeHealth(
+    healthData: any,
+    conversationId?: string,
+    userId?: number,
+  ): Promise<{
     message: string;
     data: any;
     summary: string;
   }> {
     try {
+      if (conversationId) {
+        // Verify conversation exists and belongs to user
+        const conversation =
+          await this.chatConversationRepository.findByConversationId(
+            conversationId,
+          );
+        if (conversation) {
+          // Validate user ownership if userId provided
+          if (userId && conversation.USER_ID !== userId) {
+            throw new Error(
+              'Unauthorized: Conversation does not belong to this user',
+            );
+          }
+
+          // Save system message about analysis
+          await this.chatMessageRepository.create({
+            conversationId,
+            role: 'system',
+            content: 'User requested health analysis',
+            mode: 'analyze',
+          });
+        }
+      }
+
       // Gọi trực tiếp hàm phân tích
       const analysisResult =
         this.healthChatbotService.analyzeOverallHealth(healthData);
 
-      // Format message dựa trên kết quả
-      let message = `📊 Phân tích sức khỏe tổng quan\n\n`;
-      message += `${analysisResult.summary}\n\n`;
+      // Format message với các chỉ số cụ thể
+      let message = `📊 **Phân tích sức khỏe của bạn**\n\n`;
+
+      // Hiển thị các chỉ số đầu vào
+      message += `📌 **Thông tin cơ bản:**\n`;
+      if (healthData.weight && healthData.height) {
+        message += `• Cân nặng: ${healthData.weight} kg\n`;
+        message += `• Chiều cao: ${healthData.height} cm\n`;
+      }
+      if (healthData.age) {
+        message += `• Tuổi: ${healthData.age}\n`;
+      }
+      if (healthData.bloodPressureSys && healthData.bloodPressureDia) {
+        message += `• Huyết áp: ${healthData.bloodPressureSys}/${healthData.bloodPressureDia} mmHg\n`;
+      }
+      if (healthData.bloodSugar) {
+        message += `• Đường huyết: ${healthData.bloodSugar} mg/dL\n`;
+      }
+      message += `\n`;
+
+      // Kết luận tổng quan
+      message += `📝 **Đánh giá tổng quan:**\n${analysisResult.summary}\n\n`;
 
       if (analysisResult.details.length > 0) {
-        message += `📋 Chi tiết:\n`;
+        message += `📋 **Chi tiết phân tích:**\n`;
         analysisResult.details.forEach((detail) => {
           const emoji = this.getHealthEmoji(detail.type);
-          message += `${emoji} ${detail.category}: ${detail.type}\n`;
-          message += `   ${detail.conclusion}\n\n`;
+          message += `\n${emoji} **${detail.category}**\n`;
+
+          // Hiển thị giá trị cụ thể
+          if (detail.category === 'BMI' && detail.bmi) {
+            message += `   Chỉ số BMI: ${detail.bmi}\n`;
+          } else if (
+            detail.category === 'Huyết áp' &&
+            detail.systolic &&
+            detail.diastolic
+          ) {
+            message += `   Huyết áp: ${detail.systolic}/${detail.diastolic} mmHg\n`;
+          } else if (detail.category === 'Đường huyết' && detail.bloodSugar) {
+            message += `   Đường huyết: ${detail.bloodSugar} mg/dL\n`;
+          }
+
+          message += `   ➜ Phân loại: ${detail.type}\n`;
+          message += `   ➜ ${detail.conclusion}\n`;
         });
+        message += `\n`;
       }
 
       if (analysisResult.recommendations.length > 0) {
-        message += `💡 Khuyến cáo:\n`;
+        message += `💡 **Khuyến cáo:**\n`;
         analysisResult.recommendations.forEach((rec, index) => {
           message += `${index + 1}. ${rec}\n`;
         });
+      }
+
+      // Save assistant message if conversationId provided
+      if (conversationId) {
+        const conversation =
+          await this.chatConversationRepository.findByConversationId(
+            conversationId,
+          );
+        if (conversation) {
+          await this.chatMessageRepository.create({
+            conversationId,
+            role: 'assistant',
+            content: message,
+            mode: 'analyze',
+          });
+        }
       }
 
       return {
@@ -148,6 +271,7 @@ export class AIChatbotService {
     ruleData: any,
     intent: ChatbotIntentEnum,
     conversationId: string,
+    history: any[],
   ): Promise<string> {
     if (!this.mistralClient) {
       return this.formatRuleBasedResponse(ruleData, intent);
@@ -155,7 +279,6 @@ export class AIChatbotService {
 
     const systemPrompt = this.getSystemPrompt();
     const context = this.formatContextForAI(ruleData, intent);
-    const history = this.getConversationHistory(conversationId);
 
     try {
       const s = await this.callMistralAPI(
@@ -178,13 +301,13 @@ export class AIChatbotService {
     userMessage: string,
     intent: ChatbotIntentEnum,
     conversationId: string,
+    history: any[],
   ): Promise<string> {
     if (!this.mistralClient) {
       return this.getDefaultResponse(intent);
     }
 
     const systemPrompt = this.getSystemPrompt();
-    const history = this.getConversationHistory(conversationId);
 
     try {
       const s = await this.callMistralAPI(
@@ -351,37 +474,5 @@ Khuyến cáo: ${ruleData.recommend}`;
   //Fallback response khi có lỗi
   private getFallbackResponse(userMessage: string): string {
     return 'Xin lỗi, tôi đang gặp một chút sự cố. Bạn có thể thử lại sau hoặc liên hệ với bộ phận hỗ trợ không?';
-  }
-
-  //Quản lý lịch sử hội thoại
-  private getConversationHistory(conversationId: string): any[] {
-    return this.conversationHistory.get(conversationId) || [];
-  }
-
-  private addToHistory(
-    conversationId: string,
-    role: 'user' | 'assistant',
-    content: string,
-  ) {
-    const history = this.getConversationHistory(conversationId);
-    history.push({ role, content });
-
-    // Giới hạn lịch sử 10 tin nhắn cuối
-    if (history.length > 10) {
-      history.shift();
-      history.shift();
-    }
-
-    this.conversationHistory.set(conversationId, history);
-  }
-
-  //Generate conversation ID
-  private generateConversationId(): string {
-    return `conv_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-  }
-
-  //Clear conversation history
-  clearHistory(conversationId: string) {
-    this.conversationHistory.delete(conversationId);
   }
 }

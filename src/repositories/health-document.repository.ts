@@ -29,8 +29,8 @@ export class HealthDocumentRepository {
       throw new NotFoundException(`HealthDocument with id ${id} not found`);
     }
     // console.log(updateData);
-    console.log(existingEntity);
-    console.log('updateData:', updateData);
+    // console.log(existingEntity);
+    // console.log('updateData:', updateData);
 
     // Merge data fields vào existing entity
     // Object.assign chỉ merge shallow fields, không ảnh hưởng relations

@@ -15,6 +15,8 @@ import { MealPlannerRepository } from './meal-planner.repository';
 import { MealPlannerMealRepository } from './meal-planner-meal.repository';
 import { MealPlannerMealDishRepository } from './meal-planner-meal-dish.repository';
 import { TipRepository } from './tip.repository';
+import { ChatConversationRepository } from './chat-conversation.repository';
+import { ChatMessageRepository } from './chat-message.repository';
 
 const Repositories = [
   UserRepository,
@@ -34,6 +36,8 @@ const Repositories = [
   MealPlannerMealRepository,
   MealPlannerMealDishRepository,
   TipRepository,
+  ChatConversationRepository,
+  ChatMessageRepository,
 ];
 
 export default Repositories;

@@ -25,6 +25,9 @@ import Jwt from 'jsonwebtoken';
 import { MailService } from './mail.service';
 import { OtpType } from 'src/entities/otp-record.entity';
 import { UserActiveLogService } from './user-active-log.service';
+import { ChatConversationRepository } from 'src/repositories/chat-conversation.repository';
+import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -33,6 +36,7 @@ export class AuthService {
     private readonly _userRepository: UserRepository,
     private readonly mailService: MailService,
     private readonly userActiveLogService: UserActiveLogService,
+    private readonly chatConversationRepository: ChatConversationRepository,
   ) {}
 
   async login(authLogin: AuthLoginDto, res: Response) {
@@ -75,7 +79,30 @@ export class AuthService {
     const device = authLogin.DEVICE || 'Unknown';
     await this.userActiveLogService.logLogin(user.USER_ID, device);
 
-    return { user: pickUser(user), access_token };
+    // Check if user has an active, non-expired conversation
+    const existingConversation =
+      await this.chatConversationRepository.findActiveByUserId(user.USER_ID);
+    let conversationId: string;
+
+    if (existingConversation) {
+      // Reuse existing conversation if still valid
+      conversationId = existingConversation.CONVERSATION_ID;
+      this.logger.log(`Reusing existing conversation: ${conversationId}`);
+    } else {
+      // Create new conversation if no active one exists
+      conversationId = `conv_${user.USER_ID}_${uuidv4()}`;
+      await this.chatConversationRepository.create(
+        user.USER_ID,
+        conversationId,
+      );
+      this.logger.log(`Created new conversation: ${conversationId}`);
+    }
+
+    return {
+      user: pickUser(user),
+      access_token,
+      conversation_id: conversationId,
+    };
   }
 
   async signup(
@@ -103,9 +130,9 @@ export class AuthService {
     }
     // gửi otp xác thực email
     await this.mailService.sendVerificationEmail(
-          createdUser.USER_ID.toString(),
-          OtpType.SIGN_UP,
-        );
+      createdUser.USER_ID.toString(),
+      OtpType.SIGN_UP,
+    );
 
     const access_token = generateAccessToken({
       user_id: createdUser.USER_ID,
@@ -134,7 +161,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     // kiểm tra otp và cập nhật bảng otp record
-    const otpResult = await this.mailService.verifyEmail(user.EMAIL, code)
+    const otpResult = await this.mailService.verifyEmail(user.EMAIL, code);
     if (!otpResult.success) {
       throw new BadRequestException('Invalid OTP');
     }
