@@ -257,9 +257,6 @@ export class UserService {
         updatedFields.PROVINCE = province;
       }
 
-      console.log(myHealthDocument);
-      console.log(UpdateUserProfileDto);
-
       if (
         updateData.GENDER_ID &&
         updateData.GENDER_ID !== myHealthDocument.GENDER?.ID

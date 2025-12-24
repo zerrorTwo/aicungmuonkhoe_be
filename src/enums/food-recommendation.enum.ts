@@ -1,0 +1,6 @@
+export enum TYPE_ADVICE {
+  EAT = 'EAT',
+  LIMIT = 'LIMIT',
+  RECOMMENDED = 'RECOMMENDED',
+  AVOID = 'AVOID',
+}

@@ -74,7 +74,9 @@ export class HealthDocumentRepository {
     return result;
   }
 
-  async findAllByUserId(userId: number) {
+  async findAllByUserId(
+    userId: number,
+  ): Promise<HealthDocumentWithRelationsResponse[] | null> {
     const result = await this.repo.find({
       where: {
         USER: { USER_ID: userId, IS_DELETED: 0 },
