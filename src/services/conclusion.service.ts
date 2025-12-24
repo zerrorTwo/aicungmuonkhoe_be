@@ -131,22 +131,17 @@ export class ConclusionService {
       }
 
       // Prepare age type filter
-      const validWeightHeight0to5 =
-        queryParams.ACTIVE_TAB &&
-        (queryParams.ACTIVE_TAB === ACTIVE_TAB.HEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT);
-      const ageTypeFilter = validWeightHeight0to5
-        ? [AGE_TYPE.FROM_0_LESS_THAN_2, AGE_TYPE.FROM_2_LESS_THAN_5]
-        : queryParams.AGE_TYPE;
+
+      const ageTypeFilter = queryParams.AGE_TYPE;
 
       // Get paginated results
       const result = await this._conclusionRecommendClientRepository.pagination(
         {
           ID: queryParams.ID,
-          START_TIME: queryParams.START_TIME,
-          END_TIME: queryParams.END_TIME,
-          MODEL: queryParams.MODEL,
+          MODEL:
+            queryParams.AGE_TYPE === 'FROM_0_LESS_THAN_5'
+              ? queryParams.MODEL
+              : queryParams.ACTIVE_TAB,
           OFFSET: queryParams.OFFSET,
           LIMIT: queryParams.LIMIT,
           AGE_TYPE: ageTypeFilter,
@@ -200,62 +195,20 @@ export class ConclusionService {
         gender = GENDER.FEMALE;
       }
 
-      // Prepare age type filter
-      const validWeightHeight0to5 =
-        queryParams.ACTIVE_TAB &&
-        (queryParams.ACTIVE_TAB === ACTIVE_TAB.HEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT ||
-          queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT);
-      const validBMI5to19 =
-        queryParams.AGE_TYPE &&
-        (queryParams.AGE_TYPE === AGE_TYPE.FROM_5_LESS_THAN_12 ||
-          queryParams.AGE_TYPE === AGE_TYPE.FROM_12_LESS_THAN_20);
-
-      const currentModel = validWeightHeight0to5
-        ? (queryParams.ACTIVE_TAB as HealthModel)
-        : (queryParams.MODEL as HealthModel);
-      const ageType0to5 = this.getAgeType0to5(
-        currentModel || HEALTH_MODEL.BMI,
-        queryParams.AGE_TYPE || '',
-      );
-
-      const ageTypeFilter = validWeightHeight0to5
-        ? [AGE_TYPE.FROM_0_LESS_THAN_2, AGE_TYPE.FROM_2_LESS_THAN_5]
-        : (queryParams.AGE_TYPE as AgeType);
+      const ageTypeFilter = queryParams.AGE_TYPE as AgeType;
 
       // Get range results
       const result = await this._conclusionRecommendClientRepository.range({
         ID: queryParams.ID,
         START_TIME: queryParams.START_TIME,
         END_TIME: queryParams.END_TIME,
-        MODEL: queryParams.MODEL,
+        MODEL:
+          queryParams.AGE_TYPE === 'FROM_0_LESS_THAN_5'
+            ? queryParams.MODEL
+            : queryParams.ACTIVE_TAB,
         AGE_TYPE: ageTypeFilter,
         SORT: queryParams.SORT,
       });
-
-      // Handle weight-height model for cross-age-type comparisons
-      let weightHeightModel: ConclusionModelResponse[] = [];
-      if (
-        queryParams.AGE_TYPE === AGE_TYPE.FROM_2_LESS_THAN_5 &&
-        queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT
-      ) {
-        // Fetch weight-height model for FROM_0_LESS_THAN_2
-        weightHeightModel = await this.getConclusionModel(
-          currentModel || HEALTH_MODEL.BMI,
-          gender,
-          AGE_TYPE.FROM_0_LESS_THAN_2,
-        );
-      } else if (
-        queryParams.AGE_TYPE === AGE_TYPE.FROM_0_LESS_THAN_2 &&
-        queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT
-      ) {
-        // Fetch weight-height model for FROM_2_LESS_THAN_5
-        weightHeightModel = await this.getConclusionModel(
-          currentModel || HEALTH_MODEL.BMI,
-          gender,
-          AGE_TYPE.FROM_2_LESS_THAN_5,
-        );
-      }
 
       // Fetch models, dropboxes, and user profile in parallel
       const [userProfileResult, models, dropboxs]: [
@@ -265,11 +218,13 @@ export class ConclusionService {
       ] = await Promise.all([
         this._healthDocumentRepository.findById(parseInt(queryParams.ID)),
         this.getConclusionModel(
-          currentModel || HEALTH_MODEL.BMI,
+          (queryParams.ACTIVE_TAB as HealthModel) || HEALTH_MODEL.BMI,
           gender,
           (queryParams.AGE_TYPE as AgeType) || AGE_TYPE.FROM_0_LESS_THAN_2,
         ),
-        this.getConclusionDropBox(),
+        this.getConclusionDropBoxByModel(
+          (queryParams.ACTIVE_TAB as HealthModel) || HEALTH_MODEL.BMI,
+        ),
       ]);
 
       const userProfile: HealthDocumentWithRelationsResponse | null =
@@ -280,34 +235,29 @@ export class ConclusionService {
       }
 
       let processedData: any[];
+      const ageType0to19 = [
+        'FROM_0_LESS_THAN_5',
+        'FROM_5_LESS_THAN_19',
+      ].includes(ageTypeFilter);
 
       // Process data based on age type and active tab
-      if (validWeightHeight0to5 || validBMI5to19) {
+      if (ageType0to19) {
         processedData = await Promise.all(
           result.map(async (item) => {
-            const isWeightHeightTab =
-              queryParams.ACTIVE_TAB === ACTIVE_TAB.WEIGHT_HEIGHT;
-            const itemAgeType = isWeightHeightTab
-              ? item.AGE_TYPE || ageType0to5
-              : ageType0to5;
             const currentMonthAge = this.calculateTotalMonthOfAge(
               userProfile.DOB || new Date(),
               new Date(item.DATE),
             );
-            const modelTemplate =
-              isWeightHeightTab && itemAgeType !== queryParams.AGE_TYPE
-                ? weightHeightModel
-                : models;
 
             // Use the conclusion logic to process BMI type
             return Conclusion.getConclusionByBMIType(
               item,
-              currentModel || '',
+              queryParams.ACTIVE_TAB || '',
               gender,
               dropboxs,
-              modelTemplate || models,
+              models,
               currentMonthAge,
-              itemAgeType,
+              ageTypeFilter,
             );
           }),
         );
@@ -373,18 +323,6 @@ export class ConclusionService {
     return Object.values(groupedData);
   }
 
-  private getAgeType0to5(currentModel: HealthModel, ageType: string): string {
-    if (ageType === AGE_TYPE.FROM_0_LESS_THAN_2) {
-      return AGE_TYPE.FROM_0_LESS_THAN_5;
-    }
-
-    if (ageType === AGE_TYPE.FROM_2_LESS_THAN_5) {
-      return AGE_TYPE.FROM_0_LESS_THAN_5;
-    }
-
-    return ageType;
-  }
-
   private calculateTotalMonthOfAge(
     fromDate: string | Date,
     toDate: string | Date = new Date(),
@@ -418,9 +356,13 @@ export class ConclusionService {
     }
   }
 
-  private async getConclusionDropBox(): Promise<ConclusionDropboxResponse[]> {
+  private async getConclusionDropBoxByModel(
+    model: HealthModel,
+  ): Promise<ConclusionDropboxResponse[]> {
     try {
-      return await this._conclusionRecommendDropboxRepository.findAll();
+      return await this._conclusionRecommendDropboxRepository.findByModel(
+        model,
+      );
     } catch (error) {
       this.logger.error('Error in getConclusionDropBox:', error);
       return [];

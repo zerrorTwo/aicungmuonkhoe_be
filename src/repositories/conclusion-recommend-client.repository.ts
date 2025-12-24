@@ -68,8 +68,6 @@ export class ConclusionRecommendClientRepository {
 
   async pagination(options: {
     ID?: string;
-    START_TIME?: string;
-    END_TIME?: string;
     MODEL?: string;
     OFFSET?: string;
     LIMIT?: string;
@@ -84,13 +82,6 @@ export class ConclusionRecommendClientRepository {
     if (options.ID) {
       queryBuilder.andWhere('conclusion.HEALTH_DOCUMENT_ID = :id', {
         id: options.ID,
-      });
-    }
-
-    if (options.START_TIME && options.END_TIME) {
-      queryBuilder.andWhere('conclusion.DATE BETWEEN :startTime AND :endTime', {
-        startTime: options.START_TIME,
-        endTime: options.END_TIME,
       });
     }
 
@@ -114,12 +105,6 @@ export class ConclusionRecommendClientRepository {
 
     // Add sorting
     if (options.SORT) {
-      const [field, direction] = options.SORT.split(':');
-      queryBuilder.orderBy(
-        `conclusion.${field}`,
-        (direction?.toUpperCase() as 'ASC' | 'DESC') || 'DESC',
-      );
-    } else {
       queryBuilder.orderBy('conclusion.CREATED_DATE', 'DESC');
     }
 
@@ -178,14 +163,7 @@ export class ConclusionRecommendClientRepository {
       }
     }
 
-    // Add sorting
     if (options.SORT) {
-      const [field, direction] = options.SORT.split(':');
-      queryBuilder.orderBy(
-        `conclusion.${field}`,
-        (direction?.toUpperCase() as 'ASC' | 'DESC') || 'DESC',
-      );
-    } else {
       queryBuilder.orderBy('conclusion.CREATED_DATE', 'DESC');
     }
 
