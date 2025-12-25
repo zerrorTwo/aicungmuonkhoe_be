@@ -23,11 +23,15 @@ export class ConclusionAdminController {
   constructor(private readonly conclusionService: ConclusionService) {}
 
   /**
-   * GET /admin/conclusion-recommendations?model=GLUCOSE_2H
-   * Get conclusion recommendations by model name
+   * GET /admin/conclusion-recommendations?model=GLUCOSE_2H&gender=nam&ageType=FROM_5_LESS_THAN_12
+   * Get conclusion recommendations by model name, gender, and ageType
    */
   @Get()
-  async getConclusionRecommendations(@Query('model') model: string) {
+  async getConclusionRecommendations(
+    @Query('model') model: string,
+    @Query('gender') gender?: string,
+    @Query('ageType') ageType?: string,
+  ) {
     try {
       if (!model) {
         throw new HttpException(
@@ -36,8 +40,11 @@ export class ConclusionAdminController {
         );
       }
 
-      const data =
-        await this.conclusionService.getConclusionManagementByModel(model);
+      const data = await this.conclusionService.getConclusionManagementByModel(
+        model,
+        gender,
+        ageType,
+      );
 
       return {
         success: true,
