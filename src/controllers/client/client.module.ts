@@ -31,6 +31,7 @@ import { MealPlannerMealDish } from '../../entities/meal-planner-meal-dish.entit
 import { Tips } from 'src/entities/tips.entity';
 import { ChatConversation } from '../../entities/chat-conversation.entity';
 import { ChatMessage } from '../../entities/chat-message.entity';
+import { UserStartedTour } from '../../entities/user-started-tour.entity';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ChatMessage } from '../../entities/chat-message.entity';
       MealPlannerMeal,
       MealPlannerMealDish,
       Tips,
+      UserStartedTour,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

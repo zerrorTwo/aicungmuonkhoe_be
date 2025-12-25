@@ -12,6 +12,7 @@ import { MealPlannerService } from './meal-planner.service';
 import { TipsService } from './tip.service';
 import { HealthChatbotService } from './health-chatbot.service';
 import { AIChatbotService } from './ai-chatbot.service';
+import { UserStartedTourService } from './user-started-tour.service';
 
 const Services = [
   UserService,
@@ -28,6 +29,7 @@ const Services = [
   TipsService,
   HealthChatbotService,
   AIChatbotService,
+  UserStartedTourService,
 ];
 
 export default Services;

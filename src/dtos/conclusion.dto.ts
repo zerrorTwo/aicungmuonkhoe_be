@@ -42,12 +42,17 @@ export class CreateConclusionClientDto {
 
   @IsOptional()
   @IsString()
-  CREATED_BY?: string;
+  CREATED_BY?: number;
 }
 
 export class UpdateConclusionClientDto extends CreateConclusionClientDto {
+  @IsOptional()
   @IsNumber()
   ID: number;
+
+  @IsOptional()
+  @IsNumber()
+  UPDATED_BY?: number;
 }
 
 export class ConclusionQueryDto {
