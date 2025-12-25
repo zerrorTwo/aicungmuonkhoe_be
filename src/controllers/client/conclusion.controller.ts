@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -26,6 +27,7 @@ import { ConclusionService } from 'src/services/conclusion.service';
 import { AuthGuard } from 'src/utils/auth/auth.guard';
 import { SuccessMessages } from 'src/utils/constants/message.constants';
 import { SuccessResponse, DataPagination } from 'src/utils/format';
+import { CurrentUser } from 'src/decoractors/current-user.decorator';
 
 @ApiTags('Conclusion')
 @Controller('conclusion')
@@ -35,84 +37,6 @@ export class ConclusionController {
     private readonly healthDocumentService: HealthDocumentService,
     private readonly conclusionService: ConclusionService,
   ) {}
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new conclusion document' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully created conclusion document',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Conclusion document not found or unauthorized',
-  })
-  async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
-    const user_id = req.user.user_id;
-    console.log('=== CREATE CONCLUSION DOCUMENT ===');
-    console.log('user_id:', user_id);
-    console.log('createDto:', createDto);
-
-    try {
-      const result = await this.healthDocumentService.createHealthDocument(
-        user_id,
-        createDto,
-      );
-      console.log('Create result:', result);
-
-      return Builder<SuccessResponse<HealthDocument>>()
-        .data(result)
-        .message(SuccessMessages.CREATE_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Create error:', error);
-      throw error;
-    }
-  }
-
-  @Get('/myself')
-  @ApiOperation({
-    summary: 'Get health document information for the authenticated user',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved health document information',
-  })
-  @ApiResponse({ status: 404, description: 'Health document not found' })
-  async getHealthDocumentMySelf(@Req() req) {
-    try {
-      const user_id = req.user.user_id;
-
-      if (!user_id) {
-        throw new HttpException(
-          'User not authenticated',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      const result =
-        await this.healthDocumentService.findHealthDocumentMySelfByUserID(
-          user_id,
-        );
-
-      if (!result) {
-        console.log('No health document found for user:', user_id);
-        throw new HttpException(
-          'Health document not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return Builder<SuccessResponse<HealthDocument>>()
-        .data(result)
-        .message(SuccessMessages.GET_SUCCESSFULLY)
-        .status(StatusCodes.OK)
-        .build();
-    } catch (error) {
-      console.error('Get myself error:', error);
-      throw error;
-    }
-  }
 
   @Post('/client')
   @ApiOperation({ summary: 'Create a new conclusion for client' })
@@ -126,9 +50,11 @@ export class ConclusionController {
   })
   async createConclusionClient(
     @Body() createDto: CreateConclusionClientDto,
-    @Req() req,
+    @CurrentUser() user,
   ) {
     try {
+      const user_id = user.user_id;
+      createDto.CREATED_BY = user_id;
       const result =
         await this.conclusionService.createConclusionClient(createDto);
 
@@ -159,9 +85,11 @@ export class ConclusionController {
   async updateConclusionClient(
     @Param('id') id: string,
     @Body() updateDto: UpdateConclusionClientDto,
-    @Req() req,
+    @CurrentUser() user,
   ) {
     try {
+      const user_id = user.user_id;
+      updateDto.UPDATED_BY = user_id;
       const result = await this.conclusionService.updateConclusionClient(
         parseInt(id),
         updateDto,
@@ -242,6 +170,36 @@ export class ConclusionController {
     } catch (error) {
       throw new HttpException(
         error.message || 'Failed to get conclusions range',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Delete('/client/:id')
+  @ApiOperation({ summary: 'Delete a conclusion record' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted conclusion',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Conclusion not found',
+  })
+  async deleteConclusionClient(@Param('id') id: string, @CurrentUser() user) {
+    try {
+      const result = await this.conclusionService.deleteConclusionClient(
+        parseInt(id),
+      );
+
+      return Builder<SuccessResponse<boolean>>()
+        .data(result)
+        .message(SuccessMessages.DELETE_SUCCESSFULLY)
+        .status(StatusCodes.OK)
+        .build();
+    } catch (error) {
+      console.error('Delete conclusion error:', error);
+      throw new HttpException(
+        error.message || 'Failed to delete conclusion',
         HttpStatus.BAD_REQUEST,
       );
     }

@@ -1,37 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import {
+  ConclusionQueryDto,
   CreateConclusionClientDto,
   UpdateConclusionClientDto,
-  ConclusionQueryDto,
 } from 'src/dtos/conclusion.dto';
 import { ConclusionRecommendClient } from 'src/entities/conclusion-recommend-client.entity';
-import { HealthDocumentRepository } from 'src/repositories/health-document.repository';
-import { ConclusionRecommendClientRepository } from 'src/repositories/conclusion-recommend-client.repository';
-import { ConclusionRecommendManagementRepository } from 'src/repositories/conclusion-recommend-management.repository';
-import { ConclusionRecommendDropboxRepository } from 'src/repositories/conclusion-recommend-dropbox.repository';
 import {
-  ConclusionRecommendClientResponse,
-  ConclusionModelResponse,
   ConclusionDropboxResponse,
+  ConclusionModelResponse,
 } from 'src/interfaces/conclusion.interface';
 import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
+import { ConclusionRecommendClientRepository } from 'src/repositories/conclusion-recommend-client.repository';
+import { ConclusionRecommendDropboxRepository } from 'src/repositories/conclusion-recommend-dropbox.repository';
+import { ConclusionRecommendManagementRepository } from 'src/repositories/conclusion-recommend-management.repository';
+import { HealthDocumentRepository } from 'src/repositories/health-document.repository';
+import { UserRepository } from 'src/repositories/user.repository';
 import { Conclusion } from 'src/utils/conclusion';
 import {
   AGE_TYPE,
-  ACTIVE_TAB,
-  GENDER,
-  HEALTH_MODEL,
-  COMPARISON_INDICATOR,
-  LOGICAL_OPERATOR,
-  DROPBOX_TYPE,
   AgeType,
-  ActiveTab,
+  GENDER,
   Gender,
+  HEALTH_MODEL,
   HealthModel,
-  ComparisonIndicator,
-  LogicalOperator,
-  DropboxType,
 } from 'src/utils/constants';
 
 @Injectable()
@@ -43,6 +35,7 @@ export class ConclusionService {
     private readonly _conclusionRecommendClientRepository: ConclusionRecommendClientRepository,
     private readonly _conclusionRecommendManagementRepository: ConclusionRecommendManagementRepository,
     private readonly _conclusionRecommendDropboxRepository: ConclusionRecommendDropboxRepository,
+    private readonly _userRepository: UserRepository,
   ) {}
 
   async createConclusionClient(
@@ -107,6 +100,19 @@ export class ConclusionService {
     return true;
   }
 
+  async deleteConclusionClient(ID: number): Promise<boolean> {
+    // Check if the conclusion exists
+    const existingConclusion =
+      await this._conclusionRecommendClientRepository.findById(ID);
+
+    if (!existingConclusion) {
+      throw new Error(`ConclusionRecommendClient with id ${ID} not found`);
+    }
+
+    const result = await this._conclusionRecommendClientRepository.delete(ID);
+    return result;
+  }
+
   async getConclusionsPagination(queryParams: ConclusionQueryDto): Promise<{
     listData: ConclusionRecommendClient[];
     paging: {
@@ -130,9 +136,14 @@ export class ConclusionService {
         throw new Error(`Health document with id ${queryParams.ID} not found`);
       }
 
-      // Prepare age type filter
+      // Determine gender for model lookup
+      let gender: Gender = GENDER.MALE;
+      if (healthDocument.GENDER?.NAME?.toLowerCase() !== 'nam') {
+        gender = GENDER.FEMALE;
+      }
 
-      const ageTypeFilter = queryParams.AGE_TYPE;
+      // Prepare age type filter
+      const ageTypeFilter = queryParams.AGE_TYPE as AgeType;
 
       // Get paginated results
       const result = await this._conclusionRecommendClientRepository.pagination(
@@ -149,11 +160,107 @@ export class ConclusionService {
         },
       );
 
+      // Fetch models, dropboxes, and user profile in parallel
+      const [userProfileResult, models, dropboxs]: [
+        HealthDocumentWithRelationsResponse | null,
+        ConclusionModelResponse[],
+        ConclusionDropboxResponse[],
+      ] = await Promise.all([
+        this._healthDocumentRepository.findById(parseInt(queryParams.ID)),
+        this.getConclusionModel(
+          (queryParams.ACTIVE_TAB as HealthModel) || HEALTH_MODEL.BMI,
+          gender,
+          (queryParams.AGE_TYPE as AgeType) || AGE_TYPE.FROM_0_LESS_THAN_2,
+        ),
+        this.getConclusionDropBoxByModel(
+          (queryParams.ACTIVE_TAB as HealthModel) || HEALTH_MODEL.BMI,
+        ),
+      ]);
+
+      const userProfile: HealthDocumentWithRelationsResponse | null =
+        userProfileResult;
+
+      if (!userProfile) {
+        throw new Error('User profile not found');
+      }
+
+      let processedData: any[];
+      const ageType0to19 = [
+        'FROM_0_LESS_THAN_5',
+        'FROM_5_LESS_THAN_19',
+      ].includes(ageTypeFilter);
+
+      // Process data based on age type and active tab
+      if (ageType0to19) {
+        processedData = await Promise.all(
+          result.data.map(async (item) => {
+            const currentMonthAge = this.calculateTotalMonthOfAge(
+              userProfile.DOB || new Date(),
+              new Date(item.DATE),
+            );
+
+            // Use the conclusion logic to process BMI type
+            return Conclusion.getConclusionByBMIType(
+              item,
+              queryParams.ACTIVE_TAB || '',
+              gender,
+              dropboxs,
+              models,
+              currentMonthAge,
+              ageTypeFilter,
+            );
+          }),
+        );
+      } else {
+        // Process data for other age types
+        processedData = result.data.map((item) => {
+          // Use the conclusion logic to process general cases
+          return Conclusion.getConclusion(item, models, dropboxs);
+        });
+      }
+
+      // Handle created by user information
+      const createdByIds: number[] = [
+        ...new Set(
+          processedData.map((item) => item?.CREATED_BY).filter((id) => id),
+        ),
+      ];
+
+      let createdUsersMap: Map<number, { fullName: string; avatar: string }> =
+        new Map();
+      if (createdByIds.length > 0) {
+        const createdUsers =
+          await this._userRepository.findByListIds(createdByIds);
+
+        if (createdUsers) {
+          createdUsersMap = new Map(
+            createdUsers.map((user) => {
+              const fullName =
+                user.HEALTH_DOCUMENTS?.[0]?.FULL_NAME ||
+                user.EMAIL ||
+                'Unknown';
+              const avatar = user.HEALTH_DOCUMENTS?.[0]?.AVATAR;
+              return [user.USER_ID, { fullName, avatar }];
+            }),
+          );
+        }
+      }
+
+      const finalData = processedData.map((item) => ({
+        ...item,
+        CREATED_NAME: item.CREATED_BY
+          ? createdUsersMap.get(item.CREATED_BY)?.fullName || 'Unknown'
+          : 'Unknown',
+        CREATED_AVATAR: item.CREATED_BY
+          ? createdUsersMap.get(item.CREATED_BY)?.avatar || 'Unknown'
+          : 'Unknown',
+      }));
+
       const offset = parseInt(queryParams.OFFSET || '0');
       const limit = parseInt(queryParams.LIMIT || '10');
 
       return {
-        listData: result.data,
+        listData: finalData,
         paging: {
           curPage: offset,
           limitPage: limit,
@@ -269,17 +376,6 @@ export class ConclusionService {
         });
       }
 
-      // Handle created by user information
-      const createdByIds: number[] = [
-        ...new Set(
-          processedData.map((item) => item?.CREATED_BY).filter((id) => id),
-        ),
-      ];
-      if (createdByIds.length > 0) {
-        const createdUsers: any[] =
-          await this.getHealthDocumentsByIds(createdByIds);
-      }
-
       // Group data by date and return only the latest entry for each date
       const latestDataByDate: ConclusionRecommendClient[] =
         this.groupDataByLatestDate(processedData);
@@ -367,11 +463,5 @@ export class ConclusionService {
       this.logger.error('Error in getConclusionDropBox:', error);
       return [];
     }
-  }
-
-  private async getHealthDocumentsByIds(ids: number[]): Promise<any[]> {
-    // Placeholder implementation - replace with actual database query
-    this.logger.warn('getHealthDocumentsByIds not implemented yet');
-    return [];
   }
 }

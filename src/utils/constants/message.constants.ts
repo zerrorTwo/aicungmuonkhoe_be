@@ -4,7 +4,7 @@ export const ErrorMessages = {
   FAIL_EMAIL_VERIFY: 'Failed to verify email.',
   NO_PERMISSION_ACCEPT: 'You do not have permission to access this resource.',
   FORMAT_DATA_IS_WRONG: 'Format data is wrong.',
-  MEALTIME_EXIST: 'Thiết lập giờ ăn đã tồn tại',
+  NOT_FOUND: 'Not found',
   NOTIFICATION_IS_NOT_FOUND: 'Thông báo không tồn tại',
 };
 

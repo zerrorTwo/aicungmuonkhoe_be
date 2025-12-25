@@ -49,8 +49,11 @@ export class ConclusionRecommendClient {
   @Column({ name: 'AGE_TYPE', type: 'varchar', length: 30, nullable: true })
   AGE_TYPE: string;
 
-  @Column({ name: 'CREATED_BY', type: 'varchar', length: 10, nullable: true })
-  CREATED_BY: string;
+  @Column({ name: 'CREATED_BY', type: 'int', nullable: true })
+  CREATED_BY: number;
+
+  @Column({ name: 'UPDATED_BY', type: 'int', nullable: true })
+  UPDATED_BY: number;
 
   // Liên kết với bảng HealthDocument
   @ManyToOne(() => HealthDocument, { nullable: true, onDelete: 'CASCADE' })

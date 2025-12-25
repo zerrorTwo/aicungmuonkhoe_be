@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { CreateNewUserDto } from 'src/dtos/user.dto';
 import { User } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class UserRepository {
@@ -69,5 +69,13 @@ export class UserRepository {
     }
 
     return updatedUser;
+  }
+
+  async findByListIds(ids: number[]): Promise<User[]> {
+    const result = await this.repo.find({
+      where: { USER_ID: In(ids), IS_DELETED: 0 },
+      relations: ['HEALTH_DOCUMENTS'],
+    });
+    return result;
   }
 }

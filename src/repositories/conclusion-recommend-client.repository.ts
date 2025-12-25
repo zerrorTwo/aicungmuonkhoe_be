@@ -74,9 +74,7 @@ export class ConclusionRecommendClientRepository {
     AGE_TYPE?: string | string[];
     SORT?: string;
   }): Promise<{ data: ConclusionRecommendClient[]; total: number }> {
-    const queryBuilder = this.repo
-      .createQueryBuilder('conclusion')
-      .leftJoinAndSelect('conclusion.HEALTH_DOCUMENT', 'healthDocument');
+    const queryBuilder = this.repo.createQueryBuilder('conclusion');
 
     // Add where conditions
     if (options.ID) {
@@ -127,9 +125,7 @@ export class ConclusionRecommendClientRepository {
     AGE_TYPE?: string | string[];
     SORT?: string;
   }): Promise<ConclusionRecommendClient[]> {
-    const queryBuilder = this.repo
-      .createQueryBuilder('conclusion')
-      .leftJoinAndSelect('conclusion.HEALTH_DOCUMENT', 'healthDocument');
+    const queryBuilder = this.repo.createQueryBuilder('conclusion');
 
     // Add where conditions
     if (options.ID) {

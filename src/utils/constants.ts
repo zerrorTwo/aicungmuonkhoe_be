@@ -35,6 +35,8 @@ export const HEALTH_MODEL = {
   LDL: 'LDL',
   CHOL: 'CHOL',
   AXIT_URIC: 'AXIT_URIC',
+  HEIGHT: 'HEIGHT',
+  WEIGHT: 'WEIGHT',
 } as const;
 
 export const COMPARISON_INDICATOR = {

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HealthDocument } from 'src/entities/health-document.entity';
 import { HealthDocumentWithRelationsResponse } from 'src/interfaces/health-document.interface';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class HealthDocumentRepository {
@@ -102,6 +102,17 @@ export class HealthDocumentRepository {
   async findOne(userId: number, id: number): Promise<HealthDocument | null> {
     const result = await this.repo.findOne({
       where: { USER: { USER_ID: userId, IS_DELETED: 0 }, ID: id },
+      relations: ['USER'],
+    });
+    if (!result) {
+      return null;
+    }
+    return result;
+  }
+
+  async findByListIds(ids: number[]): Promise<HealthDocument[] | null> {
+    const result = await this.repo.find({
+      where: { ID: In(ids) },
       relations: ['USER'],
     });
     if (!result) {

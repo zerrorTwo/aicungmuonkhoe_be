@@ -42,9 +42,6 @@ export class HealthDocumentController {
   })
   async createNew(@Body() createDto: CreateHealthDocumentDto, @Req() req) {
     const user_id = req.user.user_id;
-    console.log('=== CREATE HEALTH DOCUMENT ===');
-    console.log('user_id:', user_id);
-    console.log('createDto:', createDto);
 
     try {
       const result = await this.healthDocumentService.createHealthDocument(
