@@ -22,6 +22,9 @@ import { DishRepository } from './dish.repository';
 import { DishIngredientRepository } from './dish-ingredient.repository';
 import { FoodRepository } from './food.repository';
 import { AgeRangeRepository } from './age-range.repository';
+import { PostRepository } from './post.repository';
+import { CommentRepository } from './comment.repository';
+import { LikeRepository } from './like.repository';
 
 const Repositories = [
   UserRepository,
@@ -48,6 +51,9 @@ const Repositories = [
   DishIngredientRepository,
   FoodRepository,
   AgeRangeRepository,
+  PostRepository,
+  CommentRepository,
+  LikeRepository,
 ];
 
 export default Repositories;
