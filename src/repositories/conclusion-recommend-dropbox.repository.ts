@@ -38,4 +38,38 @@ export class ConclusionRecommendDropboxRepository {
       },
     });
   }
+
+  // ============================================
+  // Admin Methods
+  // ============================================
+
+  async getDropdownByModel(
+    model: string,
+  ): Promise<ConclusionDropboxResponse[]> {
+    let result = await this.repository.find({
+      where: { MODEL: model },
+    });
+
+    // Special handling for BMI model
+    if (model === 'BMI') {
+      // Filter out TYPE items from BMI
+      const filtered = result.filter((item: any) => item.TYPE !== 'TYPE');
+
+      // Get BMI_5_19 TYPE items
+      const bmi519Types = await this.repository.find({
+        where: { MODEL: 'BMI_5_19', TYPE: 'TYPE' },
+      });
+
+      // Modify MODEL field for BMI_5_19 items
+      const modifiedBmi519 = bmi519Types.map((item) => ({
+        ...item,
+        MODEL: 'BMI',
+      }));
+
+      // Merge results
+      result = [...filtered, ...modifiedBmi519];
+    }
+
+    return result;
+  }
 }

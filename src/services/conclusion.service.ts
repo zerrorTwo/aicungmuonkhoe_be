@@ -464,4 +464,141 @@ export class ConclusionService {
       return [];
     }
   }
+
+  // ============================================
+  // Admin Methods
+  // ============================================
+
+  async getConclusionManagementByModel(
+    model: string,
+    gender?: string,
+    ageType?: string,
+  ): Promise<ConclusionModelResponse[]> {
+    try {
+      return await this._conclusionRecommendManagementRepository.findByModelGenderAndAgeType(
+        model as HealthModel,
+        gender as Gender,
+        ageType as AgeType,
+      );
+    } catch (error) {
+      this.logger.error('Error in getConclusionManagementByModel:', error);
+      throw new Error(`Failed to get conclusion management: ${error.message}`);
+    }
+  }
+
+  async bulkCreateConclusionManagement(
+    data: {
+      model: string;
+      gender?: string;
+      ageType?: string;
+      items: any[];
+    },
+    userId: number,
+  ): Promise<boolean> {
+    try {
+      const { model, gender, ageType, items } = data;
+
+      // Delete existing data based on model type
+      if (model === 'BMI' && ageType) {
+        await this._conclusionRecommendManagementRepository.deleteByFilter(
+          model,
+          gender,
+          ageType,
+        );
+      } else if (gender) {
+        await this._conclusionRecommendManagementRepository.deleteByModelAndGender(
+          model,
+          gender,
+        );
+      } else {
+        await this._conclusionRecommendManagementRepository.deleteByModel(
+          model,
+        );
+      }
+
+      // Create new items
+      const createPromises = items.map((item) => {
+        const dataToCreate = {
+          ...item,
+          AGE_TYPE:
+            model === 'HEIGHT'
+              ? 'FROM_0_LESS_THAN_5'
+              : item.AGE_TYPE || ageType,
+          GENDER: gender,
+          CREATED_BY: userId,
+          MODIFIED_BY: userId,
+        };
+        return this._conclusionRecommendManagementRepository.create(
+          dataToCreate,
+        );
+      });
+
+      await Promise.all(createPromises);
+      return true;
+    } catch (error) {
+      this.logger.error('Error in bulkCreateConclusionManagement:', error);
+      throw new Error(`Failed to bulk create conclusions: ${error.message}`);
+    }
+  }
+
+  async updateConclusionManagement(
+    id: number,
+    data: any,
+    userId: number,
+  ): Promise<boolean> {
+    try {
+      const existing =
+        await this._conclusionRecommendManagementRepository.findById(id);
+
+      if (!existing) {
+        throw new Error(`Conclusion with id ${id} not found`);
+      }
+
+      const updateData = {
+        ...data,
+        MODIFIED_BY: userId,
+      };
+
+      return await this._conclusionRecommendManagementRepository.update(
+        id,
+        updateData,
+      );
+    } catch (error) {
+      this.logger.error('Error in updateConclusionManagement:', error);
+      throw new Error(
+        `Failed to update conclusion management: ${error.message}`,
+      );
+    }
+  }
+
+  async deleteConclusionManagement(id: number): Promise<boolean> {
+    try {
+      const existing =
+        await this._conclusionRecommendManagementRepository.findById(id);
+
+      if (!existing) {
+        throw new Error(`Conclusion with id ${id} not found`);
+      }
+
+      return await this._conclusionRecommendManagementRepository.softDelete(id);
+    } catch (error) {
+      this.logger.error('Error in deleteConclusionManagement:', error);
+      throw new Error(
+        `Failed to delete conclusion management: ${error.message}`,
+      );
+    }
+  }
+
+  async getConclusionDropdownByModel(
+    model: string,
+  ): Promise<ConclusionDropboxResponse[]> {
+    try {
+      return await this._conclusionRecommendDropboxRepository.getDropdownByModel(
+        model,
+      );
+    } catch (error) {
+      this.logger.error('Error in getConclusionDropdownByModel:', error);
+      throw new Error(`Failed to get dropdown data: ${error.message}`);
+    }
+  }
 }

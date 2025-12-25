@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsInt,
   Min,
+  IsNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -185,4 +186,93 @@ export class resetPasswordDto {
   @IsString()
   @MinLength(6)
   NEW_PASSWORD: string;
+}
+
+// ============================================
+// Admin DTOs for User Management
+// ============================================
+
+export class AdminUserQueryDto {
+  @ApiProperty({
+    description: 'Page number for pagination',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  page?: number;
+
+  @ApiProperty({
+    description: 'Number of items per page',
+    example: 10,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  limit?: number;
+
+  @ApiProperty({
+    description: 'Search by email, phone, or name',
+    example: 'john@example.com',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiProperty({
+    description: 'Filter by status (0: inactive, 1: active)',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  status?: number;
+
+  @ApiProperty({
+    description: 'Filter by admin role (0: user, 1: admin)',
+    example: 0,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  isAdmin?: number;
+}
+
+export class AdminUpdateUserDto {
+  @ApiProperty({
+    description: 'User status (0: inactive, 1: active)',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  STATUS_ACTIVE?: number;
+
+  @ApiProperty({
+    description: 'Admin role (0: user, 1: admin)',
+    example: 0,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  IS_ADMIN?: number;
+
+  @ApiProperty({
+    description: 'Email of the user',
+    example: 'user@example.com',
+    required: false,
+  })
+  @IsOptional()
+  @IsEmail()
+  EMAIL?: string;
+
+  @ApiProperty({
+    description: 'Phone number of the user',
+    example: '0123456789',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  PHONE?: string;
 }

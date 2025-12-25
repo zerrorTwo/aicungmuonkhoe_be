@@ -78,4 +78,94 @@ export class UserRepository {
     });
     return result;
   }
+
+  // ============================================
+  // Admin Methods
+  // ============================================
+
+  async findAllWithPagination(query: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: number;
+    isAdmin?: number;
+  }): Promise<{ users: User[]; total: number }> {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const queryBuilder = this.repo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.HEALTH_DOCUMENTS', 'healthDoc')
+      .leftJoinAndSelect('healthDoc.GENDER', 'gender')
+      .leftJoinAndSelect('healthDoc.PROVINCE', 'province')
+      .where('user.IS_DELETED = :isDeleted', { isDeleted: 0 });
+
+    // Search filter
+    if (query.search) {
+      queryBuilder.andWhere(
+        '(user.EMAIL LIKE :search OR user.PHONE LIKE :search OR healthDoc.FULL_NAME LIKE :search)',
+        { search: `%${query.search}%` },
+      );
+    }
+
+    // Status filter
+    if (query.status !== undefined) {
+      queryBuilder.andWhere('user.STATUS_ACTIVE = :status', {
+        status: query.status,
+      });
+    }
+
+    // Admin filter
+    if (query.isAdmin !== undefined) {
+      queryBuilder.andWhere('user.IS_ADMIN = :isAdmin', {
+        isAdmin: query.isAdmin,
+      });
+    }
+
+    // Get total count
+    const total = await queryBuilder.getCount();
+
+    // Get paginated results
+    const users = await queryBuilder
+      .orderBy('user.CREATED_AT', 'DESC')
+      .skip(skip)
+      .take(limit)
+      .getMany();
+
+    return { users, total };
+  }
+
+  async softDelete(userId: number): Promise<boolean> {
+    const result = await this.repo.update(
+      { USER_ID: userId },
+      { IS_DELETED: 1 },
+    );
+    return (result.affected ?? 0) > 0;
+  }
+
+  async getUserStats(): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    admins: number;
+  }> {
+    const total = await this.repo.count({
+      where: { IS_DELETED: 0 },
+    });
+
+    const active = await this.repo.count({
+      where: { IS_DELETED: 0, STATUS_ACTIVE: 1 },
+    });
+
+    const inactive = await this.repo.count({
+      where: { IS_DELETED: 0, STATUS_ACTIVE: 0 },
+    });
+
+    const admins = await this.repo.count({
+      where: { IS_DELETED: 0, IS_ADMIN: 1 },
+    });
+
+    return { total, active, inactive, admins };
+  }
 }
