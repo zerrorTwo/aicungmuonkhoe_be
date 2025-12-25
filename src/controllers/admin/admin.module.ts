@@ -30,6 +30,9 @@ import { Tips } from 'src/entities/tips.entity';
 import { ChatConversation } from '../../entities/chat-conversation.entity';
 import { ChatMessage } from '../../entities/chat-message.entity';
 import { UserStartedTour } from '../../entities/user-started-tour.entity';
+import { Comment } from 'src/entities/comment.entity';
+import { Like } from 'src/entities/like.entity';
+import { Post } from '../../entities/post.entity';
 
 @Module({
   imports: [
@@ -60,6 +63,9 @@ import { UserStartedTour } from '../../entities/user-started-tour.entity';
       MealPlannerMealDish,
       Tips,
       UserStartedTour,
+      Comment,
+      Like,
+      Post,
     ]),
   ],
   controllers: [...Controllers],

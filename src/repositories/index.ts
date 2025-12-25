@@ -18,6 +18,9 @@ import { TipRepository } from './tip.repository';
 import { ChatConversationRepository } from './chat-conversation.repository';
 import { ChatMessageRepository } from './chat-message.repository';
 import { UserStartedTourRepository } from './user-started-tour.repository';
+import { PostRepository } from './post.repository';
+import { CommentRepository } from './comment.repository';
+import { LikeRepository } from './like.repository';
 
 const Repositories = [
   UserRepository,
@@ -40,6 +43,9 @@ const Repositories = [
   ChatConversationRepository,
   ChatMessageRepository,
   UserStartedTourRepository,
+  PostRepository,
+  CommentRepository,
+  LikeRepository,
 ];
 
 export default Repositories;
