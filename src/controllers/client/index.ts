@@ -11,6 +11,7 @@ import { MealPlannerController } from './meal-planner.controller';
 import { TipController } from './tip.controller';
 import { ChatbotController } from './chatbot.controller';
 import { UserStartedTourController } from './user-started-tour.controller';
+import { DishController } from './dish.controller';
 
 const Controllers = [
   UserController,
@@ -26,6 +27,7 @@ const Controllers = [
   TipController,
   ChatbotController,
   UserStartedTourController,
+  DishController,
 ];
 
 export default Controllers;
