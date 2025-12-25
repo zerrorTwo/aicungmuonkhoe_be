@@ -13,6 +13,7 @@ import { TipsService } from './tip.service';
 import { HealthChatbotService } from './health-chatbot.service';
 import { AIChatbotService } from './ai-chatbot.service';
 import { UserStartedTourService } from './user-started-tour.service';
+import { DishService } from './dish.service';
 import { CommunityService } from './community.service';
 
 const Services = [
@@ -31,6 +32,7 @@ const Services = [
   HealthChatbotService,
   AIChatbotService,
   UserStartedTourService,
+  DishService,
   CommunityService,
 ];
 

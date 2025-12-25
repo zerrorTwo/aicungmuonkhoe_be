@@ -32,6 +32,9 @@ import { Tips } from 'src/entities/tips.entity';
 import { ChatConversation } from '../../entities/chat-conversation.entity';
 import { ChatMessage } from '../../entities/chat-message.entity';
 import { UserStartedTour } from '../../entities/user-started-tour.entity';
+import { DishIngredient } from '../../entities/dish-ingredient.entity';
+import { DishTag } from '../../entities/dish-tag.entity';
+import { DishCookingMethod } from '../../entities/dish-cooking-method.entity';
 import { Post } from '../../entities/post.entity';
 import { Comment } from '../../entities/comment.entity';
 import { Like } from '../../entities/like.entity';
@@ -65,6 +68,9 @@ import { Like } from '../../entities/like.entity';
       MealPlannerMealDish,
       Tips,
       UserStartedTour,
+      DishIngredient,
+      DishTag,
+      DishCookingMethod,
       Post,
       Comment,
       Like,

@@ -18,6 +18,10 @@ import { TipRepository } from './tip.repository';
 import { ChatConversationRepository } from './chat-conversation.repository';
 import { ChatMessageRepository } from './chat-message.repository';
 import { UserStartedTourRepository } from './user-started-tour.repository';
+import { DishRepository } from './dish.repository';
+import { DishIngredientRepository } from './dish-ingredient.repository';
+import { FoodRepository } from './food.repository';
+import { AgeRangeRepository } from './age-range.repository';
 import { PostRepository } from './post.repository';
 import { CommentRepository } from './comment.repository';
 import { LikeRepository } from './like.repository';
@@ -43,6 +47,10 @@ const Repositories = [
   ChatConversationRepository,
   ChatMessageRepository,
   UserStartedTourRepository,
+  DishRepository,
+  DishIngredientRepository,
+  FoodRepository,
+  AgeRangeRepository,
   PostRepository,
   CommentRepository,
   LikeRepository,
