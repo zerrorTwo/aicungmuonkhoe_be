@@ -1,4 +1,12 @@
-import { IsOptional, IsString, IsNumber, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateConclusionClientDto {
   @IsString()
@@ -91,4 +99,140 @@ export class ConclusionQueryDto {
   @IsOptional()
   @IsString()
   LIMIT?: string;
+}
+
+// ============================================
+// Admin DTOs for Conclusion Management
+// ============================================
+
+export class CreateConclusionManagementDto {
+  @IsString()
+  MODEL: string;
+
+  @IsOptional()
+  @IsString()
+  AGE_TYPE?: string;
+
+  @IsOptional()
+  @IsString()
+  TYPE?: string;
+
+  @IsOptional()
+  @IsString()
+  GENDER?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_FROM?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_TO?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_AND?: string;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_FROM?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_TO?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_ONE_FROM?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_ONE_TO?: number;
+
+  @IsString()
+  CONCLUSION: string;
+
+  @IsString()
+  RECOMMEND: string;
+}
+
+export class UpdateConclusionManagementDto {
+  @IsOptional()
+  @IsString()
+  AGE_TYPE?: string;
+
+  @IsOptional()
+  @IsString()
+  TYPE?: string;
+
+  @IsOptional()
+  @IsString()
+  GENDER?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_FROM?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_TO?: string;
+
+  @IsOptional()
+  @IsString()
+  INDICATOR_AND?: string;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_FROM?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_TO?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_ONE_FROM?: number;
+
+  @IsOptional()
+  @IsNumber()
+  VALUE_ONE_TO?: number;
+
+  @IsOptional()
+  @IsString()
+  CONCLUSION?: string;
+
+  @IsOptional()
+  @IsString()
+  RECOMMEND?: string;
+}
+
+export class BulkCreateConclusionDto {
+  @IsString()
+  model: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @IsOptional()
+  @IsString()
+  ageType?: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateConclusionManagementDto)
+  items: CreateConclusionManagementDto[];
+}
+
+export class ConclusionManagementQueryDto {
+  @IsString()
+  model: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @IsOptional()
+  @IsString()
+  ageType?: string;
 }
