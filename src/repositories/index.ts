@@ -25,6 +25,7 @@ import { AgeRangeRepository } from './age-range.repository';
 import { PostRepository } from './post.repository';
 import { CommentRepository } from './comment.repository';
 import { LikeRepository } from './like.repository';
+import { BannerRepository } from './banner.repository';
 
 const Repositories = [
   UserRepository,
@@ -54,6 +55,7 @@ const Repositories = [
   PostRepository,
   CommentRepository,
   LikeRepository,
+  BannerRepository,
 ];
 
 export default Repositories;

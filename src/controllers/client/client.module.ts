@@ -38,6 +38,7 @@ import { DishCookingMethod } from '../../entities/dish-cooking-method.entity';
 import { Post } from '../../entities/post.entity';
 import { Comment } from '../../entities/comment.entity';
 import { Like } from '../../entities/like.entity';
+import { BannerEntity } from 'src/entities/banner.entity';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { Like } from '../../entities/like.entity';
       Post,
       Comment,
       Like,
+      BannerEntity,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

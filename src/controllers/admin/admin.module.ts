@@ -33,6 +33,7 @@ import { UserStartedTour } from '../../entities/user-started-tour.entity';
 import { Comment } from 'src/entities/comment.entity';
 import { Like } from 'src/entities/like.entity';
 import { Post } from '../../entities/post.entity';
+import { BannerEntity } from 'src/entities/banner.entity';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { Post } from '../../entities/post.entity';
       Comment,
       Like,
       Post,
+      BannerEntity,
     ]),
   ],
   controllers: [...Controllers],

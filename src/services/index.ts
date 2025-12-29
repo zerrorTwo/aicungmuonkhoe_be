@@ -15,6 +15,7 @@ import { AIChatbotService } from './ai-chatbot.service';
 import { UserStartedTourService } from './user-started-tour.service';
 import { DishService } from './dish.service';
 import { CommunityService } from './community.service';
+import { BannerService } from './banner.service';
 
 const Services = [
   UserService,
@@ -34,6 +35,7 @@ const Services = [
   UserStartedTourService,
   DishService,
   CommunityService,
+  BannerService,
 ];
 
 export default Services;
