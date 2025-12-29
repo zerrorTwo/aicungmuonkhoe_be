@@ -156,6 +156,8 @@ export class ConclusionService {
           OFFSET: queryParams.OFFSET,
           LIMIT: queryParams.LIMIT,
           AGE_TYPE: ageTypeFilter,
+          START_TIME: queryParams.START_TIME,
+          END_TIME: queryParams.END_TIME,
           SORT: queryParams.SORT,
         },
       );

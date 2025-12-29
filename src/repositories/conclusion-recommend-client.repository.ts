@@ -72,6 +72,8 @@ export class ConclusionRecommendClientRepository {
     OFFSET?: string;
     LIMIT?: string;
     AGE_TYPE?: string | string[];
+    START_TIME?: string;
+    END_TIME?: string;
     SORT?: string;
   }): Promise<{ data: ConclusionRecommendClient[]; total: number }> {
     const queryBuilder = this.repo.createQueryBuilder('conclusion');
@@ -99,6 +101,16 @@ export class ConclusionRecommendClientRepository {
           ageType: options.AGE_TYPE,
         });
       }
+    }
+
+    if (options.START_TIME && options.END_TIME) {
+      queryBuilder.andWhere(
+        'conclusion.CREATED_DATE BETWEEN :startTime AND :endTime',
+        {
+          startTime: options.START_TIME,
+          endTime: options.END_TIME,
+        },
+      );
     }
 
     // Add sorting
