@@ -8,18 +8,17 @@ import {
   Body,
   HttpStatus,
   HttpException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserRepository } from 'src/repositories/user.repository';
 import { AdminUserQueryDto, AdminUpdateUserDto } from 'src/dtos/user.dto';
+import { AdminGuard } from 'src/utils/auth/admin.guard';
 
 @Controller('users')
+@UseGuards(AdminGuard)
 export class UserAdminController {
   constructor(private readonly userRepository: UserRepository) {}
 
-  /**
-   * GET /admin/users?page=1&limit=10&search=john&status=1&isAdmin=0
-   * Get users list with pagination and filters
-   */
   @Get()
   async getUsers(@Query() query: AdminUserQueryDto) {
     try {
@@ -54,10 +53,6 @@ export class UserAdminController {
     }
   }
 
-  /**
-   * GET /admin/users/stats/overview
-   * Get user statistics
-   */
   @Get('stats/overview')
   async getUserStats() {
     try {
@@ -75,10 +70,6 @@ export class UserAdminController {
     }
   }
 
-  /**
-   * GET /admin/users/:id
-   * Get user details with health documents
-   */
   @Get(':id')
   async getUserDetail(@Param('id') id: string) {
     try {
@@ -102,10 +93,6 @@ export class UserAdminController {
     }
   }
 
-  /**
-   * PATCH /admin/users/:id
-   * Update user (status, admin role, email, phone)
-   */
   @Patch(':id')
   async updateUser(@Param('id') id: string, @Body() data: AdminUpdateUserDto) {
     try {
@@ -129,10 +116,6 @@ export class UserAdminController {
     }
   }
 
-  /**
-   * DELETE /admin/users/:id
-   * Soft delete user
-   */
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
     try {

@@ -79,10 +79,6 @@ export class UserRepository {
     return result;
   }
 
-  // ============================================
-  // Admin Methods
-  // ============================================
-
   async findAllWithPagination(query: {
     page?: number;
     limit?: number;
@@ -96,9 +92,22 @@ export class UserRepository {
 
     const queryBuilder = this.repo
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.HEALTH_DOCUMENTS', 'healthDoc')
-      .leftJoinAndSelect('healthDoc.GENDER', 'gender')
-      .leftJoinAndSelect('healthDoc.PROVINCE', 'province')
+      .leftJoin('user.HEALTH_DOCUMENTS', 'healthDoc')
+      .leftJoin('healthDoc.GENDER', 'gender')
+      .leftJoin('healthDoc.PROVINCE', 'province')
+      .select([
+        'user.USER_ID',
+        'user.EMAIL',
+        'user.PHONE',
+        'user.STATUS_ACTIVE',
+        'user.IS_ADMIN',
+        'user.CREATED_AT',
+        'user.UPDATED_AT',
+        'user.FACE_IMAGE',
+        'healthDoc.FULL_NAME',
+        'gender.NAME',
+        'province.NAME',
+      ])
       .where('user.IS_DELETED = :isDeleted', { isDeleted: 0 });
 
     // Search filter

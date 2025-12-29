@@ -65,5 +65,6 @@ export const pickUser = (user) => {
     'CREATED_AT',
     'UPDATED_AT',
     'PHONE',
+    'IS_ADMIN',
   ]);
 };

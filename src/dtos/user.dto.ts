@@ -8,6 +8,7 @@ import {
   Min,
   IsNumber,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateNewUserDto {
@@ -199,6 +200,7 @@ export class AdminUserQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   page?: number;
 
@@ -208,6 +210,7 @@ export class AdminUserQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   limit?: number;
 
@@ -226,6 +229,7 @@ export class AdminUserQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   status?: number;
 
@@ -235,6 +239,7 @@ export class AdminUserQueryDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   isAdmin?: number;
 }
@@ -246,6 +251,7 @@ export class AdminUpdateUserDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   STATUS_ACTIVE?: number;
 
@@ -255,6 +261,7 @@ export class AdminUpdateUserDto {
     required: false,
   })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   IS_ADMIN?: number;
 

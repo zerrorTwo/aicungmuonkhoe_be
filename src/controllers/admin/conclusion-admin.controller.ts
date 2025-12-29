@@ -1,31 +1,29 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
   Body,
-  Param,
-  Query,
-  HttpStatus,
+  Controller,
+  Delete,
+  Get,
   HttpException,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
-import { ConclusionService } from 'src/services/conclusion.service';
 import {
   BulkCreateConclusionDto,
   UpdateConclusionManagementDto,
-  ConclusionManagementQueryDto,
 } from 'src/dtos/conclusion.dto';
+import { ConclusionService } from 'src/services/conclusion.service';
+import { AdminGuard } from 'src/utils/auth/admin.guard';
 
 @Controller('conclusion-recommendations')
+@UseGuards(AdminGuard)
 export class ConclusionAdminController {
   constructor(private readonly conclusionService: ConclusionService) {}
 
-  /**
-   * GET /admin/conclusion-recommendations?model=GLUCOSE_2H&gender=nam&ageType=FROM_5_LESS_THAN_12
-   * Get conclusion recommendations by model name, gender, and ageType
-   */
   @Get()
   async getConclusionRecommendations(
     @Query('model') model: string,
@@ -58,10 +56,6 @@ export class ConclusionAdminController {
     }
   }
 
-  /**
-   * GET /admin/conclusion-recommendations/:id
-   * Get single conclusion recommendation by ID
-   */
   @Get(':id')
   async getConclusionRecommendation(@Param('id') id: string) {
     try {
@@ -84,10 +78,6 @@ export class ConclusionAdminController {
     }
   }
 
-  /**
-   * POST /admin/conclusion-recommendations
-   * Bulk create/replace conclusion recommendations
-   */
   @Post()
   async createConclusionRecommendations(
     @Body() body: BulkCreateConclusionDto,
@@ -111,10 +101,6 @@ export class ConclusionAdminController {
     }
   }
 
-  /**
-   * PATCH /admin/conclusion-recommendations/:id
-   * Update single conclusion recommendation
-   */
   @Patch(':id')
   async updateConclusionRecommendation(
     @Param('id') id: string,
@@ -142,10 +128,6 @@ export class ConclusionAdminController {
     }
   }
 
-  /**
-   * DELETE /admin/conclusion-recommendations/:id
-   * Delete single conclusion recommendation
-   */
   @Delete(':id')
   async deleteConclusionRecommendation(@Param('id') id: string) {
     try {
@@ -163,10 +145,6 @@ export class ConclusionAdminController {
     }
   }
 
-  /**
-   * GET /admin/conclusion-recommendations/dropdown/:model
-   * Get dropdown options for a specific model
-   */
   @Get('dropdown/:model')
   async getDropdown(@Param('model') model: string) {
     try {
