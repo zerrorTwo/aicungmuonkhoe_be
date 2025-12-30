@@ -14,7 +14,7 @@ export class DishIngredientRepository extends Repository<DishIngredient> {
   async findByDishId(dishId: string): Promise<DishIngredient[]> {
     return this.createQueryBuilder('di')
       .leftJoinAndSelect('di.FOOD', 'food')
-      .where('di.ID = :dishId', { dishId })
+      .where('di.DISH_ID = :dishId', { dishId })
       .getMany();
   }
 }

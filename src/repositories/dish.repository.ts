@@ -14,7 +14,7 @@ export class DishRepository extends Repository<Dish> {
   async findByAgeGroupId(ageGroupId: string): Promise<Dish[]> {
     return this.find({
       where: { AGE_GROUP_ID: ageGroupId, STATUS: 1 },
-      relations: ['AGE_RANGE', 'COOKING_METHOD'],
+      relations: ['AGE_RANGE'],
       order: { CREATED_AT: 'DESC' },
     });
   }
@@ -25,8 +25,6 @@ export class DishRepository extends Repository<Dish> {
   async findByAgeGroupIds(ageGroupIds: string[]): Promise<Dish[]> {
     if (ageGroupIds.length === 0) return [];
     return this.createQueryBuilder('dish')
-      .leftJoinAndSelect('dish.AGE_RANGE', 'ageRange')
-      .leftJoinAndSelect('dish.COOKING_METHOD', 'cookingMethod')
       .where('dish.AGE_GROUP_ID IN (:...ageGroupIds)', { ageGroupIds })
       .andWhere('dish.STATUS = :status', { status: 1 })
       .orderBy('dish.CREATED_AT', 'DESC')
@@ -42,7 +40,7 @@ export class DishRepository extends Repository<Dish> {
   ): Promise<Dish | null> {
     return this.findOne({
       where: { ID: id, AGE_GROUP_ID: ageGroupId },
-      relations: ['AGE_RANGE', 'COOKING_METHOD', 'TAGS'],
+      relations: ['AGE_RANGE', 'TAGS'],
     });
   }
 }

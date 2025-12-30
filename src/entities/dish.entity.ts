@@ -42,6 +42,14 @@ export class Dish {
   @Column({ type: 'varchar', length: 255, name: 'SMALL_IMAGE', nullable: true })
   SMALL_IMAGE: string;
 
+  @Column({
+    type: 'varchar',
+    length: 50,
+    name: 'EXTERNAL_DISH_TYPE_ID',
+    nullable: true,
+  })
+  EXTERNAL_DISH_TYPE_ID: string;
+
   @Column({ type: 'varchar', length: 255, name: 'LARGE_IMAGE', nullable: true })
   LARGE_IMAGE: string;
 

@@ -9,6 +9,9 @@ export class DishIngredient {
   @PrimaryColumn({ type: 'int', name: 'INGREDIENT_ID' })
   INGREDIENT_ID: number;
 
+  @Column({ type: 'varchar', length: 50, name: 'DISH_ID', nullable: true })
+  DISH_ID: string;
+
   @Column({
     type: 'decimal',
     precision: 10,

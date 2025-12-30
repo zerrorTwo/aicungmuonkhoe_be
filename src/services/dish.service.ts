@@ -163,7 +163,9 @@ export class DishService {
     }
 
     // Get ingredients with food details
-    const ingredients = await this.dishIngredientRepository.findByDishId(id);
+    const ingredients = await this.dishIngredientRepository.findByDishId(
+      dish.ID,
+    );
 
     console.log('=== DEBUG DISH INGREDIENTS ===');
     console.log('Total ingredients found:', ingredients.length);
