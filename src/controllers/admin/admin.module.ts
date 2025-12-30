@@ -34,6 +34,7 @@ import { Comment } from 'src/entities/comment.entity';
 import { Like } from 'src/entities/like.entity';
 import { Post } from '../../entities/post.entity';
 import { BannerEntity } from 'src/entities/banner.entity';
+import { MaterialGroup } from '../../entities/material_group.entity';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { BannerEntity } from 'src/entities/banner.entity';
       Like,
       Post,
       BannerEntity,
+      MaterialGroup,
     ]),
   ],
   controllers: [...Controllers],

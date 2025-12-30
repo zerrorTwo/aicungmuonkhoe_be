@@ -16,10 +16,17 @@ export class CloudinaryProvider {
   async uploadStream(
     file: Express.Multer.File,
     folderName: string = 'avatarHealth',
+    publicId?: string,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
+      const options: any = { folder: folderName };
+      if (publicId) {
+        options.public_id = publicId;
+        options.overwrite = true;
+      }
+
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: folderName },
+        options,
         (error, result) => {
           if (result) {
             resolve(result);
