@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { DishTag } from './dish-tag.entity';
 import { AgeRange } from './age-range.entity';
-import { DishCookingMethod } from './dish-cooking-method.entity';
 
 @Entity('dish')
 export class Dish {
@@ -77,11 +76,6 @@ export class Dish {
   @ManyToOne(() => AgeRange, (ageRange) => ageRange.DISHES)
   @JoinColumn({ name: 'AGE_GROUP_ID', referencedColumnName: 'ID' })
   AGE_RANGE: AgeRange;
-
-  // Dish -> CookingMethod
-  @ManyToOne(() => DishCookingMethod, (method) => method.DISHES)
-  @JoinColumn({ name: 'COOKING_METHOD_ID', referencedColumnName: 'ID' })
-  COOKING_METHOD: DishCookingMethod;
 
   // Dish -> DishTag
   @OneToMany(() => DishTag, (tag) => tag.DISH)

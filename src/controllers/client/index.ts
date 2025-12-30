@@ -13,6 +13,7 @@ import { ChatbotController } from './chatbot.controller';
 import { UserStartedTourController } from './user-started-tour.controller';
 import { DishController } from './dish.controller';
 import { CommunityController } from './community.controller';
+import { BannerClientController } from './banner-client.controller';
 
 const Controllers = [
   UserController,
@@ -30,6 +31,7 @@ const Controllers = [
   UserStartedTourController,
   DishController,
   CommunityController,
+  BannerClientController,
 ];
 
 export default Controllers;

@@ -66,4 +66,7 @@ export class BannerService {
     this.logger.log(`Deleting banner ${id}`);
     return this.bannerRepository.delete(id);
   }
+  async getActiveBanners(): Promise<BannerEntity[]> {
+    return this.bannerRepository.findActive();
+  }
 }

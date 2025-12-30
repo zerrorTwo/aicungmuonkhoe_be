@@ -43,7 +43,6 @@ export class DishService {
         NAME: dish.NAME,
         REGION_ID: dish.REGION_ID,
         COOKING_METHOD_ID: dish.COOKING_METHOD_ID,
-        COOKING_METHOD_NAME: dish.COOKING_METHOD?.NAME,
         MEAL_STRUCTURE_ID: dish.MEAL_STRUCTURE_ID,
         SMALL_IMAGE:
           dish.SMALL_IMAGE ||
@@ -256,7 +255,6 @@ export class DishService {
       NAME: dish.NAME,
       REGION_ID: dish.REGION_ID,
       COOKING_METHOD_ID: dish.COOKING_METHOD_ID,
-      COOKING_METHOD_NAME: dish.COOKING_METHOD?.NAME,
       MEAL_STRUCTURE_ID: dish.MEAL_STRUCTURE_ID,
       SMALL_IMAGE:
         dish.SMALL_IMAGE || 'https://via.placeholder.com/300x200?text=No+Image',

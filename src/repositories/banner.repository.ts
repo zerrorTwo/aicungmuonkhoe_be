@@ -77,4 +77,10 @@ export class BannerRepository {
 
     return { banners, total };
   }
+  async findActive(): Promise<BannerEntity[]> {
+    return this.repo.find({
+      where: { ACTIVE: true },
+      order: { CREATED_AT: 'DESC' },
+    });
+  }
 }
