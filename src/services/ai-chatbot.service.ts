@@ -87,6 +87,8 @@ export class AIChatbotService {
 
       // 4. Generate response
       let aiResponse = '';
+      let actionData: any = null;
+
       if (ruleBasedResult) {
         aiResponse = await this.generateNaturalResponse(
           userMessage,
@@ -94,14 +96,38 @@ export class AIChatbotService {
           intent,
           conversationId,
           history,
+          healthData,
         );
+
+        // Check if response contains dish recommendation action
+        if (
+          intent === ChatbotIntentEnum.DISH_RECOMMENDATION ||
+          aiResponse.includes('Phù hợp với bạn')
+        ) {
+          actionData = {
+            action: 'navigate_to_recommended_dishes',
+            hasHealthData: !!(healthData?.weight && healthData?.height),
+          };
+        }
       } else {
         aiResponse = await this.generateGeneralResponse(
           userMessage,
           intent,
           conversationId,
           history,
+          healthData,
         );
+
+        // Check if AI triggered function calling for dish recommendation
+        if (
+          aiResponse.includes('Phù hợp với bạn') ||
+          aiResponse.includes('Thực đơn cá nhân')
+        ) {
+          actionData = {
+            action: 'navigate_to_recommended_dishes',
+            hasHealthData: !!(healthData?.weight && healthData?.height),
+          };
+        }
       }
 
       // Save assistant message
@@ -116,7 +142,7 @@ export class AIChatbotService {
       return {
         message: aiResponse,
         intent,
-        data: ruleBasedResult,
+        data: actionData || ruleBasedResult,
         conversationId,
       };
     } catch (error) {
@@ -272,6 +298,7 @@ export class AIChatbotService {
     intent: ChatbotIntentEnum,
     conversationId: string,
     history: any[],
+    healthData?: any,
   ): Promise<string> {
     if (!this.mistralClient) {
       return this.formatRuleBasedResponse(ruleData, intent);
@@ -286,6 +313,7 @@ export class AIChatbotService {
         userMessage,
         context,
         history,
+        healthData,
       );
       return s;
     } catch (error) {
@@ -302,6 +330,7 @@ export class AIChatbotService {
     intent: ChatbotIntentEnum,
     conversationId: string,
     history: any[],
+    healthData?: any,
   ): Promise<string> {
     if (!this.mistralClient) {
       return this.getDefaultResponse(intent);
@@ -315,6 +344,7 @@ export class AIChatbotService {
         userMessage,
         '',
         history,
+        healthData,
       );
       return s;
     } catch (error) {
@@ -324,13 +354,14 @@ export class AIChatbotService {
   }
 
   /**
-   * Gọi Mistral AI API
+   * Gọi Mistral AI API với function calling
    */
   private async callMistralAPI(
     systemPrompt: string,
     userMessage: string,
     context: string,
     history: any[],
+    healthData?: any,
   ): Promise<string> {
     // Build messages array theo format của Mistral
     const messages: any[] = [{ role: 'system', content: systemPrompt }];
@@ -347,28 +378,93 @@ export class AIChatbotService {
     }
     messages.push({ role: 'user', content: userContent });
 
-    // Gọi Mistral API
-    const chatResponse = await this.mistralClient.chat.complete({
-      model: 'mistral-small-latest', // Hoặc 'mistral-large-latest' tùy nhu cầu
-      messages: messages,
-      temperature: 0.7,
-      maxTokens: 500,
-    });
+    // Định nghĩa function/tool cho dish recommendation
+    const tools: any[] = [
+      {
+        type: 'function',
+        function: {
+          name: 'recommend_dishes_by_health',
+          description:
+            'Gợi ý món ăn phù hợp dựa trên tình trạng sức khỏe của người dùng. Sử dụng khi người dùng hỏi về món ăn, thực đơn, nên ăn gì.',
+          parameters: {
+            type: 'object',
+            properties: {
+              reason: {
+                type: 'string',
+                description: 'Lý do gợi ý món ăn dựa trên tình trạng sức khỏe',
+              },
+            },
+            required: ['reason'],
+          },
+        },
+      },
+    ];
 
-    // Lấy content từ response
-    const content = chatResponse.choices?.[0]?.message?.content;
+    try {
+      // Gọi Mistral API với tools
+      const chatResponse = await this.mistralClient.chat.complete({
+        model: 'mistral-small-latest',
+        messages: messages,
+        tools: tools,
+        toolChoice: 'auto', // AI tự quyết định khi nào gọi function
+        temperature: 0.7,
+        maxTokens: 500,
+      });
 
-    if (typeof content === 'string') {
-      return content;
-    } else if (Array.isArray(content)) {
-      // Nếu content là array, ghép các phần text lại
-      return content
-        .filter((item: any) => item.type === 'text')
-        .map((item: any) => item.text)
-        .join('');
+      const message = chatResponse.choices?.[0]?.message;
+
+      // Kiểm tra xem AI có gọi tool không
+      if (message?.toolCalls && message.toolCalls.length > 0) {
+        const toolCall = message.toolCalls[0];
+
+        if (toolCall.function.name === 'recommend_dishes_by_health') {
+          // AI muốn gọi function recommend dishes
+          this.logger.log('AI triggered function: recommend_dishes_by_health');
+
+          // Kiểm tra healthData
+          if (!healthData || !healthData.weight || !healthData.height) {
+            return 'Để tôi có thể gợi ý món ăn phù hợp, bạn cần cập nhật thông tin sức khỏe (cân nặng, chiều cao, BMI, đường huyết, cholesterol) trong hồ sơ của bạn. Sau đó hãy quay lại trang Tư vấn sức khỏe → Thực đơn cá nhân → tab "Phù hợp với bạn" để xem gợi ý.';
+          }
+
+          // Parse function arguments
+          const args =
+            typeof toolCall.function.arguments === 'string'
+              ? JSON.parse(toolCall.function.arguments)
+              : toolCall.function.arguments;
+
+          // Tạo response với hướng dẫn navigate
+          const response = `Dựa trên tình trạng sức khỏe của bạn, tôi có một số gợi ý món ăn phù hợp! 
+
+${args.reason || 'Các món ăn được lựa chọn dựa trên chỉ số sức khỏe của bạn.'}
+
+Để xem danh sách món ăn được đề xuất chi tiết, hãy:
+1. Vào trang **Tư vấn sức khỏe**
+2. Chọn **Thực đơn cá nhân**
+3. Chuyển sang tab **"Phù hợp với bạn"**
+
+Tôi sẽ tự động chuyển bạn đến đó ngay bây giờ! 🍽️`;
+
+          return response;
+        }
+      }
+
+      // Không có tool call, trả response bình thường
+      const content = message?.content;
+
+      if (typeof content === 'string') {
+        return content;
+      } else if (Array.isArray(content)) {
+        return content
+          .filter((item: any) => item.type === 'text')
+          .map((item: any) => item.text)
+          .join('');
+      }
+
+      return 'Xin lỗi, tôi không thể tạo câu trả lời lúc này.';
+    } catch (error) {
+      this.logger.error('Mistral API error:', error);
+      throw error;
     }
-
-    return 'Xin lỗi, tôi không thể tạo câu trả lời lúc này.';
   }
 
   //System prompt cho AI
@@ -377,6 +473,7 @@ export class AIChatbotService {
 Nhiệm vụ của bạn:
 - Trả lời các câu hỏi về sức khỏe một cách thân thiện, dễ hiểu
 - Sử dụng dữ liệu phân tích sức khỏe được cung cấp để đưa ra câu trả lời chính xác
+- Khi người dùng hỏi về món ăn, thực đơn, nên ăn gì - hãy sử dụng function recommend_dishes_by_health để gợi ý món ăn phù hợp với tình trạng sức khỏe
 - Luôn khuyến khích người dùng đi khám bác sĩ khi cần thiết
 - Không đưa ra chẩn đoán y tế, chỉ cung cấp thông tin tham khảo
 - Trả lời bằng tiếng Việt, giọng điệu thân thiện và chuyên nghiệp

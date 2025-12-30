@@ -51,6 +51,23 @@ export class HealthChatbotService {
       return ChatbotIntentEnum.BLOOD_SUGAR_INQUIRY;
     }
 
+    // Dish Recommendation Intent
+    if (
+      lowerMessage.includes('món ăn') ||
+      lowerMessage.includes('mon an') ||
+      lowerMessage.includes('nên ăn') ||
+      lowerMessage.includes('nen an') ||
+      lowerMessage.includes('ăn gì') ||
+      lowerMessage.includes('an gi') ||
+      lowerMessage.includes('thực đơn') ||
+      lowerMessage.includes('thuc don') ||
+      lowerMessage.includes('món nào') ||
+      lowerMessage.includes('gợi ý món') ||
+      lowerMessage.includes('goi y mon')
+    ) {
+      return ChatbotIntentEnum.DISH_RECOMMENDATION;
+    }
+
     // Health Advice Intent
     if (
       lowerMessage.includes('lời khuyên') ||
@@ -454,6 +471,23 @@ export class HealthChatbotService {
           return this.evaluateBloodSugar(healthData.bloodSugar);
         }
         return null;
+
+      case ChatbotIntentEnum.DISH_RECOMMENDATION:
+        // Return metadata to trigger frontend navigation
+        if (healthData) {
+          return {
+            action: 'navigate_to_recommended_dishes',
+            hasHealthData: true,
+            message:
+              'Để xem món ăn phù hợp với sức khỏe của bạn, hãy chuyển sang tab "Phù hợp với bạn" trong phần Thực đơn cá nhân.',
+          };
+        }
+        return {
+          action: 'navigate_to_recommended_dishes',
+          hasHealthData: false,
+          message:
+            'Vui lòng cập nhật thông tin sức khỏe (BMI, đường huyết, cholesterol) để nhận được gợi ý món ăn phù hợp.',
+        };
 
       case ChatbotIntentEnum.GENERAL_HEALTH_INQUIRY:
         if (healthData) {
