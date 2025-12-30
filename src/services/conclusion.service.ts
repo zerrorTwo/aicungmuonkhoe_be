@@ -501,22 +501,22 @@ export class ConclusionService {
       const { model, gender, ageType, items } = data;
 
       // Delete existing data based on model type
-      if (model === 'BMI' && ageType) {
-        await this._conclusionRecommendManagementRepository.deleteByFilter(
-          model,
-          gender,
-          ageType,
-        );
-      } else if (gender) {
-        await this._conclusionRecommendManagementRepository.deleteByModelAndGender(
-          model,
-          gender,
-        );
-      } else {
-        await this._conclusionRecommendManagementRepository.deleteByModel(
-          model,
-        );
-      }
+      // if (model === 'BMI' && ageType) {
+      //   await this._conclusionRecommendManagementRepository.deleteByFilter(
+      //     model,
+      //     gender,
+      //     ageType,
+      //   );
+      // } else if (gender) {
+      //   await this._conclusionRecommendManagementRepository.deleteByModelAndGender(
+      //     model,
+      //     gender,
+      //   );
+      // } else {
+      //   await this._conclusionRecommendManagementRepository.deleteByModel(
+      //     model,
+      //   );
+      // }
 
       // Create new items
       const createPromises = items.map((item) => {

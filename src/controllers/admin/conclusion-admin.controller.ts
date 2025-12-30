@@ -85,7 +85,7 @@ export class ConclusionAdminController {
   ) {
     try {
       // TODO: Extract user ID from JWT token in req.user
-      const userId = req.user?.userId || 1; // Default to 1 for now
+      const userId = req.user?.USER_ID || 1; // Default to 1 for now
 
       await this.conclusionService.bulkCreateConclusionManagement(body, userId);
 
@@ -108,7 +108,7 @@ export class ConclusionAdminController {
     @Request() req: any,
   ) {
     try {
-      const userId = req.user?.userId || 1;
+      const userId = req.user?.USER_ID || 1;
 
       await this.conclusionService.updateConclusionManagement(
         parseInt(id),
