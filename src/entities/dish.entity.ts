@@ -12,14 +12,12 @@ import { DishCookingMethod } from './dish-cooking-method.entity';
 
 @Entity('dish')
 export class Dish {
-  // ===== COMPOSITE PRIMARY KEY =====
   @PrimaryColumn({ type: 'varchar', length: 50, name: 'ID' })
   ID: string;
 
   @PrimaryColumn({ type: 'varchar', length: 50, name: 'AGE_GROUP_ID' })
   AGE_GROUP_ID: string;
 
-  // ===== BASIC INFO =====
   @Column({ type: 'varchar', length: 255, name: 'NAME', nullable: true })
   NAME: string;
 

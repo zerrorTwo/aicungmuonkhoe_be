@@ -23,6 +23,34 @@ export class DishController {
   }
 
   /**
+   * Get recommended dishes based on health
+   * GET /api/dishes/recommended?age=25&healthDocumentId=1
+   */
+  @Get('recommended')
+  async getRecommendedDishes(
+    @Query('age') age: string,
+    @Query('healthDocumentId') healthDocumentId: string,
+  ): Promise<{
+    success: boolean;
+    data: DishBasicResponseDto[];
+    hasHealthData: boolean;
+  }> {
+    const ageInYears = parseInt(age, 10);
+    const healthDocId = parseInt(healthDocumentId, 10);
+
+    const result = await this.dishService.getRecommendedDishesByHealth(
+      ageInYears,
+      healthDocId,
+    );
+
+    return {
+      success: true,
+      data: result.dishes,
+      hasHealthData: result.hasHealthData,
+    };
+  }
+
+  /**
    * Get dish detail
    * GET /api/dishes/:id/detail?ageGroupId=DT13
    */

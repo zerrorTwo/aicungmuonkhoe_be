@@ -29,15 +29,15 @@ export class ConclusionRecommendClientRepository {
     return result;
   }
 
-  async findByHealthDocumentId(
-    healthDocumentId: number,
-  ): Promise<ConclusionRecommendClient[]> {
-    const result = await this.repo.find({
-      where: { HEALTH_DOCUMENT_ID: healthDocumentId },
-      relations: ['HEALTH_DOCUMENT'],
-    });
-    return result;
-  }
+  // async findByHealthDocumentId(
+  //   healthDocumentId: number,
+  // ): Promise<ConclusionRecommendClient[]> {
+  //   const result = await this.repo.find({
+  //     where: { HEALTH_DOCUMENT_ID: healthDocumentId },
+  //     relations: ['HEALTH_DOCUMENT'],
+  //   });
+  //   return result;
+  // }
 
   async update(
     id: number,
@@ -178,5 +178,23 @@ export class ConclusionRecommendClientRepository {
     const data = await queryBuilder.getMany();
 
     return data;
+  }
+
+  async findByHealthDocumentId(
+    healthDocumentId: number,
+    limit?: number,
+  ): Promise<ConclusionRecommendClient[]> {
+    const queryBuilder = this.repo
+      .createQueryBuilder('conclusion')
+      .where('conclusion.HEALTH_DOCUMENT_ID = :healthDocumentId', {
+        healthDocumentId,
+      })
+      .orderBy('conclusion.CREATED_DATE', 'DESC');
+
+    if (limit) {
+      queryBuilder.limit(limit);
+    }
+
+    return await queryBuilder.getMany();
   }
 }
