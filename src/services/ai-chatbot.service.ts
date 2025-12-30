@@ -195,55 +195,54 @@ export class AIChatbotService {
         this.healthChatbotService.analyzeOverallHealth(healthData);
 
       // Format message với các chỉ số cụ thể
-      let message = `📊 **Phân tích sức khỏe của bạn**\n\n`;
+      let message = `[PHÂN TÍCH SỨC KHỎE]\n\n`;
 
       // Hiển thị các chỉ số đầu vào
-      message += `📌 **Thông tin cơ bản:**\n`;
+      message += `Thông tin cơ bản:\n`;
       if (healthData.weight && healthData.height) {
-        message += `• Cân nặng: ${healthData.weight} kg\n`;
-        message += `• Chiều cao: ${healthData.height} cm\n`;
+        message += `- Cân nặng: ${healthData.weight} kg\n`;
+        message += `- Chiều cao: ${healthData.height} cm\n`;
       }
       if (healthData.age) {
-        message += `• Tuổi: ${healthData.age}\n`;
+        message += `- Tuổi: ${healthData.age}\n`;
       }
       if (healthData.bloodPressureSys && healthData.bloodPressureDia) {
-        message += `• Huyết áp: ${healthData.bloodPressureSys}/${healthData.bloodPressureDia} mmHg\n`;
+        message += `- Huyết áp: ${healthData.bloodPressureSys}/${healthData.bloodPressureDia} mmHg\n`;
       }
       if (healthData.bloodSugar) {
-        message += `• Đường huyết: ${healthData.bloodSugar} mg/dL\n`;
+        message += `- Đường huyết: ${healthData.bloodSugar} mg/dL\n`;
       }
       message += `\n`;
 
       // Kết luận tổng quan
-      message += `📝 **Đánh giá tổng quan:**\n${analysisResult.summary}\n\n`;
+      message += `Đánh giá tổng quan:\n${analysisResult.summary}\n\n`;
 
       if (analysisResult.details.length > 0) {
-        message += `📋 **Chi tiết phân tích:**\n`;
+        message += `Chi tiết phân tích:\n`;
         analysisResult.details.forEach((detail) => {
-          const emoji = this.getHealthEmoji(detail.type);
-          message += `\n${emoji} **${detail.category}**\n`;
+          message += `\n${detail.category}:\n`;
 
           // Hiển thị giá trị cụ thể
           if (detail.category === 'BMI' && detail.bmi) {
-            message += `   Chỉ số BMI: ${detail.bmi}\n`;
+            message += `  Chỉ số BMI: ${detail.bmi}\n`;
           } else if (
             detail.category === 'Huyết áp' &&
             detail.systolic &&
             detail.diastolic
           ) {
-            message += `   Huyết áp: ${detail.systolic}/${detail.diastolic} mmHg\n`;
+            message += `  Huyết áp: ${detail.systolic}/${detail.diastolic} mmHg\n`;
           } else if (detail.category === 'Đường huyết' && detail.bloodSugar) {
             message += `   Đường huyết: ${detail.bloodSugar} mg/dL\n`;
           }
 
-          message += `   ➜ Phân loại: ${detail.type}\n`;
-          message += `   ➜ ${detail.conclusion}\n`;
+          message += `  Phân loại: ${detail.type}\n`;
+          message += `  ${detail.conclusion}\n`;
         });
         message += `\n`;
       }
 
       if (analysisResult.recommendations.length > 0) {
-        message += `💡 **Khuyến cáo:**\n`;
+        message += `Khuyến cáo:\n`;
         analysisResult.recommendations.forEach((rec, index) => {
           message += `${index + 1}. ${rec}\n`;
         });
