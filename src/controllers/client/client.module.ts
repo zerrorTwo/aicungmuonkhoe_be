@@ -39,6 +39,7 @@ import { Post } from '../../entities/post.entity';
 import { Comment } from '../../entities/comment.entity';
 import { Like } from '../../entities/like.entity';
 import { BannerEntity } from 'src/entities/banner.entity';
+import { MaterialGroup } from '../../entities/material_group.entity';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { BannerEntity } from 'src/entities/banner.entity';
       Comment,
       Like,
       BannerEntity,
+      MaterialGroup,
     ]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,

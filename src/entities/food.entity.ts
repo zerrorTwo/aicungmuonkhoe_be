@@ -9,45 +9,14 @@ export class Food {
   @Column({ type: 'varchar', length: 255, name: 'NAME', nullable: true })
   NAME: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'GROUP_FOOD', nullable: true })
-  GROUP_FOOD: string;
-
   @Column({
     type: 'varchar',
     length: 255,
-    name: 'PROTEIN_CLASSIFICATION',
+    name: 'GROUP_MATERIAL',
     nullable: true,
   })
-  PROTEIN_CLASSIFICATION: string;
+  GROUP_MATERIAL: string;
 
-  @Column({
-    type: 'varchar',
-    length: 255,
-    name: 'SUGAR_CLASSIFICATION',
-    nullable: true,
-  })
-  SUGAR_CLASSIFICATION: string;
-
-  @Column({
-    type: 'varchar',
-    length: 255,
-    name: 'FRUIT_CLASSIFICATION',
-    nullable: true,
-  })
-  FRUIT_CLASSIFICATION: string;
-
-  @Column({ type: 'varchar', length: 255, name: 'FOOD_SNACK', nullable: true })
-  FOOD_SNACK: string;
-
-  @Column({
-    type: 'varchar',
-    length: 255,
-    name: 'STANDARD_VOLUME',
-    nullable: true,
-  })
-  STANDARD_VOLUME: string;
-
-  // ===== DECIMAL =====
   @Column({
     type: 'decimal',
     precision: 10,
@@ -194,15 +163,6 @@ export class Food {
   })
   IMAGE_COOKED: string;
 
-  @Column({
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
-    name: 'REMOVE_FOOD_WEIGHT',
-    nullable: true,
-  })
-  REMOVE_FOOD_WEIGHT: number;
-
   @Column({ type: 'datetime', name: 'CREATED_DATE', nullable: true })
   CREATED_DATE: Date;
 
@@ -215,7 +175,6 @@ export class Food {
   @Column({ type: 'int', name: 'UPDATED_BY', nullable: true })
   UPDATED_BY: number;
 
-  // ===== RELATION (LOGICAL ONLY) =====
   @OneToMany(() => DishIngredient, (di) => di.FOOD)
   DISH_INGREDIENTS: DishIngredient[];
 }

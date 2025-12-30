@@ -16,6 +16,8 @@ import { UserStartedTourService } from './user-started-tour.service';
 import { DishService } from './dish.service';
 import { CommunityService } from './community.service';
 import { BannerService } from './banner.service';
+import { FoodService } from './food.service';
+import { MaterialGroupService } from './material-group.service';
 
 const Services = [
   UserService,
@@ -36,6 +38,8 @@ const Services = [
   DishService,
   CommunityService,
   BannerService,
+  FoodService,
+  MaterialGroupService,
 ];
 
 export default Services;
