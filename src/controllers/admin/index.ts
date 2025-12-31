@@ -3,6 +3,7 @@ import { UserAdminController } from './user-admin.controller';
 import { BannerAdminController } from './banner-admin.controller';
 import { FoodAdminController } from './food-admin.controller';
 import { MaterialGroupAdminController } from './material-group-admin.controller';
+import { DishAdminController } from './dish-admin.controller';
 
 const Controllers = [
   ConclusionAdminController,
@@ -10,6 +11,7 @@ const Controllers = [
   BannerAdminController,
   FoodAdminController,
   MaterialGroupAdminController,
+  DishAdminController,
 ];
 
 export default Controllers;
